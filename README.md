@@ -236,6 +236,7 @@ livrables/
   questions-jury.md          Questions probables et éléments de réponse
 prototype/                   Code de la démo (une partie par développeur, voir prototype/README.md)
   plateforme/                DEV-1 : box.sh, services Docker, installeur, sauvegarde, vérification hors ligne
+  ia/                        DEV-2 : assistant IA (droits Nextcloud, citations, refus), mesures des modèles
   donnees-demo/              Cabinet FICTIF de la démo : documents, agendas, contacts, droits
 reference/                   PDF officiel du challenge
 ```

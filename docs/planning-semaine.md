@@ -42,9 +42,9 @@ Règles valables tous les jours :
 - [x] Créer le **jeu de données fictif** : un faux cabinet avec 3 faux dossiers clients (20 à 30 documents), un agenda rempli, des contacts. Bien marqué « fictif ». *(30 documents, 20 événements, 14 contacts : `prototype/donnees-demo/`.)*
 
 **DEV-2**
-- [ ] Installer le moteur d'inférence local et télécharger 2 ou 3 modèles candidats.
+- [x] Installer le moteur d'inférence local et télécharger 2 ou 3 modèles candidats. *(3 nov : Ollama dans la box ; candidats Qwen3.6-35B-A3B avec Colibri, déjà sur la machine, et qwen3:4b. Le réseau de l'école, entre 0,3 et 3 Mo/s, a limité le nombre de modèles.)*
 - [ ] Mesurer sur le matériel de démo : vitesse (tokens par seconde), temps jusqu'au premier mot, qualité en français sur 5 questions types. Noter les résultats dans [`prototype.md`](prototype.md).
-- [ ] Premier prototype de recherche dans les documents (RAG) sur une dizaine de PDF fictifs, avec citation du document source.
+- [x] Premier prototype de recherche dans les documents (RAG) sur une dizaine de PDF fictifs, avec citation du document source. *(Fait sur les 30 documents du cabinet fictif : `prototype/ia/`.)*
 
 **DEV-3**
 - [ ] **Landing page + formulaire de liste d'attente en ligne ce soir.** Formulaire conforme au RGPD : consentement explicite, finalité indiquée, lien vers une courte mention de confidentialité.
@@ -98,7 +98,7 @@ Règles valables tous les jours :
 
 **DEV-2**
 - [ ] Assistant IA qui cherche dans les fichiers **et** l'agenda, respecte les droits de l'utilisateur, **n'accède jamais au coffre-fort**, et cite ses sources.
-- [ ] Pack métier : vérifier la licence et le format d'un jeu de données ouvert utile aux avocats (textes juridiques, jurisprudence), et l'intégrer si c'est faisable en une demi-journée. Sinon, le présenter comme roadmap.
+- [x] Pack métier : vérifier la licence et le format d'un jeu de données ouvert utile aux avocats (textes juridiques, jurisprudence), et l'intégrer si c'est faisable en une demi-journée. Sinon, le présenter comme roadmap. *(Vérifié le 3 nov : LEGI et jurisprudence de la Cour de cassation, licence ouverte. Pas faisable en une demi-journée : roadmap, voir `prototype.md`, section 3.)*
 - [ ] Préparer les 3 questions exactes de la démo et vérifier que les réponses sont bonnes à chaque essai.
 
 **DEV-3**

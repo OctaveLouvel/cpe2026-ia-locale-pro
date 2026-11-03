@@ -390,6 +390,110 @@ cmd_restaurer() {
     afficher_adresses
 }
 
+# ---------------------------------------------------------------- vérification hors ligne
+#
+# Automatise la liste de vérification de docs/prototype.md (section 9). À lancer câble débranché
+# et wifi coupé : le mercredi à 16 h, puis le vendredi matin avant le passage devant le jury.
+
+cmd_verifier_hors_ligne() {
+    charger_env
+    local echecs=0 alertes=0 ip=127.0.0.1 domaine=$BOX_DOMAIN mdp=$DEMO_MOT_DE_PASSE
+    [ "$BIND_ADDRESS" != 0.0.0.0 ] && ip=$BIND_ADDRESS
+    local CURL=(curl -sS --max-time 15 --cacert "$SORTIE/autorite-locale.crt"
+                --resolve "$domaine:443:$ip" --resolve "cloud.$domaine:443:$ip" --resolve "coffre.$domaine:443:$ip")
+    reussi() { ok "$*"; }
+    rate() { printf '\033[1;31m ÉCHEC\033[0m %s\n' "$*"; echecs=$((echecs + 1)); }
+    attention() { alerte "$*"; alertes=$((alertes + 1)); }
+
+    info "1. Coupure réseau de la machine"
+    if ip route show default 2>/dev/null | grep -q .; then
+        attention "une route par défaut existe : la machine est encore connectée (débrancher le câble, couper le wifi)"
+    else
+        reussi "aucune route vers internet"
+    fi
+
+    info "2. Services"
+    local service etat
+    for service in proxy nextcloud nextcloud-cron db cache coffre; do
+        etat=$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
+               "$("${COMPOSE[@]}" ps -q "$service" 2>/dev/null)" 2>/dev/null || echo absent)
+        case $etat in healthy|running) reussi "$service : $etat" ;; *) rate "$service : $etat" ;; esac
+    done
+    [ -s "$SORTIE/autorite-locale.crt" ] || exporter_certificat >/dev/null
+
+    info "3. Isolement réseau des services"
+    if [ "$(docker network inspect -f '{{.Internal}}' box_interne)" = true ]; then
+        reussi "réseau des services « interne » : sans accès à internet par construction"
+    else
+        rate "le réseau box_interne n'est pas marqué internal"
+    fi
+    local relies
+    relies=$(docker network inspect -f '{{range .Containers}}{{.Name}} {{end}}' box_frontal)
+    if [ "$(echo "$relies" | wc -w)" -le 1 ] && [[ $relies == *proxy* ]]; then
+        reussi "seul le reverse proxy est relié au réseau de l'hôte"
+    else
+        rate "conteneurs reliés au réseau de l'hôte : $relies"
+    fi
+    if "${COMPOSE[@]}" exec -T nextcloud curl -sS --max-time 5 -o /dev/null https://www.example.com 2>/dev/null; then
+        rate "Nextcloud arrive à joindre internet"
+    else
+        reussi "Nextcloud ne peut pas joindre internet (essai vers www.example.com refusé)"
+    fi
+    local reglage valeur
+    for reglage in has_internet_connection appstoreenabled updatechecker; do
+        valeur=$(occ config:system:get "$reglage" 2>/dev/null | tr -d '\r')
+        [ "$valeur" = false ] && reussi "Nextcloud : $reglage = false" || rate "Nextcloud : $reglage = ${valeur:-non défini}"
+    done
+
+    info "4. Pages chargées sans ressource externe (CDN, polices, scripts)"
+    local page html externes
+    for page in "https://$domaine/" "https://cloud.$domaine/login" "https://coffre.$domaine/"; do
+        if ! html=$("${CURL[@]}" -f "$page"); then
+            rate "$page ne se charge pas"; continue
+        fi
+        externes=$(grep -oiE '<(script|link|img|iframe)[^>]+(src|href)="(https?:)?//[^"]+"' <<<"$html" \
+                   | grep -oiE '(https?:)?//[^/"]+' | grep -viE "//([a-z0-9-]+\.)*${domaine//./\\.}$" | sort -u | tr '\n' ' ' || true)
+        [ -z "$externes" ] && reussi "$page : aucune ressource externe" || rate "$page charge des ressources externes : $externes"
+    done
+
+    info "5. Données de démonstration et droits"
+    local nb
+    nb=$("${CURL[@]}" -u "hcorbiere:$mdp" -X PROPFIND -H 'Depth: infinity' \
+         "https://cloud.$domaine/remote.php/dav/files/hcorbiere/Dossiers%20clients/" | grep -o '<d:getcontenttype>' | wc -l)
+    [ "$nb" -ge 26 ] && reussi "l'associée voit $nb documents dans « Dossiers clients »" \
+                     || rate "l'associée ne voit que $nb documents (jeu de démo chargé ? ./box.sh donnees-demo)"
+    local lefort="Dossiers clients/2026-009 Lefort - divorce amiable/03 Inventaire du patrimoine des époux Lefort.pdf" code
+    code=$("${CURL[@]}" -o /dev/null -w '%{http_code}' -u "ibelkacem:$mdp" \
+           "https://cloud.$domaine/remote.php/dav/files/hcorbiere/$(encoder_url "$lefort")")
+    [ "$code" = 404 ] && reussi "refus d'accès : la stagiaire ne peut pas lire le dossier Lefort (HTTP 404)" \
+                      || rate "la stagiaire obtient HTTP $code sur un document du dossier Lefort"
+    nb=$("${CURL[@]}" -u "hcorbiere:$mdp" -X PROPFIND -H 'Depth: 1' \
+         "https://cloud.$domaine/remote.php/dav/calendars/hcorbiere/audiences/" | grep -o '\.ics<' | wc -l)
+    [ "$nb" -ge 1 ] && reussi "agenda « Audiences et échéances » : $nb événements" || rate "agenda des audiences vide"
+
+    info "6. Journal d'audit de Nextcloud"
+    nb=$("${COMPOSE[@]}" exec -T nextcloud sh -c 'wc -l < /var/www/html/data/audit.log' 2>/dev/null | tr -d '[:space:]')
+    [ "${nb:-0}" -gt 0 ] && reussi "data/audit.log : ${nb} événements (connexions, accès et partages)" \
+                         || attention "journal d'audit de Nextcloud vide ou absent"
+
+    info "7. Accès depuis l'ordinateur de présentation"
+    if [ "$BIND_ADDRESS" = 127.0.0.1 ]; then
+        attention "BIND_ADDRESS=127.0.0.1 : la box n'est joignable que depuis elle-même (mettre 0.0.0.0 si la démo se fait depuis un autre ordinateur)"
+    else
+        reussi "box joignable sur $BIND_ADDRESS, ports 80 et 443"
+    fi
+
+    echo
+    echo "  Restent à vérifier à la main : les 3 questions de démo (DEV-2), le tableau de bord (DEV-3),"
+    echo "  le journal d'audit dans le tableau de bord (DEV-4), l'écran et l'adaptateur de la salle."
+    journal verification_hors_ligne "$echecs échec(s), $alertes alerte(s)" "$([ "$echecs" -eq 0 ] && echo ok || echo echec)"
+    if [ "$echecs" -eq 0 ]; then
+        ok "vérification terminée : 0 échec, $alertes alerte(s)"
+    else
+        echec "$echecs échec(s), $alertes alerte(s)"
+    fi
+}
+
 # Télécharge et construit toutes les images, puis les exporte dans une archive : la box peut ensuite
 # être installée sur une machine qui n'a jamais eu accès à internet (docker load -i ...).
 cmd_preparer_hors_ligne() {
@@ -432,6 +536,8 @@ Usage : ./box.sh <commande>
   sauvegardes          Liste des instantanés
   tester-restauration  Restaure le dernier instantané dans un projet isolé et vérifie tout
   restaurer [id]       Reconstruit la box depuis un instantané (REMPLACE les données)
+  verifier-hors-ligne  Liste de vérification de la démo, à lancer câble débranché
+  assistant [adresse]  Assistant web de première configuration (défaut 127.0.0.1:8090)
   preparer-hors-ligne  Exporte toutes les images dans sortie/images-box.tar (installation sans internet)
   reinitialiser        Supprime conteneurs ET volumes (demande confirmation)
 EOF
@@ -451,6 +557,8 @@ case $commande in
     sauvegardes)          cmd_sauvegardes ;;
     tester-restauration)  cmd_tester_restauration "$@" ;;
     restaurer)            cmd_restaurer "$@" ;;
+    verifier-hors-ligne)  cmd_verifier_hors_ligne ;;
+    assistant)            exec python3 "$ICI/installeur/assistant.py" "$@" ;;
     preparer-hors-ligne)  cmd_preparer_hors_ligne ;;
     reinitialiser)        cmd_reinitialiser ;;
     aide|-h|--help)       cmd_aide ;;

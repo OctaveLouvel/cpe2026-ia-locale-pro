@@ -21,9 +21,10 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+import inviter_coffre
+
 DONNEES = pathlib.Path("/donnees-demo")
 NC = os.environ.get("NC_URL", "http://nextcloud").rstrip("/")
-VW = os.environ.get("VW_URL", "http://coffre").rstrip("/")
 ADMIN = (os.environ["NC_ADMIN_USER"], os.environ["NC_ADMIN_PASSWORD"])
 MOT_DE_PASSE_DEMO = os.environ["DEMO_MOT_DE_PASSE"]
 
@@ -221,21 +222,8 @@ def inviter_au_coffre():
     navigateur : le chiffrement du coffre se fait côté client, la box ne connaît jamais le mot de passe."""
     associee = next(u for u in CABINET["utilisateurs"] if u["id"] == CABINET["coffre_fort"]["compte"])
     try:
-        _, _, entetes = http("POST", f"{VW}/admin",
-                             corps=urllib.parse.urlencode({"token": os.environ["VW_ADMIN_TOKEN"]}),
-                             entetes={"Content-Type": "application/x-www-form-urlencoded"},
-                             acceptes=(200, 302, 303))
-        cookie = next((c.split(";")[0] for c in entetes.get_all("Set-Cookie") or [] if c.startswith("VW_ADMIN=")), None)
-        if not cookie:
-            raise Echec("pas de session d'administration (jeton refusé ?)")
-        statut, contenu, _ = http("POST", f"{VW}/admin/invite", corps=json.dumps({"email": associee["courriel"]}),
-                                  entetes={"Content-Type": "application/json", "Cookie": cookie},
-                                  acceptes=(200, 400, 409))
-        if statut == 200:
-            print(f"  invitation créée pour {associee['courriel']}")
-        else:
-            print(f"  invitation déjà existante pour {associee['courriel']}")
-    except (Echec, urllib.error.URLError) as erreur:
+        print(f"  invitation {inviter_coffre.inviter(associee['courriel'])} pour {associee['courriel']}")
+    except (RuntimeError, urllib.error.URLError) as erreur:
         print(f"  Attention : invitation au coffre-fort impossible ({erreur})")
 
 

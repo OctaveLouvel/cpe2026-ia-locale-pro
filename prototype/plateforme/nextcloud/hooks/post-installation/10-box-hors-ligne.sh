@@ -32,8 +32,16 @@ done
 echo "[box] Applications du cabinet"
 occ app:enable calendar
 occ app:enable contacts
-# Journal d'audit de Nextcloud (connexions, accès et partages de fichiers) : data/audit.log
+# Journal d'audit de Nextcloud (connexions, accès et partages de fichiers) : data/audit.log.
+# Il écrit au niveau « info » : log.condition l'active sans rendre bavard le journal principal.
 occ app:enable admin_audit
+occ config:system:set log.condition apps 0 --value=admin_audit
+
+echo "[box] Pas de serveur de messagerie : aucun envoi de courriel"
+occ config:system:set mail_smtpmode --value=null
+# Requêtes internes de l'application Circles : par http://localhost, dans le conteneur.
+essayer config:app:set circles loopback_cloud_scheme --value=http
+essayer config:app:set circles loopback_cloud_id --value=localhost
 
 echo "[box] Langue, région, tâches de fond"
 occ config:system:set default_language --value=fr

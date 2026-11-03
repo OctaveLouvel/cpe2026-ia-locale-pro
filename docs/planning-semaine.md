@@ -27,8 +27,8 @@ Règles valables tous les jours :
 ### Après-midi
 
 **BIZ**
-- [ ] Construire une **liste de 40 cabinets** à appeler : 20 cabinets d'avocats et 20 cabinets d'expertise comptable, en Essonne et à Paris, en priorité ceux de 1 à 10 personnes. Sources : annuaires du barreau et de l'Ordre des experts-comptables, cartes en ligne, réseau personnel de l'équipe (famille, anciens maîtres de stage), LinkedIn. Mettre les coordonnées (noms, téléphones, mails) dans un **tableur partagé privé, hors du dépôt**. Dans `entretiens/suivi.md`, n'écrire que des identifiants anonymes (A01, E01...).
-- [ ] Ajouter **2 ou 3 spécialistes** à contacter : prestataire informatique qui travaille pour des cabinets, élu ou responsable numérique d'un barreau ou d'un conseil de l'Ordre, enseignant en droit ou en comptabilité.
+- [ ] Construire une **liste de 40 cabinets d'avocats** à appeler, en Essonne et à Paris, en priorité ceux de 1 à 10 personnes. Sources : annuaires des barreaux, cartes en ligne, réseau personnel de l'équipe (famille, anciens maîtres de stage), LinkedIn. Mettre les coordonnées (noms, téléphones, mails) dans un **tableur partagé privé, hors du dépôt**. Dans `entretiens/suivi.md`, n'écrire que des identifiants anonymes (A01, A02...).
+- [ ] Ajouter **2 ou 3 spécialistes** à contacter : prestataire informatique qui travaille pour des cabinets d'avocats, élu ou responsable numérique d'un barreau, enseignant en droit.
 - [ ] Répartir la liste : 8 contacts par personne.
 - [ ] Écrire le texte de la landing page pour DEV-3 **avant 15h00** (titre, problème, promesse, bouton « rejoindre la liste d'attente »). Pas de faux clients, pas de faux avis.
 - [ ] Commencer le tableau des concurrents dans [`marche-et-concurrence.md`](marche-et-concurrence.md).
@@ -76,15 +76,15 @@ Règles valables tous les jours :
 - [ ] **Chaque développeur : au moins 2 appels ou rendez-vous** dans la matinée.
 - [ ] **BIZ** : entretiens et relances de la veille. Demander à chaque personne intéressée une **marque d'intérêt écrite** (un simple mail : « je serais intéressé par une solution de ce type à environ X€ »).
 
-### 12h00 : décision de la profession de lancement
+### 12h00 : point sur les entretiens
 
-- [ ] Choisir **avocats** ou **experts-comptables**. Critère : nombre d'entretiens réels et de marques d'intérêt écrites. En cas d'égalité : avocats.
-- [ ] Noter la décision et la raison dans le README (section 8), puis mettre à jour la section 2.
+- [ ] Valider le **persona** (l'associé qui paie, les collaborateurs qui utilisent) à partir de ce que disent les entretiens, et le noter dans [`marche-et-concurrence.md`](marche-et-concurrence.md).
+- [ ] Lister ce que les avocats ont confirmé et ce qu'ils ont contredit. Si un point du problème est contredit, l'écrire dans la section 8 du README et en parler aux coachs l'après-midi.
 
 ### Après-midi
 
 **BIZ** (avec l'aide de DEV-4 sur les coûts)
-- [ ] TAM / SAM / SOM de la profession choisie, avec sources.
+- [ ] TAM / SAM / SOM des cabinets d'avocats, avec sources.
 - [ ] **Au moins 3 concurrents détaillés** (taille, fonctionnalités, stratégie, levées de fonds) + positionnement sur un schéma.
 - [ ] Prix des offres (2 ou 3 maximum) à partir du coût matériel réel et des entretiens.
 - [ ] Go to market : canaux, coûts, nombre de clients par an, coût d'acquisition.
@@ -98,7 +98,7 @@ Règles valables tous les jours :
 
 **DEV-2**
 - [ ] Assistant IA qui cherche dans les fichiers **et** l'agenda, respecte les droits de l'utilisateur, **n'accède jamais au coffre-fort**, et cite ses sources.
-- [ ] Pack métier : vérifier la licence et le format d'un jeu de données ouvert utile à la profession choisie, et l'intégrer si c'est faisable en une demi-journée. Sinon, le présenter comme roadmap.
+- [ ] Pack métier : vérifier la licence et le format d'un jeu de données ouvert utile aux avocats (textes juridiques, jurisprudence), et l'intégrer si c'est faisable en une demi-journée. Sinon, le présenter comme roadmap.
 - [ ] Préparer les 3 questions exactes de la démo et vérifier que les réponses sont bonnes à chaque essai.
 
 **DEV-3**

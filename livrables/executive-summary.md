@@ -12,13 +12,13 @@ Les parties entre crochets sont à remplacer. **Aucun chiffre sans source, aucun
 
 **Équipe n°[numéro]** : [Prénom Nom, école], [Prénom Nom, école], [Prénom Nom, école], [Prénom Nom, école], [Prénom Nom, école]
 
-**En une phrase** : [Nom] installe dans les cabinets [d'avocats / d'expertise comptable] une box clé en main qui leur donne un cloud privé et un assistant IA travaillant sur leurs dossiers, sans qu'aucune donnée ne quitte le cabinet.
+**En une phrase** : [Nom] installe dans les cabinets d'avocats une box clé en main qui leur donne un cloud privé et un assistant IA travaillant sur leurs dossiers, sans qu'aucune donnée ne quitte le cabinet.
 
 ### Le problème
 
 [2 ou 3 phrases. Le besoin d'IA des cabinets, l'obligation de secret professionnel, l'absence de service informatique dans les petits cabinets.]
 
-**Preuves** : [nombre] entretiens réalisés avec des [professionnels] entre le 2 et le 4 novembre 2026, dont [nombre] marques d'intérêt écrites. [Une citation anonyme autorisée.] [Un chiffre sourcé sur l'usage de l'IA ou les incidents de confidentialité.]
+**Preuves** : [nombre] entretiens réalisés avec des avocats entre le 2 et le 4 novembre 2026, dont [nombre] marques d'intérêt écrites. [Une citation anonyme autorisée.] [Un chiffre sourcé sur l'usage de l'IA ou les incidents de confidentialité.]
 
 ### La solution
 
@@ -26,7 +26,7 @@ Les parties entre crochets sont à remplacer. **Aucun chiffre sans source, aucun
 
 ### Le marché
 
-- **Cible de lancement** : [profession], [nombre] professionnels en France [source], dont [part] dans des cabinets de moins de [taille] [source].
+- **Cible** : les cabinets d'avocats de 1 à 10 personnes. 77 598 avocats inscrits en France ; 63% des cabinets comptent 1 à 4 avocats [citer les sources S1 et S2 de docs/sources.md].
 - **TAM / SAM / SOM** : [valeurs et méthode courte].
 - **Concurrence** : [Olares One, Umbrel, Start9, ZimaCube, IA en ligne]. Notre différence : [service sur place, conformité au secret professionnel, pack métier, simplicité].
 

@@ -64,8 +64,8 @@ Notre abonnement couvre les mises à jour de sécurité suivies, la sauvegarde h
 **Avez-vous besoin de lever des fonds ?**
 [Besoin de trésorerie du modèle : le matériel est payé avant d'être vendu. Sources et calendrier.]
 
-**Pourquoi ne pas avoir gardé les particuliers ?**
-Les particuliers disent tenir à leur vie privée mais paient rarement pour la protéger, et les acquérir coûte cher. Les cabinets ont une obligation légale et un budget. Les particuliers restent dans la vision à 5 ans.
+**Pourquoi le B2B et pas les particuliers ?**
+Les particuliers disent tenir à leur vie privée mais paient rarement pour la protéger, et les acquérir coûte cher. Les avocats ont une obligation légale de confidentialité, un décideur identifiable et un budget.
 
 ## RSE
 

@@ -85,10 +85,10 @@ flowchart TB
 - le **pack métier** ;
 - le **service** : installation, mises à jour, support.
 
-### Pack métier (à vérifier avant de promettre)
+### Pack métier avocats (à vérifier avant de promettre)
 
-- Avocats : textes consolidés et jurisprudence en données ouvertes (par exemple les jeux de données de la DILA et de la Cour de cassation). **Vérifier la licence, le format et la taille** avant de l'annoncer.
-- Experts-comptables : référentiels comptables publics. **Mêmes vérifications.**
+- Textes consolidés et jurisprudence en données ouvertes (par exemple les jeux de données de la DILA et de la Cour de cassation), consultables et interrogeables hors ligne. **Vérifier la licence, le format et la taille** avant de l'annoncer.
+- Modèles de documents utiles au cabinet (à définir avec les entretiens).
 - Si l'intégration ne tient pas en une demi-journée le mercredi, le pack passe dans la roadmap et n'est pas montré.
 
 ## 4. Priorités
@@ -98,7 +98,7 @@ flowchart TB
 | **Indispensable** | Nextcloud avec données fictives, assistant IA avec citations, fonctionnement hors ligne vérifié, tableau de bord minimal, refus d'accès démontré (coffre-fort ou dossier non autorisé) |
 | **Important** | Journal d'audit visible, sauvegarde chiffrée avec restauration testée, installeur (au moins en captures ou en vidéo courte), mesures de consommation et de vitesse |
 | **Bonus** | Pack métier intégré, accès distant WireGuard activable depuis le tableau de bord |
-| **Hors périmètre de la démo** | Home Assistant, Immich, Wikipédia, cartes, offre famille |
+| **Hors périmètre de la démo** | Tout ce qui ne sert pas un cabinet d'avocats, et les fonctions prévues pour les autres professions |
 
 ## 5. Mesures à faire (DEV-2 et DEV-4)
 
@@ -140,10 +140,10 @@ Les 3 questions exactes et leurs réponses attendues sont écrites ici par DEV-2
 |---|---|---|---|
 | MVP pilote | Stabilisation de la démo, installeur complet, mises à jour à distance sûres, 5 à 10 cabinets pilotes | 3 à 4 mois | 2 développeurs + 1 personne pour les installations |
 | V1 commerciale | Supervision, sauvegarde hors site, documentation, procédures de support | 6 mois | 3 développeurs + 1 support |
-| Pack métier n°2 | Intégrations pour la deuxième profession | 4 mois | 1 à 2 développeurs |
+| Intégrations cabinet d'avocats | Connexion aux logiciels de gestion de cabinet les plus utilisés | 4 mois | 1 à 2 développeurs |
 | Industrialisation | Préparation des box en série, gestion du parc, mises à jour en masse | En continu | 1 développeur + 1 logistique |
 
-Enjeux de R&D à citer : qualité des réponses en français sur des documents juridiques ou comptables, limitation des réponses inventées, respect des droits d'accès dans la recherche, mises à jour sûres d'un parc de box hors ligne, performance sur du matériel abordable.
+Enjeux de R&D à citer : qualité des réponses en français sur des documents juridiques, limitation des réponses inventées, respect des droits d'accès dans la recherche, mises à jour sûres d'un parc de box hors ligne, performance sur du matériel abordable.
 
 ## 8. Risques techniques et réponses
 

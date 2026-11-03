@@ -6,11 +6,11 @@ Copier ce fichier en `entretiens/CR-<ID>.md` (par exemple `CR-A03.md`) le jour m
 
 ---
 
-- **ID** : _A.. pour avocat, E.. pour expert-comptable, S.. pour spécialiste_
+- **ID** : _A.. pour un avocat, S.. pour un spécialiste_
 - **Date** :
 - **Mené par** : _rôle (BIZ, DEV-1...)_
 - **Canal** : _téléphone, visio, sur place_
-- **Profession et rôle** : _ex. associé, collaborateur, assistant_
+- **Rôle** : _ex. associé, collaborateur, assistant, prestataire informatique_
 - **Taille du cabinet** :
 - **Accord pour citation anonyme** : oui / non
 

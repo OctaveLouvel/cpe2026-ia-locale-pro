@@ -2,7 +2,7 @@
 
 Objectif : **prouver ou réfuter le problème** avec de vrais professionnels, et obtenir des **marques d'intérêt écrites**. C'est ce qui fait la différence pour le jury (critère Problème & marché, 4 points, et crédibilité de tout le reste).
 
-Cible : **au moins 15 entretiens réels d'ici le mercredi 4 novembre au soir**, répartis entre avocats et experts-comptables jusqu'à la décision de 12h00, puis concentrés sur la profession choisie. Chaque développeur fait au moins 3 appels le mardi et 2 le mercredi.
+Cible : **au moins 15 entretiens réels avec des avocats d'ici le mercredi 4 novembre au soir**, plus 2 ou 3 spécialistes. Chaque développeur fait au moins 3 appels le mardi et 2 le mercredi.
 
 ## Règles
 
@@ -16,7 +16,7 @@ Cible : **au moins 15 entretiens réels d'ici le mercredi 4 novembre au soir**, 
 
 ## Accroche téléphonique (30 secondes)
 
-> Bonjour, je m'appelle [prénom], je suis étudiant à [école]. Nous préparons un projet d'entreprise sur la façon dont les cabinets [d'avocats / d'expertise comptable] gèrent leurs documents et l'intelligence artificielle, en respectant le secret professionnel. Auriez-vous 15 minutes, maintenant ou à un autre moment aujourd'hui ou demain, pour nous raconter comment ça se passe chez vous ? Il n'y a rien à vendre.
+> Bonjour, je m'appelle [prénom], je suis étudiant à [école]. Nous préparons un projet d'entreprise sur la façon dont les cabinets d'avocats gèrent leurs documents et l'intelligence artificielle, en respectant le secret professionnel. Auriez-vous 15 minutes, maintenant ou à un autre moment aujourd'hui ou demain, pour nous raconter comment ça se passe chez vous ? Il n'y a rien à vendre.
 
 Si refus : demander s'il y a une autre personne du cabinet à qui en parler, ou un confrère.
 
@@ -34,7 +34,7 @@ Si refus : demander s'il y a une autre personne du cabinet à qui en parler, ou 
 ### IA
 6. Vous ou vos collaborateurs utilisez-vous déjà des outils d'IA ? Pour quelles tâches ?
 7. Qu'est-ce qui vous retient de les utiliser davantage ?
-8. Le cabinet a-t-il des règles sur ce qu'on a le droit d'envoyer à ces outils ? Votre instance professionnelle ou votre assureur vous a-t-il donné des consignes ?
+8. Le cabinet a-t-il des règles sur ce qu'on a le droit d'envoyer à ces outils ? Votre barreau ou votre assureur vous a-t-il donné des consignes ?
 
 ### Confidentialité et incidents
 9. Comment vous assurez-vous aujourd'hui que les données des clients restent confidentielles ?
@@ -57,12 +57,12 @@ Si refus : demander s'il y a une autre personne du cabinet à qui en parler, ou 
 
 ## Questions pour les spécialistes
 
-**Prestataire informatique qui travaille pour des cabinets**
+**Prestataire informatique qui travaille pour des cabinets d'avocats**
 - Que demandent les cabinets en ce moment, en particulier sur l'IA ?
 - Qu'installez-vous chez eux, et à quel prix ?
 - Seriez-vous intéressé pour revendre ou installer une solution de ce type ?
 
-**Instance professionnelle (barreau, Ordre) ou enseignant du domaine**
+**Élu ou responsable numérique d'un barreau, enseignant en droit**
 - Quelles règles s'appliquent à l'usage de l'IA avec des données clients ?
 - Quelles sont les erreurs fréquentes des cabinets en matière de confidentialité ?
 - Quels événements ou canaux permettent de toucher les cabinets ?

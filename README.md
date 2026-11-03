@@ -1,8 +1,8 @@
-# IA locale et cloud privé pour cabinets soumis au secret professionnel
+# IA locale et cloud privé pour cabinets d'avocats
 
 Projet d'équipe pour le **Challenge Projets d'Entreprendre 2026 (27e édition, IMT Starter / IMT-BS / Télécom SudParis / ENSIIE)**, du lundi 2 au vendredi 6 novembre 2026, finale le lundi 9 novembre 2026.
 
-> **En une phrase** : une box clé en main, installée et maintenue par nous, qui donne aux petits cabinets soumis au secret professionnel (avocats, experts-comptables) un cloud privé et un assistant IA qui travaille sur leurs dossiers **sans qu'aucune donnée ne quitte le cabinet**.
+> **En une phrase** : une box clé en main, installée et maintenue par nous, qui donne aux petits cabinets d'avocats un cloud privé et un assistant IA qui travaille sur leurs dossiers **sans qu'aucune donnée ne quitte le cabinet**.
 
 Ce dépôt est la source de vérité du projet. Il est écrit pour être lu par les 5 membres de l'équipe **et par les agents IA** qu'ils utilisent. Un agent qui arrive sans contexte doit lire, dans l'ordre : ce README, puis [`AGENTS.md`](AGENTS.md), puis le document de `docs/` qui correspond à sa tâche.
 
@@ -13,8 +13,8 @@ Nom commercial du projet : **à choisir** (voir [Décisions ouvertes](#8-décisi
 ## Sommaire
 
 1. [Le challenge en bref](#1-le-challenge-en-bref)
-2. [Le projet après recadrage](#2-le-projet-après-recadrage)
-3. [Pourquoi on a recadré](#3-pourquoi-on-a-recadré)
+2. [Le projet](#2-le-projet)
+3. [Pourquoi les avocats et le B2B](#3-pourquoi-les-avocats-et-le-b2b)
 4. [Équipe et rôles](#4-équipe-et-rôles)
 5. [Planning de la semaine](#5-planning-de-la-semaine)
 6. [Roadmap à 5 ans](#6-roadmap-à-5-ans)
@@ -48,20 +48,19 @@ Le jury a écrit noir sur blanc : **« Travail basique réalisé via IA = mauvai
 
 ---
 
-## 2. Le projet après recadrage
+## 2. Le projet
 
 ### Le problème
 
-Les avocats et les experts-comptables manipulent des données couvertes par le secret professionnel. Ils voudraient utiliser l'IA générative (résumer un dossier, retrouver une pièce, rédiger un premier jet), mais envoyer les dossiers clients dans un service cloud grand public pose un problème de confidentialité. Les petits cabinets n'ont **pas de service informatique** pour monter une alternative locale.
+Les avocats manipulent des données couvertes par le secret professionnel. Ils voudraient utiliser l'IA générative (résumer un dossier, retrouver une pièce, rédiger un premier jet), mais envoyer les dossiers clients dans un service cloud grand public pose un problème de confidentialité. Les petits cabinets n'ont **pas de service informatique** pour monter une alternative locale.
 
-**Ce problème est une hypothèse tant que les entretiens ne l'ont pas confirmé.** La preuve doit venir de vrais professionnels, pas d'un agent IA.
+**Ce problème est une hypothèse tant que les entretiens ne l'ont pas confirmé.** La preuve doit venir de vrais avocats, pas d'un agent IA.
 
 ### La cible
 
-- **Segment large (pour le TAM et le SAM)** : les petites structures soumises au secret professionnel, sans service informatique.
-- **Profession de lancement (pour le persona et le SOM)** : **avocats OU experts-comptables**, à trancher **le mercredi 4 novembre à 12h00** selon les entretiens (voir [Décisions ouvertes](#8-décisions-ouvertes)).
+- **Cible** : les **cabinets d'avocats de 1 à 10 personnes**, sans service informatique, en commençant par l'Île-de-France. Vente en **B2B**.
 - **Payeur ≠ utilisateur** : l'associé ou le fondateur du cabinet paie, les collaborateurs et assistants utilisent. Le pitch doit parler aux deux.
-- **Hors périmètre pendant le challenge** : particuliers (B2C), santé, psychologues. Ils apparaissent seulement dans la vision à 5 ans.
+- **Extensions (vision à 5 ans uniquement)** : autres professions soumises au secret (experts-comptables, notaires, conseils en propriété industrielle), puis la santé. Elles servent au TAM et à la roadmap, jamais au persona ni à la démo.
 
 Chiffres et sources : [`docs/marche-et-concurrence.md`](docs/marche-et-concurrence.md).
 
@@ -84,16 +83,13 @@ Vente de la box + installation, puis **abonnement mensuel** (mises à jour, supp
 
 ---
 
-## 3. Pourquoi on a recadré
+## 3. Pourquoi les avocats et le B2B
 
-L'idée de départ était de vendre des homelabs préconfigurés à des particuliers (ingénieurs et grand public), entre 1 000 et 10 000€, avec Immich, un drive, un agenda, un coffre-fort, Home Assistant, Wikipédia et des cartes hors ligne, et une IA locale. Une analyse face à la grille de notation donnait environ **9 à 10/20 en l'état**, pour ces raisons :
-
-- **Cible contradictoire** : les ingénieurs savent monter leur homelab et ne paieront pas de prime ; le grand public ne perçoit pas le problème et ne paiera pas 1 000€. Le jury prévient qu'en B2C il faut prouver une acquisition massive.
-- **Concurrence directe déjà financée** : Olares One fait exactement « cloud personnel + IA locale sur vos fichiers », avec une Série A de 45 millions de dollars. Umbrel, Start9 et ZimaCube vendent des box préconfigurées entre 400 et 1 100 dollars environ. Start9 inclut déjà le support à vie.
-- **Gamme de prix incohérente** (1 000 à 10 000€) : signe qu'il n'y a pas de persona.
-- **Contradictions techniques** : « fonctionne sans internet » contre support à distance, mises à jour et sauvegarde hors site.
-
-Le recadrage garde **le même produit technique** et change la cible vers des professionnels qui ont une **obligation légale** de confidentialité, **pas de service informatique** et **les moyens de payer**. Estimation après recadrage : **15 à 16/20** si les entretiens et la démo suivent.
+- **Une obligation légale, pas une préférence.** Le secret professionnel de l'avocat rend la confidentialité obligatoire. Le besoin d'une IA qui ne fait pas sortir les dossiers du cabinet est structurel.
+- **Beaucoup de petites structures sans informatique.** La France compte 77 598 avocats inscrits ; 32% des cabinets n'ont qu'un avocat et 31% en ont 2 à 4 (sources S1 et S2 de [`docs/sources.md`](docs/sources.md)). Ces cabinets n'ont personne pour installer et maintenir une solution locale.
+- **Un décideur identifiable qui peut payer.** L'associé décide et dispose d'un budget informatique : vente B2B, cycle de décision court.
+- **Le B2B est plus crédible pour le jury.** Les organisateurs le disent : en B2C, il faudrait prouver une acquisition massive.
+- **Un espace libre face aux concurrents.** Olares One, Umbrel, Start9 et ZimaCube vendent des box de cloud personnel à des passionnés ou au grand public. Aucun ne propose, à notre connaissance, un service clé en main sur place pour les cabinets d'avocats (**à confirmer** par la recherche sur la concurrence).
 
 ---
 
@@ -123,8 +119,8 @@ Détail par rôle et par créneau : [`docs/planning-semaine.md`](docs/planning-s
 
 | Jour | Objectifs de fin de journée |
 |---|---|
-| **Mardi 3 nov** (aujourd'hui) | Atelier RSE à 13h30 (2 personnes : BIZ + DEV-4). **Liste de 40 cabinets à appeler** et premiers appels. **Landing page + liste d'attente en ligne** le soir. Matériel de démo choisi, OS et services de base installés. Modèle IA local qui tourne. |
-| **Mercredi 4 nov** | Atelier Finance & Pitch **avec toute l'équipe** (9h00 si équipe 1 à 47, 10h15 si équipe 48 à 94). **12h00 : choix de la profession de lancement.** Démo de bout en bout fonctionnelle hors ligne. Modèle financier v1. **Executive summary terminé et déposé le soir** (pas le jeudi matin). |
+| **Mardi 3 nov** (aujourd'hui) | Atelier RSE à 13h30 (2 personnes : BIZ + DEV-4). **Liste de 40 cabinets d'avocats à appeler** et premiers appels. **Landing page + liste d'attente en ligne** le soir. Matériel de démo choisi, OS et services de base installés. Modèle IA local qui tourne. |
+| **Mercredi 4 nov** | Atelier Finance & Pitch **avec toute l'équipe** (9h00 si équipe 1 à 47, 10h15 si équipe 48 à 94). **12h00 : persona validé à partir des premiers entretiens.** Démo de bout en bout fonctionnelle hors ligne. Modèle financier v1. **Executive summary terminé et déposé le soir** (pas le jeudi matin). |
 | **Jeudi 5 nov** | **9h00 : date limite de l'executive summary sur Moodle.** Slides finalisées. **16h00 : gel de la démo** (plus aucune fonctionnalité). Vidéo de secours enregistrée. 3 répétitions chronométrées. Liste de questions du jury préparée. Open coaching facultatif (10h-17h, rue Étoile) pour un retour sur le pitch. |
 | **Vendredi 6 nov** | **Jury** (bâtiment F, voir le planning). Arriver 30 minutes en avance, tester la démo sur place sans wifi. |
 | **Lundi 9 nov** | Si lauréats : pitch de 3 minutes, 2 ou 3 slides, Amphi 10 à 18h. |
@@ -138,11 +134,11 @@ Détail : [`docs/roadmap-5-ans.md`](docs/roadmap-5-ans.md). Tous les chiffres so
 
 | Période | Produit et technique | Commercial | Équipe |
 |---|---|---|---|
-| **Année 0** (déc. 2026 à mi-2027) | MVP stable, 5 à 10 pilotes | Pilotes dans la profession de lancement, incubation (Next Step, IMT Starter) | Fondateurs |
-| **Année 1** | V1 commercialisée, pack métier n°1 | Île-de-France, ventes directes et partenariats avec les instances professionnelles | 4 à 6 personnes |
-| **Année 2** | Pack métier n°2 (l'autre profession) | Intégrateurs informatiques locaux comme revendeurs | 8 à 10 |
-| **Année 3** | Offre santé, via un partenaire certifié HDS pour la sauvegarde hors site | Grandes villes françaises | 12 à 15 |
-| **Années 4 et 5** | Offre famille (B2C), pays francophones | Belgique, Suisse, Luxembourg | 15 à 25 |
+| **Année 0** (déc. 2026 à mi-2027) | MVP stable, 5 à 10 pilotes | Cabinets d'avocats pilotes en Île-de-France, incubation (Next Step, IMT Starter) | Fondateurs |
+| **Année 1** | V1 commercialisée, pack métier avocats | Île-de-France, vente directe et partenariats avec les barreaux | 4 à 6 personnes |
+| **Année 2** | Pack métier experts-comptables | Grandes villes françaises, intégrateurs informatiques locaux comme revendeurs | 8 à 10 |
+| **Année 3** | Offre santé, via un partenaire certifié HDS pour la sauvegarde hors site | Toute la France | 12 à 15 |
+| **Années 4 et 5** | Autres professions réglementées (notaires, conseils en propriété industrielle) | Belgique, Suisse, Luxembourg | 15 à 25 |
 
 ---
 
@@ -152,11 +148,11 @@ Chaque piège ci-dessous a été identifié pendant l'analyse du projet. **Un ag
 
 ### Cible et positionnement
 
-1. **Revenir à une cible floue.** « Les ingénieurs et le grand public » était le défaut principal. « Toutes les professions libérales » serait le même défaut. Le segment large sert au TAM/SAM, **une seule profession** porte le persona, le SOM et la démo.
-2. **Élargir pendant le challenge.** Santé, psychologues, B2C famille : uniquement dans la vision à 5 ans, jamais dans la démo ni dans le persona.
-3. **Croire au « paradoxe de la vie privée ».** Les gens disent tenir à leur vie privée mais paient rarement pour. C'est pour ça qu'on cible une **obligation légale**, pas une préférence.
+1. **Diluer la cible.** Le persona, la démo et le SOM portent sur les **cabinets d'avocats**. « Toutes les professions libérales » serait trop flou. Les autres professions servent seulement au TAM et à la roadmap.
+2. **Élargir pendant le challenge.** Experts-comptables, notaires, santé : uniquement dans la vision à 5 ans, jamais dans la démo ni dans le persona.
+3. **Croire au « paradoxe de la vie privée ».** Les gens disent tenir à leur vie privée mais paient rarement pour. C'est pour ça qu'on vend en B2B à des professionnels soumis à une **obligation légale**, pas à des particuliers.
 4. **Ignorer que le payeur n'est pas l'utilisateur.** L'associé décide et paie, les collaborateurs utilisent. Les entretiens doivent couvrir les deux.
-5. **Laisser une gamme de prix floue.** Deux ou trois offres maximum, chacune liée à une taille de cabinet. Jamais « de 1 000 à 10 000€ ».
+5. **Laisser une gamme de prix floue.** Deux ou trois offres maximum, chacune liée à une taille de cabinet. Jamais une fourchette large et floue.
 
 ### Concurrence
 
@@ -170,7 +166,7 @@ Chaque piège ci-dessous a été identifié pendant l'analyse du projet. **Un ag
 10. **Oublier la sauvegarde hors site.** Si le cabinet brûle, la box et le coffre-fort brûlent avec. Règle 3-2-1 : une sauvegarde locale + une copie hors site **chiffrée côté client** (nous ne pouvons pas la lire).
 11. **Sous-estimer la responsabilité.** Nous devenons responsables du coffre-fort et des dossiers d'un cabinet. Il faut expliquer qui applique les correctifs de sécurité, en combien de temps, et ce que dit le contrat.
 12. **Donner à l'IA l'accès au coffre-fort de mots de passe.** L'assistant ne doit jamais lire le coffre. Il respecte les droits d'accès de l'utilisateur qui pose la question.
-13. **Laisser l'IA répondre sans citer ses sources.** Pour un avocat ou un comptable, une réponse inventée est dangereuse. Chaque réponse doit indiquer le document utilisé.
+13. **Laisser l'IA répondre sans citer ses sources.** Pour un avocat, une réponse inventée est dangereuse. Chaque réponse doit indiquer le document utilisé.
 14. **Surpromettre sur l'IA locale.** La qualité dépend du matériel. On annonce ce que la box de démo fait réellement, avec des temps de réponse mesurés.
 15. **Une démo qui casse hors ligne.** Polices ou scripts chargés depuis un CDN, télémétrie, modèle non téléchargé à l'avance : tout cela échoue sans internet. **Tester la démo câble débranché dès le mercredi.**
 16. **Utiliser de vraies données de clients ou d'entretiens dans la démo.** Les données de démo sont fictives et présentées comme telles.
@@ -178,7 +174,7 @@ Chaque piège ci-dessous a été identifié pendant l'analyse du projet. **Un ag
 ### Juridique
 
 17. **Le piège HDS pour la santé.** Un cabinet médical qui garde ses propres dossiers sur ses serveurs n'a pas besoin de la certification HDS. Mais si **nous** faisons la sauvegarde hors site ou l'administration à distance, nous risquons de devenir hébergeur et de devoir être certifiés (coût de l'ordre de 20 000 à 80 000€ sur 3 ans). D'où : santé en année 3, via un partenaire certifié.
-18. **Ignorer les licences.** Nextcloud et Immich sont sous licence AGPL : la revente commerciale est permise, avec des obligations sur le code source. Le dire au jury dans la partie « cadre juridique ».
+18. **Ignorer les licences.** Nextcloud est sous licence AGPL (à vérifier pour chaque brique utilisée) : la revente commerciale est permise, avec des obligations sur le code source. Le dire au jury dans la partie « cadre juridique ».
 19. **Passer du temps sur les statuts juridiques de la société.** Le jury le liste comme une erreur à éviter pendant la semaine.
 
 ### Marché, preuves et méthode
@@ -194,7 +190,7 @@ Chaque piège ci-dessous a été identifié pendant l'analyse du projet. **Un ag
 25. **Déposer l'executive summary le jeudi matin.** La date limite est **jeudi 9h00**. Il doit être fini le **mercredi soir**.
 26. **Décrire la solution sans la montrer.** Le jury le liste comme une erreur. La démo live est le cœur du pitch (8 points sur 20).
 27. **Montrer des logiciels libres au lieu de notre couche.** Montrer Nextcloud, c'est montrer le travail des autres. On montre l'installeur, le tableau de bord, l'assistant qui croise les services et cite ses sources.
-28. **Trop de briques en 15 minutes.** On ne montre que ce qui sert la profession choisie. Home Assistant, Immich, Wikipédia et les cartes ne servent pas à un cabinet d'avocats.
+28. **Trop de briques en 15 minutes.** On ne montre que ce qui sert un cabinet d'avocats : documents, agenda, assistant, coffre-fort, sauvegarde, journal.
 29. **Oublier qu'une seule personne parle.** Tout le monde doit s'exprimer : environ 3 minutes par personne.
 30. **Dépasser les 15 minutes.** Répéter chronomètre en main au moins 3 fois le jeudi.
 31. **Ne pas détailler les actions commerciales.** « Le produit ne se vendra pas seul » : canaux, coûts, nombre de clients visés et coût pour les acquérir.
@@ -208,7 +204,6 @@ Chaque piège ci-dessous a été identifié pendant l'analyse du projet. **Un ag
 
 | Décision | Responsable | Échéance | Critère |
 |---|---|---|---|
-| Profession de lancement : avocats ou experts-comptables | BIZ, avec toute l'équipe | **Mercredi 4 nov, 12h00** | Celle qui a donné le plus d'entretiens réels et de marques d'intérêt écrites. En cas d'égalité : avocats (secret professionnel plus strict) |
 | Nom du projet | BIZ | Mardi 3 nov, 18h00 | Court, disponible en nom de domaine, pas déjà pris par un concurrent |
 | Numéro d'équipe et salle de coaching | Toute l'équipe | Immédiat | À reporter dans [`docs/attendus-challenge.md`](docs/attendus-challenge.md) |
 | Matériel de la démo | DEV-1 | Mardi 3 nov, 14h00 | Ce qui est disponible tout de suite et fait tourner un modèle local correct |
@@ -225,7 +220,7 @@ CLAUDE.md                    Charge AGENTS.md automatiquement dans Claude Code
 docs/
   attendus-challenge.md      Règles, grille, calendrier officiel du challenge
   planning-semaine.md        Tâches par jour et par rôle (3 au 9 nov)
-  marche-et-concurrence.md   Cibles, TAM/SAM/SOM, concurrents, chiffres sourcés
+  marche-et-concurrence.md   Cible, TAM/SAM/SOM, concurrents, chiffres sourcés
   prototype.md               Spécification de la démo et architecture technique
   business-model.md          Offres, prix, modèle financier, financement
   rse.md                     Méthode de mesure de l'impact

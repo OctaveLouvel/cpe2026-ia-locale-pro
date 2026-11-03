@@ -19,11 +19,11 @@ Le **revenu récurrent** est le cœur du modèle : le matériel rapporte peu de 
 
 ## 2. Offres
 
-Deux ou trois offres maximum, chacune liée à une taille de cabinet. **Jamais une fourchette floue** du type « 1 000 à 10 000€ ».
+Deux ou trois offres maximum, chacune liée à une taille de cabinet d'avocats. **Jamais une fourchette large et floue.**
 
 | Offre | Pour qui | Prix de la box (HT) | Installation (HT) | Abonnement (HT) |
 |---|---|---|---|---|
-| Solo | Cabinet de 1 à 3 personnes | HYPOTHÈSE : _à fixer_ | HYPOTHÈSE : _à fixer_ | HYPOTHÈSE : _à fixer_ |
+| Solo | Avocat seul ou cabinet de 2 à 3 personnes | HYPOTHÈSE : _à fixer_ | HYPOTHÈSE : _à fixer_ | HYPOTHÈSE : _à fixer_ |
 | Cabinet | Cabinet de 4 à 10 personnes | HYPOTHÈSE : 3 500€ | HYPOTHÈSE : 500€ | HYPOTHÈSE : 79€ par mois |
 
 Pour fixer les prix :
@@ -47,7 +47,7 @@ Méthode : vente de la box et installation l'année de la signature ; abonnement
 | 4 | 150 | 350 | 600 000€ | 260 700€ | environ 861 000€ |
 | 5 | 180 | 530 | 720 000€ | 417 120€ | environ 1 137 000€ |
 
-Le seuil demandé par le jury (**au moins 700 à 800K€ de CA à 5 ans**) est atteint avec 530 cabinets clients, soit une petite fraction des 77 598 avocats ou des 19 490 sociétés d'expertise comptable. **Chaque volume doit être justifié** par le go to market (section 4) : combien de commerciaux, combien de rendez-vous, quel taux de conversion.
+Le seuil demandé par le jury (**au moins 700 à 800K€ de CA à 5 ans**) est atteint avec 530 cabinets clients, à comparer aux 77 598 avocats inscrits en France (le nombre de cabinets reste à sourcer pour exprimer cette part correctement). **Chaque volume doit être justifié** par le go to market (section 4) : combien de commerciaux, combien de rendez-vous, quel taux de conversion.
 
 À compléter dans le modèle v1 du mercredi :
 
@@ -67,7 +67,7 @@ Le seuil demandé par le jury (**au moins 700 à 800K€ de CA à 5 ans**) est a
 |---|---|---|---|
 | Vente directe | Prospection téléphonique et rendez-vous en cabinet, démonstration sur place | Temps commercial | HYPOTHÈSE : _à fixer_ rendez-vous par mois, taux de conversion _à fixer_ |
 | Pilotes | 5 à 10 cabinets pilotes à prix réduit contre un témoignage réel et un retour d'usage | Remise accordée | Références réelles pour la suite |
-| Instances professionnelles | Présentation aux barreaux ou conseils de l'Ordre, salons et congrès de la profession, formations continues | Stand, déplacements | Visibilité et crédibilité |
+| Barreaux et événements de la profession | Présentation aux barreaux, salons et congrès d'avocats, formations continues des avocats | Stand, déplacements | Visibilité et crédibilité |
 | Prestataires informatiques locaux | Programme de revendeurs : ils vendent et installent, nous fournissons la box et le logiciel | Commission | Couverture des régions sans commerciaux |
 | Contenu | Articles et webinaires sur l'IA et le secret professionnel | Temps | Prospects entrants |
 | Liste d'attente | Landing page créée pendant le challenge | Quasi nul | Mesure d'intérêt, premiers contacts |

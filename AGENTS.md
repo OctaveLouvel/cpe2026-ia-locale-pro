@@ -5,7 +5,7 @@ Ce fichier s'applique à tout agent IA (Claude, ou autre) qui travaille dans ce 
 ## Contexte minimal
 
 - Projet étudiant pour le **Challenge Projets d'Entreprendre 2026**, du 2 au 6 novembre 2026. Oral devant le jury le **vendredi 6 novembre**. Executive summary à déposer le **jeudi 5 novembre à 9h00**.
-- Produit : une box d'IA locale et de cloud privé pour petits cabinets soumis au secret professionnel (avocats ou experts-comptables, choix le mercredi 4 novembre à 12h00).
+- Produit : une box d'IA locale et de cloud privé pour les petits cabinets d'avocats, vendue en B2B.
 - Équipe : 4 développeurs (DEV-1 plateforme, DEV-2 IA, DEV-3 interface et vitrine, DEV-4 sécurité et mesures) et 1 profil business (BIZ). Voir le README, section 4.
 - **Avant toute tâche, vérifier la date du jour** et relire la ligne correspondante de [`docs/planning-semaine.md`](docs/planning-semaine.md). Les échéances sont serrées.
 
@@ -22,8 +22,8 @@ Le jury a écrit : « Travail basique réalisé via IA = mauvaise note ». Un fa
 
 ## Règle n°2 : respecter le périmètre
 
-- Une seule profession de lancement dans le persona, la démo et le SOM. Le reste (autres professions, santé, B2C) n'apparaît que dans la vision à 5 ans.
-- Ne pas réintroduire dans la démo les briques de l'idée initiale qui ne servent pas à un cabinet (Home Assistant, Immich, Wikipédia, cartes).
+- Les cabinets d'avocats sont la seule cible du persona, de la démo et du SOM. Les autres professions et la santé n'apparaissent que dans la vision à 5 ans.
+- La démo ne montre que ce qui sert un cabinet d'avocats.
 - **Ne jamais supprimer un piège** de la section 7 du README. On peut en ajouter, avec la date et la raison.
 - Toute décision qui change le périmètre doit être notée dans la section 8 du README (Décisions ouvertes) et validée par l'équipe au point de 12h00 ou de 17h30.
 

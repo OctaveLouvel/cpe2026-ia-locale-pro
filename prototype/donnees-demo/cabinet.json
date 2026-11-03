@@ -16,7 +16,10 @@
       "affichage": "Me Hélène Corbière",
       "fonction": "Avocate associée, fondatrice du cabinet",
       "courriel": "h.corbiere@corbiere-avocats.example",
-      "groupes": ["cabinet", "associes"]
+      "groupes": [
+        "cabinet",
+        "associes"
+      ]
     },
     {
       "id": "jarnoult",
@@ -24,7 +27,11 @@
       "affichage": "Me Julien Arnoult",
       "fonction": "Avocat collaborateur",
       "courriel": "j.arnoult@corbiere-avocats.example",
-      "groupes": ["cabinet", "equipe-2026-014", "equipe-2026-021"]
+      "groupes": [
+        "cabinet",
+        "equipe-2026-014",
+        "equipe-2026-021"
+      ]
     },
     {
       "id": "ibelkacem",
@@ -32,7 +39,10 @@
       "affichage": "Inès Belkacem",
       "fonction": "Élève-avocate stagiaire",
       "courriel": "i.belkacem@corbiere-avocats.example",
-      "groupes": ["cabinet", "equipe-2026-014"]
+      "groupes": [
+        "cabinet",
+        "equipe-2026-014"
+      ]
     },
     {
       "id": "mthevenet",
@@ -40,7 +50,10 @@
       "affichage": "Margaux Thévenet",
       "fonction": "Assistante juridique",
       "courriel": "m.thevenet@corbiere-avocats.example",
-      "groupes": ["cabinet", "secretariat"]
+      "groupes": [
+        "cabinet",
+        "secretariat"
+      ]
     }
   ],
   "groupes": {
@@ -58,7 +71,12 @@
       "matiere": "Bail commercial : commandement de payer visant la clause résolutoire, référé du bailleur",
       "responsable": "hcorbiere",
       "chemin": "Dossiers clients/2026-014 Fournil des Aubépines - bail commercial",
-      "partage": [{"groupe": "equipe-2026-014", "droits": "modification"}]
+      "partage": [
+        {
+          "groupe": "equipe-2026-014",
+          "droits": "modification"
+        }
+      ]
     },
     {
       "code": "2026-021",
@@ -66,7 +84,12 @@
       "matiere": "Droit du travail : contestation du licenciement, contrepartie de la clause de non-concurrence",
       "responsable": "jarnoult",
       "chemin": "Dossiers clients/2026-021 Garnier c. Techniflux - licenciement",
-      "partage": [{"groupe": "equipe-2026-021", "droits": "modification"}]
+      "partage": [
+        {
+          "groupe": "equipe-2026-021",
+          "droits": "modification"
+        }
+      ]
     },
     {
       "code": "2026-009",
@@ -82,7 +105,25 @@
       "matiere": "Gestion du cabinet",
       "responsable": "hcorbiere",
       "chemin": "Administratif",
-      "partage": [{"groupe": "secretariat", "droits": "modification"}]
+      "partage": [
+        {
+          "groupe": "secretariat",
+          "droits": "modification"
+        }
+      ]
+    },
+    {
+      "code": "regles",
+      "client": null,
+      "matiere": "Règles internes du cabinet, signées par toute l'équipe",
+      "responsable": "hcorbiere",
+      "chemin": "Règles du cabinet",
+      "partage": [
+        {
+          "groupe": "cabinet",
+          "droits": "lecture"
+        }
+      ]
     },
     {
       "code": "modeles",
@@ -90,7 +131,12 @@
       "matiere": "Modèles de documents du cabinet",
       "responsable": "hcorbiere",
       "chemin": "Modèles",
-      "partage": [{"groupe": "cabinet", "droits": "lecture"}]
+      "partage": [
+        {
+          "groupe": "cabinet",
+          "droits": "lecture"
+        }
+      ]
     }
   ],
   "agendas": [
@@ -99,21 +145,40 @@
       "nom": "Audiences et échéances",
       "proprietaire": "hcorbiere",
       "couleur": "#b23a48",
-      "partage": [{"groupe": "cabinet", "droits": "modification"}]
+      "partage": [
+        {
+          "groupe": "cabinet",
+          "droits": "modification"
+        }
+      ]
     },
     {
       "id": "corbiere",
       "nom": "Agenda de Me Corbière",
       "proprietaire": "hcorbiere",
       "couleur": "#1d3557",
-      "partage": [{"groupe": "secretariat", "droits": "modification"}]
+      "partage": [
+        {
+          "groupe": "secretariat",
+          "droits": "modification"
+        }
+      ]
     },
     {
       "id": "arnoult",
       "nom": "Agenda de Me Arnoult",
       "proprietaire": "jarnoult",
       "couleur": "#2a9d8f",
-      "partage": [{"groupe": "associes", "droits": "lecture"}, {"groupe": "secretariat", "droits": "modification"}]
+      "partage": [
+        {
+          "groupe": "associes",
+          "droits": "lecture"
+        },
+        {
+          "groupe": "secretariat",
+          "droits": "modification"
+        }
+      ]
     }
   ],
   "carnets": [
@@ -121,7 +186,12 @@
       "id": "cabinet",
       "nom": "Contacts du cabinet",
       "proprietaire": "hcorbiere",
-      "partage": [{"groupe": "cabinet", "droits": "modification"}]
+      "partage": [
+        {
+          "groupe": "cabinet",
+          "droits": "modification"
+        }
+      ]
     },
     {
       "id": "confidentiel",
@@ -134,11 +204,31 @@
     "compte": "hcorbiere",
     "remarque": "Entrées à créer dans le coffre-fort de Me Corbière. Les mots de passe sont générés au moment du chargement : il n'y en a aucun dans git. L'assistant IA n'a jamais accès au coffre-fort.",
     "entrees": [
-      {"nom": "RPVA - clé e-Barreau (FICTIF)", "identifiant": "h.corbiere", "adresse": "https://ebarreau.example"},
-      {"nom": "Banque du cabinet - compte professionnel (FICTIF)", "identifiant": "CORBIERE-AVOCATS", "adresse": "https://banque.example"},
-      {"nom": "CARPA - espace avocat (FICTIF)", "identifiant": "corbiere.h", "adresse": "https://carpa.example"},
-      {"nom": "Messagerie du cabinet (FICTIF)", "identifiant": "h.corbiere@corbiere-avocats.example", "adresse": "https://messagerie.example"},
-      {"nom": "Wifi du cabinet (FICTIF)", "identifiant": "Corbiere-Bureau", "adresse": null}
+      {
+        "nom": "RPVA - clé e-Barreau (FICTIF)",
+        "identifiant": "h.corbiere",
+        "adresse": "https://ebarreau.example"
+      },
+      {
+        "nom": "Banque du cabinet - compte professionnel (FICTIF)",
+        "identifiant": "CORBIERE-AVOCATS",
+        "adresse": "https://banque.example"
+      },
+      {
+        "nom": "CARPA - espace avocat (FICTIF)",
+        "identifiant": "corbiere.h",
+        "adresse": "https://carpa.example"
+      },
+      {
+        "nom": "Messagerie du cabinet (FICTIF)",
+        "identifiant": "h.corbiere@corbiere-avocats.example",
+        "adresse": "https://messagerie.example"
+      },
+      {
+        "nom": "Wifi du cabinet (FICTIF)",
+        "identifiant": "Corbiere-Bureau",
+        "adresse": null
+      }
     ]
   }
 }

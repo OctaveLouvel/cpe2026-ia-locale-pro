@@ -106,8 +106,12 @@ cmd_installer() {
     verifier_prerequis
     creer_env
     charger_env
-    info "Construction de l'image Nextcloud de la box"
-    "${COMPOSE[@]}" build nextcloud
+    if docker image inspect "$NC_IMAGE" >/dev/null 2>&1; then
+        ok "image $NC_IMAGE déjà présente (construite ou chargée depuis l'archive hors ligne)"
+    else
+        info "Construction de l'image Nextcloud de la box (connexion internet nécessaire)"
+        "${COMPOSE[@]}" build nextcloud
+    fi
     info "Démarrage des services"
     "${COMPOSE[@]}" up -d
     info "Attente de la fin de l'installation de Nextcloud (1 à 3 minutes la première fois)"
@@ -189,7 +193,10 @@ verifier_destination() {
 }
 
 # Fichiers en clair (export de base, .env) : supprimés dès que l'instantané chiffré est fait.
-nettoyer_preparation() { rm -f "$PREPARATION"/{nextcloud.pgdump,roles.sql,coffre.sqlite3,env,manifeste.txt}; }
+nettoyer_preparation() { rm -f "$PREPARATION"/{nextcloud.pgdump,roles.sql,comptes.txt,coffre.sqlite3,env,manifeste.txt}; }
+
+# Tables comptées au moment de la sauvegarde, puis comparées après restauration.
+TABLES_CONTROLE=(oc_users oc_filecache oc_share oc_calendarobjects oc_cards)
 
 # Les fichiers restaurés appartiennent à www-data ou root : suppression depuis un conteneur.
 nettoyer_restauration() {
@@ -212,6 +219,10 @@ cmd_sauvegarder() {
     "${COMPOSE[@]}" exec -T db pg_dump -U nextcloud -Fc nextcloud > "$PREPARATION/nextcloud.pgdump"
     # Rôles PostgreSQL : Nextcloud se connecte avec son propre rôle (oc_<admin>), propriétaire des tables.
     "${COMPOSE[@]}" exec -T db pg_dumpall -U nextcloud --globals-only > "$PREPARATION/roles.sql"
+    local table
+    for table in "${TABLES_CONTROLE[@]}"; do
+        echo "$table=$(compter box "select count(*) from $table")"
+    done > "$PREPARATION/comptes.txt"
     info "Copie cohérente de la base du coffre-fort"
     fichier=$("${COMPOSE[@]}" exec -T coffre /vaultwarden backup 2>/dev/null | grep -o 'db_[0-9_]*\.sqlite3' | head -1)
     [ -n "$fichier" ] || echec "la copie de la base du coffre-fort a échoué"
@@ -302,13 +313,16 @@ verifier_restauration() {
     else
         alerte "Nextcloud restauré : état incorrect"; erreurs=$((erreurs + 1))
     fi
-    for table in oc_users oc_filecache oc_share oc_calendarobjects oc_cards; do
-        vivant=$(compter box "select count(*) from $table")
+    # Comparaison avec les comptages faits au moment de la sauvegarde (la box en service a pu changer depuis).
+    for table in "${TABLES_CONTROLE[@]}"; do
+        vivant=$(grep "^$table=" "$src/preparation/comptes.txt" 2>/dev/null | cut -d= -f2)
         restaure=$(compter "$projet" "select count(*) from $table")
-        if [ "$vivant" = "$restaure" ]; then
-            ok "$table : $restaure lignes, identique à la box en service"
+        if [ -z "$vivant" ]; then
+            alerte "$table : $restaure lignes (pas de comptage dans cet instantané, ancien format)"
+        elif [ "$vivant" = "$restaure" ]; then
+            ok "$table : $restaure lignes, identique à la sauvegarde"
         else
-            alerte "$table : $restaure lignes restaurées contre $vivant dans la box en service"; erreurs=$((erreurs + 1))
+            alerte "$table : $restaure lignes restaurées contre $vivant au moment de la sauvegarde"; erreurs=$((erreurs + 1))
         fi
     done
     # Un document du jeu de démonstration, relu par WebDAV dans la box restaurée, comparé à l'original.

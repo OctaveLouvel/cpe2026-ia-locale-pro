@@ -10,6 +10,10 @@ Les fichiers produits sont versionnés : inutile de régénérer pour faire la d
 Pour régénérer après une modification : pandoc 3 et XeLaTeX avec la police Liberation Serif.
 
     python3 generer.py
+
+Génération incrémentale : un document n'est refait que si sa source ou le modèle a changé
+(XeLaTeX ne produit pas deux fois le même PDF au bit près, cela éviterait des modifications
+inutiles dans git). `--tout` force la régénération complète.
 """
 import datetime
 import hashlib
@@ -84,49 +88,86 @@ def nombre_de_pages(pdf):
     return None
 
 
-def generer_documents():
-    for outil in ("pandoc", "xelatex"):
-        if not shutil.which(outil):
-            sys.exit(f"{outil} est nécessaire pour régénérer les documents")
+def empreinte(donnees):
+    return hashlib.sha256(donnees).hexdigest()
+
+
+def empreinte_source(texte):
+    """Empreinte de tout ce dont dépend un document : sa source, le modèle et le filtre."""
+    morceaux = texte.encode("utf-8")
+    for fichier in ("modele.latex", "filtre.lua"):
+        morceaux += (ICI / "generation" / fichier).read_bytes()
+    return empreinte(morceaux)
+
+
+def generer_documents(tout=False, adopter=False):
     dossiers = dossiers_par_code()
     racine = ICI / "fichiers"
-    if racine.exists():
-        shutil.rmtree(racine)
-    index = []
+    ancien_index = ICI / "index.json"
+    precedents = {} if tout or not ancien_index.exists() else {
+        d["chemin"]: d for d in json.loads(ancien_index.read_text(encoding="utf-8"))["documents"]}
+    index, produits, refaits = [], set(), 0
     for source in sorted((ICI / "sources").glob("*/*.md")):
         texte = source.read_text(encoding="utf-8")
         meta, corps = lire_entete(texte, source)
         dossier = dossiers[source.parent.name]
         destination = racine / dossier["chemin"] / f'{meta["fichier"]}.{meta["format"]}'
-        destination.parent.mkdir(parents=True, exist_ok=True)
+        chemin = str(destination.relative_to(racine))
+        produits.add(destination)
         epoch = horodatage(meta["date"])
-        env = dict(os.environ, SOURCE_DATE_EPOCH=str(epoch), FORCE_SOURCE_DATE="1")
-        commande = ["pandoc", "-f", "markdown-smart", "-o", str(destination),
-                    "--lua-filter", str(ICI / "generation" / "filtre.lua")]
-        if meta["format"] == "pdf":
-            commande += ["--pdf-engine=xelatex", "--template", str(ICI / "generation" / "modele.latex")]
-            entree = texte
-        elif meta["format"] == "docx":
-            entree = texte.replace(corps, AVERTISSEMENT_DOCX + corps, 1)
-        else:
-            sys.exit(f"{source} : format inconnu {meta['format']}")
-        resultat = subprocess.run(commande, input=entree, text=True, env=env, capture_output=True)
-        if resultat.returncode != 0:
-            sys.exit(f"{source} : échec de pandoc\n{resultat.stderr}")
+        attendue = empreinte_source(texte)
+        precedent = precedents.get(chemin)
+        a_jour = (precedent and destination.exists()
+                  and empreinte(destination.read_bytes()) == precedent["sha256"]
+                  and (precedent.get("empreinte_source") == attendue
+                       or (adopter and "empreinte_source" not in precedent)))
+        if not a_jour:
+            produire(source, texte, corps, meta, destination, epoch)
+            refaits += 1
         os.utime(destination, (epoch, epoch))
         index.append({
-            "chemin": str(destination.relative_to(racine)),
+            "chemin": chemin,
             "dossier": dossier["code"],
             "titre": meta["titre"],
             "date": meta["date"],
             "horodatage": epoch,
             "format": meta["format"],
             "pages": nombre_de_pages(destination) if meta["format"] == "pdf" else None,
-            "sha256": hashlib.sha256(destination.read_bytes()).hexdigest(),
+            "sha256": empreinte(destination.read_bytes()),
+            "empreinte_source": attendue,
             "lecteurs": lecteurs(dossier["partage"], CABINET["proprietaire_des_fichiers"]),
         })
-        print(f"  {destination.relative_to(ICI)}")
+    # Documents dont la source a disparu ou a changé de dossier.
+    for fichier in sorted(racine.rglob("*")):
+        if fichier.is_file() and fichier not in produits:
+            fichier.unlink()
+            print(f"  supprimé : {fichier.relative_to(ICI)}")
+    for dossier in sorted((d for d in racine.rglob("*") if d.is_dir()), reverse=True):
+        if not any(dossier.iterdir()):
+            dossier.rmdir()
+    print(f"  {refaits} document(s) régénéré(s), {len(index) - refaits} inchangé(s)")
     return index
+
+
+def produire(source, texte, corps, meta, destination, epoch):
+    for outil in ("pandoc", "xelatex"):
+        if not shutil.which(outil):
+            sys.exit(f"{outil} est nécessaire pour régénérer les documents")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    env = dict(os.environ, SOURCE_DATE_EPOCH=str(epoch), FORCE_SOURCE_DATE="1")
+    commande = ["pandoc", "-f", "markdown-smart", "-o", str(destination),
+                "--lua-filter", str(ICI / "generation" / "filtre.lua")]
+    if meta["format"] == "pdf":
+        commande += ["--pdf-engine=xelatex", "--template", str(ICI / "generation" / "modele.latex")]
+        entree = texte
+    elif meta["format"] == "docx":
+        entree = texte.replace(corps, AVERTISSEMENT_DOCX + corps, 1)
+    else:
+        sys.exit(f"{source} : format inconnu {meta['format']}")
+    resultat = subprocess.run(commande, input=entree, text=True, env=env, capture_output=True)
+    if resultat.returncode != 0:
+        sys.exit(f"{source} : échec de pandoc\n{resultat.stderr}")
+    print(f"  {destination.relative_to(ICI)}")
 
 
 # ---------------------------------------------------------------- iCalendar et vCard
@@ -238,7 +279,7 @@ def generer_contacts():
 
 def main():
     print("Documents :")
-    index = generer_documents()
+    index = generer_documents(tout="--tout" in sys.argv, adopter="--adopter" in sys.argv)
     print("Agendas :")
     generer_agendas()
     print("Contacts :")

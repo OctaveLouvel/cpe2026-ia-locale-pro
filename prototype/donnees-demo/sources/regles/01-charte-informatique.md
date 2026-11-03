@@ -3,7 +3,7 @@ titre: "Charte informatique et confidentialité du cabinet"
 fichier: "Charte informatique et confidentialité du cabinet"
 format: pdf
 date: 2026-01-05
-entete: "Administratif - usage interne"
+entete: "Règles du cabinet"
 ---
 
 ::: centre

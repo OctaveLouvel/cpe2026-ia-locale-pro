@@ -1,0 +1,38 @@
+# Secrets
+.env
+*.env
+!.env.example
+*.key
+*.pem
+secrets/
+
+# Modèles et gros fichiers
+*.gguf
+*.safetensors
+*.bin
+models/
+*.zim
+
+# Données
+data/
+*.sqlite
+*.db
+backups/
+
+# Contacts et entretiens nominatifs (à garder hors du dépôt)
+contacts*
+entretiens/*.xlsx
+entretiens/*.csv
+entretiens/*.pdf
+
+# Outils
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+dist/
+build/
+.DS_Store
+.idea/
+.vscode/

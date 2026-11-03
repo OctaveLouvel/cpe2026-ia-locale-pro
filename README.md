@@ -227,7 +227,8 @@ docs/
   roadmap-5-ans.md           Planning global à 5 ans
   sources.md                 Toutes les sources citées
 entretiens/
-  guide-entretien.md         Script et questions
+  guide-entretien.md         Script et questions (version détaillée 15 min)
+  guide-entretien-v2.md      Script rapide (accroche courte, 5 min et prix)
   modele-compte-rendu.md     Modèle de fiche d'entretien
   suivi.md                   Tableau de suivi des entretiens (données réelles uniquement)
 livrables/

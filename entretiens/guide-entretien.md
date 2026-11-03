@@ -16,7 +16,7 @@ Cible : **au moins 15 entretiens réels avec des avocats d'ici le mercredi 4 nov
 
 ## Accroche téléphonique (30 secondes)
 
-> Bonjour, je m'appelle [prénom], je suis étudiant à [école]. Nous préparons un projet d'entreprise sur la façon dont les cabinets d'avocats gèrent leurs documents et l'intelligence artificielle, en respectant le secret professionnel. Auriez-vous 15 minutes, maintenant ou à un autre moment aujourd'hui ou demain, pour nous raconter comment ça se passe chez vous ? Il n'y a rien à vendre.
+> Bonjour, je m'appelle [prénom], je suis étudiant à [école]. Nous préparons un projet d'entreprise sur la façon dont les cabinets d'avocats gèrent leurs documents et l'intelligence artificielle, en respectant le secret professionnel. Auriez-vous 15 minutes, maintenant ou à un autre moment aujourd'hui ou demain, pour nous raconter comment ça se passe chez vous ? Je n'ai rien à vendre, c'est pour un travail scolaire.
 
 Si refus : demander s'il y a une autre personne du cabinet à qui en parler, ou un confrère.
 

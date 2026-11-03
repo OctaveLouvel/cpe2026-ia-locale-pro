@@ -221,6 +221,7 @@ Chaque piège ci-dessous a été identifié pendant l'analyse du projet. **Un ag
 ```
 README.md                    Ce fichier : point d'entrée
 AGENTS.md                    Règles pour les agents IA
+CLAUDE.md                    Charge AGENTS.md automatiquement dans Claude Code
 docs/
   attendus-challenge.md      Règles, grille, calendrier officiel du challenge
   planning-semaine.md        Tâches par jour et par rôle (3 au 9 nov)

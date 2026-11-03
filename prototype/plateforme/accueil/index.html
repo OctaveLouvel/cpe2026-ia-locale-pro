@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Box du cabinet</title>
+<!-- Page d'accueil provisoire de la plateforme (DEV-1), remplacée par le tableau de bord de DEV-3.
+     Aucune ressource externe : elle s'affiche câble débranché. -->
+<style>
+  :root { --fond: #f4f6f8; --carte: #ffffff; --texte: #1b2430; --doux: #5b6675; --accent: #1d3557; --bord: #d9dee5; }
+  @media (prefers-color-scheme: dark) {
+    :root { --fond: #11161d; --carte: #1a212b; --texte: #e6eaf0; --doux: #9aa5b4; --accent: #8fb3e8; --bord: #2c3542; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--fond); color: var(--texte); }
+  main { max-width: 760px; margin: 0 auto; padding: 48px 16px; }
+  h1 { margin: 0 0 4px; font-size: 1.6rem; }
+  .sous-titre { margin: 0 0 32px; color: var(--doux); }
+  .services { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  a.service { display: block; padding: 20px; border: 1px solid var(--bord); border-radius: 10px; background: var(--carte); color: inherit; text-decoration: none; }
+  a.service:hover { border-color: var(--accent); }
+  a.service strong { display: block; color: var(--accent); margin-bottom: 6px; }
+  a.service span { color: var(--doux); font-size: .95rem; }
+  .note { margin-top: 32px; color: var(--doux); font-size: .9rem; line-height: 1.5; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Box du cabinet</h1>
+  <p class="sous-titre">Fonctionne sans internet. Aucune donnée ne quitte le cabinet.</p>
+  <div class="services">
+    <a class="service" data-sous-domaine="cloud" href="#"><strong>Fichiers, agenda, contacts</strong><span>Dossiers clients et agenda partagé du cabinet</span></a>
+    <a class="service" data-sous-domaine="coffre" href="#"><strong>Coffre-fort</strong><span>Mots de passe du cabinet. L'assistant IA n'y a pas accès.</span></a>
+  </div>
+  <p class="note">Page provisoire de la plateforme, remplacée par le tableau de bord. Pour faire confiance aux certificats de la box sur un poste, installer le <a href="http://" id="lien-ca">certificat racine local</a> après avoir vérifié son empreinte.</p>
+</main>
+<script>
+  for (const lien of document.querySelectorAll("a[data-sous-domaine]")) {
+    lien.href = "https://" + lien.dataset.sousDomaine + "." + location.host + "/";
+  }
+  document.getElementById("lien-ca").href = "http://" + location.hostname + "/autorite-locale.crt";
+</script>
+</body>
+</html>

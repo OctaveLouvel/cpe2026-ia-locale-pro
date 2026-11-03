@@ -1,0 +1,18 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:fournil-fin-delai-commandement@corbiere-avocats.example
+DTSTAMP:20261101T090000Z
+DTSTART;VALUE=DATE:20261022
+DTEND;VALUE=DATE:20261023
+SUMMARY:Fin du délai d'un mois du commandement de payer - Fournil des Aub
+ épines
+DESCRIPTION:Commandement de payer visant la clause résolutoire signifié l
+ e 22 septembre 2026 pour 8 250 euros. Paiement partiel de 2 750 euros le 1
+ 5 octobre : reste dû 5 500 euros.\n\nÉvénement FICTIF (données de dém
+ onstration).
+CATEGORIES:Dossier 2026-014
+END:VEVENT
+END:VCALENDAR

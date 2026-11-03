@@ -1,0 +1,36 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+CALSCALE:GREGORIAN
+BEGIN:VTIMEZONE
+TZID:Europe/Paris
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:fournil-audience-refere@corbiere-avocats.example
+DTSTAMP:20261101T090000Z
+DTSTART;TZID=Europe/Paris:20261117T093000
+DTEND;TZID=Europe/Paris:20261117T113000
+SUMMARY:Audience de référé - SCI Montaury c. SARL Fournil des Aubépines
+  (RG 26/01482)
+LOCATION:Tribunal judiciaire d'Évry\, juge des référés
+DESCRIPTION:Plaidoirie : Me Corbière. Nous demandons des délais de paieme
+ nt et la suspension des effets de la clause résolutoire. Apporter le doss
+ ier de plaidoirie\, le rapport d'expertise du 9 juillet 2026 et le décomp
+ te locatif.\n\nÉvénement FICTIF (données de démonstration).
+CATEGORIES:Dossier 2026-014
+END:VEVENT
+END:VCALENDAR

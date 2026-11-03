@@ -1,0 +1,434 @@
+{
+  "avertissement": "Données entièrement FICTIVES, créées pour la démonstration du prototype. Le cabinet, les personnes, les sociétés, les adresses, les numéros et les affaires sont inventés. Toute ressemblance avec des personnes ou des sociétés existantes serait fortuite.",
+  "date_de_reference": "2026-11-06",
+  "documents": [
+    {
+      "chemin": "Dossiers clients/2026-009 Lefort - divorce amiable/01 Convention d'honoraires - M. Lefort.pdf",
+      "dossier": "2026-009",
+      "titre": "Convention d'honoraires - M. Antoine Lefort",
+      "date": "2026-09-21",
+      "horodatage": 1789977600,
+      "format": "pdf",
+      "pages": 1,
+      "sha256": "0acf0f6c28bfe469ee69ad7c6eca55b246125e3438d36026e704c0be5bf4820a",
+      "lecteurs": [
+        "hcorbiere"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-009 Lefort - divorce amiable/02 Note d'entretien du 21 septembre 2026.docx",
+      "dossier": "2026-009",
+      "titre": "Note d'entretien du 21 septembre 2026 avec M. Lefort",
+      "date": "2026-09-21",
+      "horodatage": 1789977600,
+      "format": "docx",
+      "pages": null,
+      "sha256": "f52c07642003baad0655c1f591833c8199fee468d99a66caa311ad11ac59c1a9",
+      "lecteurs": [
+        "hcorbiere"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-009 Lefort - divorce amiable/03 Inventaire du patrimoine des époux Lefort.pdf",
+      "dossier": "2026-009",
+      "titre": "Inventaire du patrimoine des époux Lefort au 5 octobre 2026",
+      "date": "2026-10-05",
+      "horodatage": 1791187200,
+      "format": "pdf",
+      "pages": 1,
+      "sha256": "aeb56ee47894ab283fb3249b3f5d76b5632290a2d61c191eaa30a8ad71164dec",
+      "lecteurs": [
+        "hcorbiere"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-009 Lefort - divorce amiable/04 Courrier de Me Desforges du 22 octobre 2026.pdf",
+      "dossier": "2026-009",
+      "titre": "Courrier de Me Desforges du 22 octobre 2026 - propositions de Mme Lefort",
+      "date": "2026-10-22",
+      "horodatage": 1792656000,
+      "format": "pdf",
+      "pages": 1,
+      "sha256": "8ae67db58e33a54d56776705bdb75d281157aa1fb5d072da80bdc3abfa67f41d",
+      "lecteurs": [
+        "hcorbiere"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-009 Lefort - divorce amiable/05 Courrier à Me Desforges du 30 octobre 2026.pdf",
+      "dossier": "2026-009",
+      "titre": "Courrier à Me Desforges du 30 octobre 2026 - réponse de M. Lefort",
+      "date": "2026-10-30",
+      "horodatage": 1793350800,
+      "format": "pdf",
+      "pages": 1,
+      "sha256": "5122288e8641fc58e8bdce3227458170becd8d8e431f2614cedf8b6bbea30c40",
+      "lecteurs": [
+        "hcorbiere"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-009 Lefort - divorce amiable/06 Projet de convention de divorce par consentement mutuel - version 2.docx",
+      "dossier": "2026-009",
+      "titre": "Projet de convention de divorce par consentement mutuel Lefort - version 2",
+      "date": "2026-11-04",
+      "horodatage": 1793782800,
+      "format": "docx",
+      "pages": null,
+      "sha256": "bab26b799fc4bd4a8e7e5ff47ce8c002b30673b6265c62f225b063653aa95d53",
+      "lecteurs": [
+        "hcorbiere"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-014 Fournil des Aubépines - bail commercial/01 Convention d'honoraires - SARL Fournil des Aubépines.pdf",
+      "dossier": "2026-014",
+      "titre": "Convention d'honoraires - SARL Fournil des Aubépines",
+      "date": "2026-10-02",
+      "horodatage": 1790928000,
+      "format": "pdf",
+      "pages": 2,
+      "sha256": "541ec0d66c56c34f98ada503ffb97082188cef5738b6050497e46669169fb627",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult",
+        "ibelkacem"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-014 Fournil des Aubépines - bail commercial/02 Bail commercial du 1er mars 2019.pdf",
+      "dossier": "2026-014",
+      "titre": "Bail commercial du 1er mars 2019 - SCI Montaury / SARL Fournil des Aubépines",
+      "date": "2019-03-01",
+      "horodatage": 1551430800,
+      "format": "pdf",
+      "pages": 3,
+      "sha256": "69ad9df7e91199643568ea6eb5b79401facd0fee23862c4f61e413a8bc410a26",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult",
+        "ibelkacem"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-014 Fournil des Aubépines - bail commercial/03 Courriel de M. Bensaïd du 18 juin 2026 - dégât des eaux.pdf",
+      "dossier": "2026-014",
+      "titre": "Courriel de M. Bensaïd au bailleur du 18 juin 2026 - dégât des eaux",
+      "date": "2026-06-18",
+      "horodatage": 1781769600,
+      "format": "pdf",
+      "pages": 1,
+      "sha256": "abddea68fda05be0c5223c6b4fd06c8d57fad72c279c7d0ae03c77977619e9f8",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult",
+        "ibelkacem"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-014 Fournil des Aubépines - bail commercial/04 Lettre recommandée au bailleur du 26 juin 2026.pdf",
+      "dossier": "2026-014",
+      "titre": "Lettre recommandée du locataire au bailleur du 26 juin 2026 - mise en demeure de réparer la toiture",
+      "date": "2026-06-26",
+      "horodatage": 1782460800,
+      "format": "pdf",
+      "pages": 1,
+      "sha256": "13a199267f98b7cf2d30bbe5ba59a5387ef6f19d7337f32810f93dc806ef85a1",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult",
+        "ibelkacem"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-014 Fournil des Aubépines - bail commercial/05 Rapport d'expertise de l'assureur du 9 juillet 2026.pdf",
+      "dossier": "2026-014",
+      "titre": "Rapport d'expertise de l'assureur du 9 juillet 2026 - dégât des eaux au Fournil des Aubépines",
+      "date": "2026-07-09",
+      "horodatage": 1783584000,
+      "format": "pdf",
+      "pages": 2,
+      "sha256": "20ddafad1f1c9f997fd0a5d79352fbe816c24475711552b1ef2b436b3a3ea275",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult",
+        "ibelkacem"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-014 Fournil des Aubépines - bail commercial/06 Commandement de payer du 22 septembre 2026.pdf",
+      "dossier": "2026-014",
+      "titre": "Commandement de payer visant la clause résolutoire du 22 septembre 2026",
+      "date": "2026-09-22",
+      "horodatage": 1790064000,
+      "format": "pdf",
+      "pages": 2,
+      "sha256": "59a8133bea69847f6d4e03e4e03542a8b49d17b1b28267d9a94683d9f6755d6d",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult",
+        "ibelkacem"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-014 Fournil des Aubépines - bail commercial/07 Décompte locatif au 3 novembre 2026.pdf",
+      "dossier": "2026-014",
+      "titre": "Décompte locatif du Fournil des Aubépines au 3 novembre 2026",
+      "date": "2026-11-03",
+      "horodatage": 1793696400,
+      "format": "pdf",
+      "pages": 2,
+      "sha256": "b203f8e2499b7a3a8a5ca257a08e4ae9b67bf44859db4d3aa6541e99f9735872",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult",
+        "ibelkacem"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-014 Fournil des Aubépines - bail commercial/08 Assignation en référé du 29 octobre 2026.pdf",
+      "dossier": "2026-014",
+      "titre": "Assignation en référé du 29 octobre 2026 - SCI Montaury contre SARL Fournil des Aubépines",
+      "date": "2026-10-29",
+      "horodatage": 1793264400,
+      "format": "pdf",
+      "pages": 2,
+      "sha256": "cbcb1e9e9ca12a460598134922388c74a52f83342a05f0660c5a34a1006f0fe1",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult",
+        "ibelkacem"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-014 Fournil des Aubépines - bail commercial/09 Note d'entretien du 2 octobre 2026.docx",
+      "dossier": "2026-014",
+      "titre": "Note d'entretien du 2 octobre 2026 avec M. Bensaïd",
+      "date": "2026-10-02",
+      "horodatage": 1790928000,
+      "format": "docx",
+      "pages": null,
+      "sha256": "d5d4afdaf53098b730d575913570eaec33a6f4cfce310f89e377b220e6e8d834",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult",
+        "ibelkacem"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-014 Fournil des Aubépines - bail commercial/10 Projet de conclusions en défense (référé) - version 1.docx",
+      "dossier": "2026-014",
+      "titre": "Projet de conclusions en défense - référé SCI Montaury contre SARL Fournil des Aubépines",
+      "date": "2026-11-03",
+      "horodatage": 1793696400,
+      "format": "docx",
+      "pages": null,
+      "sha256": "8e67983221684a8e7c14649c02a953f9535b2ea2a9bf90d7fd90f5500ca8d184",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult",
+        "ibelkacem"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-021 Garnier c. Techniflux - licenciement/01 Convention d'honoraires - Mme Garnier.pdf",
+      "dossier": "2026-021",
+      "titre": "Convention d'honoraires - Mme Élodie Garnier",
+      "date": "2026-09-15",
+      "horodatage": 1789459200,
+      "format": "pdf",
+      "pages": 2,
+      "sha256": "0baa4be09beb7d743e68008635f2bcca62c9ee857e5a45d8b17b163f7be68cee",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-021 Garnier c. Techniflux - licenciement/02 Contrat de travail du 4 janvier 2021.pdf",
+      "dossier": "2026-021",
+      "titre": "Contrat de travail à durée indéterminée de Mme Élodie Garnier - SAS Techniflux",
+      "date": "2021-01-04",
+      "horodatage": 1609750800,
+      "format": "pdf",
+      "pages": 3,
+      "sha256": "cc47f5b0ea9b43311601d1e42da1d9e954e020cef54526e170a321a9b10347a2",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-021 Garnier c. Techniflux - licenciement/03 Avenant n° 1 du 1er février 2023.pdf",
+      "dossier": "2026-021",
+      "titre": "Avenant n° 1 du 1er février 2023 au contrat de travail de Mme Garnier",
+      "date": "2023-02-01",
+      "horodatage": 1675242000,
+      "format": "pdf",
+      "pages": 1,
+      "sha256": "5a4b39a4e5ba68f2c9e9532136ba051dd4d0a4b2473fd6b98e633decae24e3a3",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-021 Garnier c. Techniflux - licenciement/04 Convocation à entretien préalable du 17 août 2026.pdf",
+      "dossier": "2026-021",
+      "titre": "Convocation de Mme Garnier à un entretien préalable au licenciement - 17 août 2026",
+      "date": "2026-08-17",
+      "horodatage": 1786953600,
+      "format": "pdf",
+      "pages": 1,
+      "sha256": "98a0afe589d122ade0764261d096a649a861dd508a65b6498c9f2a7402d1b8ad",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-021 Garnier c. Techniflux - licenciement/05 Lettre de licenciement du 8 septembre 2026.pdf",
+      "dossier": "2026-021",
+      "titre": "Lettre de licenciement de Mme Garnier du 8 septembre 2026",
+      "date": "2026-09-08",
+      "horodatage": 1788854400,
+      "format": "pdf",
+      "pages": 1,
+      "sha256": "ebf32206e0e2a61014af8d202a32737d936a0a30199acb81ad6d283fd1292e13",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-021 Garnier c. Techniflux - licenciement/06 Courriel de Techniflux du 2 octobre 2026 - renonciation à la clause de non-concurrence.pdf",
+      "dossier": "2026-021",
+      "titre": "Courriel de la SAS Techniflux du 2 octobre 2026 - renonciation à la clause de non-concurrence",
+      "date": "2026-10-02",
+      "horodatage": 1790928000,
+      "format": "pdf",
+      "pages": 1,
+      "sha256": "07b23e99250597b8ffd72610ef6f3ff88a0556a897a250e269e9b8471f4ab4e3",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-021 Garnier c. Techniflux - licenciement/07 Tableau des salaires septembre 2025 - août 2026.pdf",
+      "dossier": "2026-021",
+      "titre": "Tableau des salaires de Mme Garnier de septembre 2025 à août 2026 et calcul des demandes",
+      "date": "2026-10-06",
+      "horodatage": 1791273600,
+      "format": "pdf",
+      "pages": 1,
+      "sha256": "d2e9a195dfc75fb8a9d7b253e53c639e893680f74faedd425926f2b05a881cad",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-021 Garnier c. Techniflux - licenciement/08 Attestation de M. Lucas Fontaine du 12 octobre 2026.pdf",
+      "dossier": "2026-021",
+      "titre": "Attestation de témoin de M. Lucas Fontaine du 12 octobre 2026",
+      "date": "2026-10-12",
+      "horodatage": 1791792000,
+      "format": "pdf",
+      "pages": 1,
+      "sha256": "f197f04a79f27345341159553e98b49da3952a5898136438a36a73373b8ae04e",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-021 Garnier c. Techniflux - licenciement/09 Note d'entretien du 15 septembre 2026.docx",
+      "dossier": "2026-021",
+      "titre": "Note d'entretien du 15 septembre 2026 avec Mme Garnier",
+      "date": "2026-09-15",
+      "horodatage": 1789459200,
+      "format": "docx",
+      "pages": null,
+      "sha256": "478383f976c3f774d2e9663fc2636380aebabf83bb838a3d74a5ff07431be77e",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult"
+      ]
+    },
+    {
+      "chemin": "Dossiers clients/2026-021 Garnier c. Techniflux - licenciement/10 Requête devant le conseil de prud'hommes du 20 octobre 2026.docx",
+      "dossier": "2026-021",
+      "titre": "Requête introductive d'instance devant le conseil de prud'hommes de Longjumeau - Garnier contre SAS Techniflux",
+      "date": "2026-10-20",
+      "horodatage": 1792483200,
+      "format": "docx",
+      "pages": null,
+      "sha256": "4a564e686548fba3a21b72c3f0f19f9c6b98ddd3d9af78946fa3e1ea00a66f0c",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult"
+      ]
+    },
+    {
+      "chemin": "Administratif/Tableau de suivi des dossiers en cours.pdf",
+      "dossier": "administratif",
+      "titre": "Tableau de suivi des dossiers en cours au 2 novembre 2026",
+      "date": "2026-11-02",
+      "horodatage": 1793610000,
+      "format": "pdf",
+      "pages": 1,
+      "sha256": "d5efd39ac49f82145d073aa4cae6f43ca68131a967d819562e91a59ae621e9a0",
+      "lecteurs": [
+        "hcorbiere",
+        "mthevenet"
+      ]
+    },
+    {
+      "chemin": "Administratif/Charte informatique et confidentialité du cabinet.pdf",
+      "dossier": "administratif",
+      "titre": "Charte informatique et confidentialité du cabinet",
+      "date": "2026-01-05",
+      "horodatage": 1767603600,
+      "format": "pdf",
+      "pages": 1,
+      "sha256": "44ef1d09b356db6863bf8824b3ae70fb539c9d9aded6ba9fde05c9dd930e67bd",
+      "lecteurs": [
+        "hcorbiere",
+        "mthevenet"
+      ]
+    },
+    {
+      "chemin": "Modèles/Modèle - Convention d'honoraires.docx",
+      "dossier": "modeles",
+      "titre": "Modèle de convention d'honoraires du cabinet",
+      "date": "2025-09-01",
+      "horodatage": 1756713600,
+      "format": "docx",
+      "pages": null,
+      "sha256": "3d0592fa9446ab4dc354d00c9a856c8a1ad27c56861e053dea838c8833f9e1a2",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult",
+        "ibelkacem",
+        "mthevenet"
+      ]
+    },
+    {
+      "chemin": "Modèles/Modèle - Lettre de mise en demeure.docx",
+      "dossier": "modeles",
+      "titre": "Modèle de lettre de mise en demeure",
+      "date": "2025-09-01",
+      "horodatage": 1756713600,
+      "format": "docx",
+      "pages": null,
+      "sha256": "64775b48b8a8cefda04b5d8a3af5dd3be9f800b1a2ba51c30c61c16e5a667d87",
+      "lecteurs": [
+        "hcorbiere",
+        "jarnoult",
+        "ibelkacem",
+        "mthevenet"
+      ]
+    }
+  ]
+}

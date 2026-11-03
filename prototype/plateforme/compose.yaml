@@ -1,0 +1,173 @@
+# Services de base de la box (DEV-1).
+# Lancement et explications : README.md du même dossier. Ne pas lancer à la main la première
+# fois : `./box.sh installer` crée le fichier .env (secrets) puis démarre tout.
+#
+# Règle réseau : seul le reverse proxy est sur le réseau « frontal » relié à l'hôte.
+# Tous les autres services sont sur le réseau « interne », sans aucun accès à internet.
+# Un service ajouté par une autre équipe (IA, tableau de bord) va sur « interne ».
+
+name: box
+
+x-nextcloud-env: &nextcloud-env
+  POSTGRES_HOST: db
+  POSTGRES_DB: nextcloud
+  POSTGRES_USER: nextcloud
+  POSTGRES_PASSWORD: ${NC_DB_PASSWORD:?lancer ./box.sh installer pour créer .env}
+  REDIS_HOST: cache
+  REDIS_HOST_PASSWORD: ${CACHE_PASSWORD:?}
+  NEXTCLOUD_ADMIN_USER: ${NC_ADMIN_USER:-admin}
+  NEXTCLOUD_ADMIN_PASSWORD: ${NC_ADMIN_PASSWORD:?}
+  NEXTCLOUD_TRUSTED_DOMAINS: cloud.${BOX_DOMAIN:-cabinet.localhost} nextcloud
+  TRUSTED_PROXIES: 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
+  OVERWRITEPROTOCOL: https
+  OVERWRITECLIURL: https://cloud.${BOX_DOMAIN:-cabinet.localhost}
+  PHP_MEMORY_LIMIT: 1G
+  PHP_UPLOAD_LIMIT: 4G
+  BOX_DOMAIN: ${BOX_DOMAIN:-cabinet.localhost}
+  BOX_NOM: ${BOX_NOM:-Box du cabinet}
+  TZ: Europe/Paris
+
+x-nextcloud-volumes: &nextcloud-volumes
+  - nextcloud_html:/var/www/html
+  - nextcloud_donnees:/var/www/html/data
+
+services:
+  # Reverse proxy TLS avec autorité de certification locale (aucune autorité publique).
+  proxy:
+    image: caddy:2.11.7-alpine
+    restart: unless-stopped
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:80:80"
+      - "${BIND_ADDRESS:-127.0.0.1}:443:443"
+    environment:
+      BOX_DOMAIN: ${BOX_DOMAIN:-cabinet.localhost}
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy/sites:/etc/caddy/sites:ro
+      - ./accueil:/srv/accueil:ro
+      - caddy_donnees:/data
+      - caddy_config:/config
+    networks: [frontal, interne]
+    depends_on:
+      nextcloud:
+        condition: service_started
+      coffre:
+        condition: service_started
+
+  # Fichiers, agenda, contacts. Image dérivée : Agenda et Contacts intégrés, durcissement hors ligne.
+  nextcloud:
+    build: ./nextcloud
+    image: box/nextcloud:34.0.5-1
+    restart: unless-stopped
+    environment: *nextcloud-env
+    volumes: *nextcloud-volumes
+    networks: [interne]
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null http://localhost/status.php || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10m
+      start_interval: 5s
+
+  # Tâches de fond de Nextcloud (toutes les 5 minutes).
+  nextcloud-cron:
+    image: box/nextcloud:34.0.5-1
+    restart: unless-stopped
+    entrypoint: /cron.sh
+    environment: *nextcloud-env
+    volumes: *nextcloud-volumes
+    networks: [interne]
+    depends_on:
+      nextcloud:
+        condition: service_healthy
+
+  db:
+    image: postgres:17.11-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: nextcloud
+      POSTGRES_USER: nextcloud
+      POSTGRES_PASSWORD: ${NC_DB_PASSWORD:?}
+      TZ: Europe/Paris
+    volumes:
+      - db_donnees:/var/lib/postgresql/data
+    networks: [interne]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nextcloud -d nextcloud"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # Cache et verrous de fichiers de Nextcloud (rien n'est écrit sur disque).
+  cache:
+    image: valkey/valkey:8.1.11-alpine
+    restart: unless-stopped
+    command: ["valkey-server", "--requirepass", "${CACHE_PASSWORD:?}", "--save", "", "--appendonly", "no"]
+    environment:
+      CACHE_PASSWORD: ${CACHE_PASSWORD:?}
+    networks: [interne]
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli -a \"$$CACHE_PASSWORD\" --no-auth-warning ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # Coffre-fort de mots de passe, compatible avec les applications Bitwarden.
+  # L'assistant IA n'a jamais accès à ce service.
+  coffre:
+    image: vaultwarden/server:1.37.5-alpine
+    restart: unless-stopped
+    environment:
+      DOMAIN: https://coffre.${BOX_DOMAIN:-cabinet.localhost}
+      SIGNUPS_ALLOWED: "false"
+      INVITATIONS_ALLOWED: "true"
+      ADMIN_TOKEN: ${VW_ADMIN_TOKEN:?}
+      # Pas de téléchargement d'icônes de sites : ce serait une connexion sortante.
+      DISABLE_ICON_DOWNLOAD: "true"
+      ICON_SERVICE: internal
+      PASSWORD_HINTS_ALLOWED: "false"
+      SHOW_PASSWORD_HINT: "false"
+      LOG_LEVEL: warn
+      TZ: Europe/Paris
+    volumes:
+      - coffre_donnees:/data
+    networks: [interne]
+
+  # Outil ponctuel : chargement du jeu de données fictif (./box.sh donnees-demo).
+  outils:
+    image: python:3.12-slim
+    profiles: [outils]
+    working_dir: /outils
+    entrypoint: ["python3", "-u"]
+    environment:
+      NC_URL: http://nextcloud
+      NC_ADMIN_USER: ${NC_ADMIN_USER:-admin}
+      NC_ADMIN_PASSWORD: ${NC_ADMIN_PASSWORD:?}
+      DEMO_MOT_DE_PASSE: ${DEMO_MOT_DE_PASSE:?}
+      VW_URL: http://coffre
+      VW_ADMIN_TOKEN: ${VW_ADMIN_TOKEN:?}
+    volumes:
+      - ./outils:/outils:ro
+      - ../donnees-demo:/donnees-demo:ro
+    networks: [interne]
+
+networks:
+  # Seul réseau relié à l'hôte : il reçoit les connexions des postes du cabinet.
+  frontal: {}
+  # Réseau des services : « internal » interdit toute sortie vers internet.
+  interne:
+    internal: true
+
+volumes:
+  caddy_donnees:
+  caddy_config:
+  nextcloud_html:
+  nextcloud_donnees:
+  db_donnees:
+  coffre_donnees:

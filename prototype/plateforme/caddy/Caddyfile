@@ -1,0 +1,66 @@
+# Reverse proxy TLS de la box (DEV-1).
+# Tous les certificats sont signés par l'autorité de certification locale de Caddy :
+# aucune demande à une autorité publique, tout fonctionne câble débranché.
+# Les postes du cabinet doivent faire confiance au certificat racine (voir README.md).
+{
+	local_certs
+	skip_install_trust
+	servers {
+		protocols h1 h2
+	}
+	pki {
+		ca local {
+			name "Box du cabinet"
+			root_cn "Box du cabinet - autorite racine locale"
+			intermediate_cn "Box du cabinet - autorite intermediaire"
+		}
+	}
+}
+
+(entetes) {
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+}
+
+# Seule ressource servie sans TLS : le certificat racine, pour l'installer sur les postes.
+# Vérifier son empreinte (affichée par ./box.sh installer) avant de lui faire confiance.
+http://{$BOX_DOMAIN} {
+	handle /autorite-locale.crt {
+		root * /data/caddy/pki/authorities/local
+		rewrite * /root.crt
+		header Content-Type application/x-x509-ca-cert
+		file_server
+	}
+	handle {
+		redir https://{host}{uri} 308
+	}
+}
+
+# Page d'accueil provisoire (remplacée par le tableau de bord de DEV-3).
+{$BOX_DOMAIN} {
+	import entetes
+	root * /srv/accueil
+	file_server
+}
+
+# Fichiers, agenda, contacts.
+cloud.{$BOX_DOMAIN} {
+	import entetes
+	redir /.well-known/carddav /remote.php/dav/ 301
+	redir /.well-known/caldav /remote.php/dav/ 301
+	request_body {
+		max_size 4GB
+	}
+	reverse_proxy nextcloud:80
+}
+
+# Coffre-fort de mots de passe.
+coffre.{$BOX_DOMAIN} {
+	import entetes
+	reverse_proxy coffre:80
+}
+
+# Services des autres équipes : un fichier <service>.caddy par service dans caddy/sites/.
+import sites/*.caddy

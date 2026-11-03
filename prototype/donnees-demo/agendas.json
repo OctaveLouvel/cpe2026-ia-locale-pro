@@ -1,0 +1,190 @@
+{
+  "avertissement": "Événements FICTIFS. Semaine de la démo : du lundi 2 au vendredi 6 novembre 2026.",
+  "evenements": [
+    {
+      "id": "reunion-equipe",
+      "agenda": "audiences",
+      "titre": "Réunion d'équipe hebdomadaire",
+      "debut": "2026-09-02T09:00:00",
+      "fin": "2026-09-02T09:30:00",
+      "lieu": "Salle de réunion du cabinet",
+      "description": "Point sur les dossiers en cours et les échéances de la semaine.",
+      "repetition": "FREQ=WEEKLY;BYDAY=WE"
+    },
+    {
+      "id": "garnier-depot-requete",
+      "agenda": "audiences",
+      "dossier": "2026-021",
+      "titre": "Dépôt de la requête au conseil de prud'hommes - Garnier c. SAS Techniflux",
+      "jour": "2026-10-20",
+      "description": "Requête déposée au greffe du conseil de prud'hommes de Longjumeau. Responsable : Me Arnoult."
+    },
+    {
+      "id": "fournil-fin-delai-commandement",
+      "agenda": "audiences",
+      "dossier": "2026-014",
+      "titre": "Fin du délai d'un mois du commandement de payer - Fournil des Aubépines",
+      "jour": "2026-10-22",
+      "description": "Commandement de payer visant la clause résolutoire signifié le 22 septembre 2026 pour 8 250 euros. Paiement partiel de 2 750 euros le 15 octobre : reste dû 5 500 euros."
+    },
+    {
+      "id": "fournil-conclusions",
+      "agenda": "audiences",
+      "dossier": "2026-014",
+      "titre": "Échéance : conclusions et pièces à communiquer à Me Lucet - référé Fournil des Aubépines",
+      "jour": "2026-11-10",
+      "description": "Communiquer les conclusions en défense et le bordereau de pièces au conseil du bailleur avant l'audience du 17 novembre. Projet de conclusions rédigé par Me Arnoult, relecture par Me Corbière."
+    },
+    {
+      "id": "fournil-expertise",
+      "agenda": "audiences",
+      "dossier": "2026-014",
+      "titre": "Réunion d'expertise de l'assureur dans les locaux du Fournil des Aubépines",
+      "debut": "2026-11-13T14:00:00",
+      "fin": "2026-11-13T15:30:00",
+      "lieu": "Fournil des Aubépines, 12 place du Marché-Neuf, 91000 Évry-Courcouronnes (adresse fictive)",
+      "description": "Réunion avec M. Hugo Perrin, expert mandaté par l'assureur du locataire, sur la perte d'exploitation pendant la fermeture du 15 juin au 2 août 2026. Présence de M. Bensaïd. Me Arnoult y assiste."
+    },
+    {
+      "id": "fournil-audience-refere",
+      "agenda": "audiences",
+      "dossier": "2026-014",
+      "titre": "Audience de référé - SCI Montaury c. SARL Fournil des Aubépines (RG 26/01482)",
+      "debut": "2026-11-17T09:30:00",
+      "fin": "2026-11-17T11:30:00",
+      "lieu": "Tribunal judiciaire d'Évry, juge des référés",
+      "description": "Plaidoirie : Me Corbière. Nous demandons des délais de paiement et la suspension des effets de la clause résolutoire. Apporter le dossier de plaidoirie, le rapport d'expertise du 9 juillet 2026 et le décompte locatif."
+    },
+    {
+      "id": "garnier-pieces",
+      "agenda": "audiences",
+      "dossier": "2026-021",
+      "titre": "Échéance : bordereau de pièces Garnier à communiquer à Me Ollier",
+      "jour": "2026-11-20",
+      "description": "Communication des pièces au conseil de la SAS Techniflux avant le bureau de conciliation et d'orientation."
+    },
+    {
+      "id": "garnier-bco",
+      "agenda": "audiences",
+      "dossier": "2026-021",
+      "titre": "Conseil de prud'hommes - bureau de conciliation et d'orientation - Garnier c. SAS Techniflux",
+      "debut": "2026-11-24T14:00:00",
+      "fin": "2026-11-24T15:00:00",
+      "lieu": "Conseil de prud'hommes de Longjumeau",
+      "description": "Me Arnoult. Mme Garnier doit être présente en personne. Numéro de rôle fictif : F 26/00731."
+    },
+    {
+      "id": "corbiere-rdv-bensaid-1",
+      "agenda": "corbiere",
+      "dossier": "2026-014",
+      "titre": "Premier rendez-vous M. Bensaïd (SARL Fournil des Aubépines)",
+      "debut": "2026-10-02T10:00:00",
+      "fin": "2026-10-02T11:30:00",
+      "lieu": "Cabinet",
+      "description": "Commandement de payer signifié le 22 septembre. Ouverture du dossier 2026-014 et signature de la convention d'honoraires."
+    },
+    {
+      "id": "corbiere-rdv-bensaid-2",
+      "agenda": "corbiere",
+      "dossier": "2026-014",
+      "titre": "RDV M. Bensaïd - préparation de l'audience de référé",
+      "debut": "2026-11-05T10:00:00",
+      "fin": "2026-11-05T11:00:00",
+      "lieu": "Cabinet",
+      "description": "Relire le projet de conclusions avec le client. Récupérer l'attestation de l'assureur et les trois derniers bilans."
+    },
+    {
+      "id": "corbiere-appel-lucet",
+      "agenda": "corbiere",
+      "dossier": "2026-014",
+      "titre": "Appel à Me Lucet : proposition d'échéancier amiable",
+      "debut": "2026-11-06T16:00:00",
+      "fin": "2026-11-06T16:30:00",
+      "description": "Proposer le règlement des 5 500 euros restants en 6 mensualités, contre l'abandon de la demande de résiliation du bail."
+    },
+    {
+      "id": "corbiere-rdv-lefort-1",
+      "agenda": "corbiere",
+      "dossier": "2026-009",
+      "titre": "Premier rendez-vous M. Lefort",
+      "debut": "2026-09-21T18:00:00",
+      "fin": "2026-09-21T19:30:00",
+      "lieu": "Cabinet",
+      "description": "Projet de divorce par consentement mutuel. Ouverture du dossier 2026-009."
+    },
+    {
+      "id": "corbiere-rdv-lefort-2",
+      "agenda": "corbiere",
+      "dossier": "2026-009",
+      "titre": "RDV M. Lefort - relecture du projet de convention de divorce (version 2)",
+      "debut": "2026-11-10T18:00:00",
+      "fin": "2026-11-10T19:00:00",
+      "lieu": "Cabinet",
+      "description": "Valider la prestation compensatoire de 17 000 euros et le calendrier de résidence alternée avant l'envoi du projet."
+    },
+    {
+      "id": "corbiere-envoi-convention-lefort",
+      "agenda": "corbiere",
+      "dossier": "2026-009",
+      "titre": "Envoi en recommandé du projet de convention à M. Lefort",
+      "jour": "2026-11-13",
+      "description": "Le délai de réflexion de 15 jours court à compter de la réception de la lettre recommandée (article 229-4 du Code civil). La convention ne peut pas être signée avant l'expiration de ce délai."
+    },
+    {
+      "id": "corbiere-notaire-lefort",
+      "agenda": "corbiere",
+      "dossier": "2026-009",
+      "titre": "RDV Me Vasseur, notaire - état liquidatif Lefort",
+      "debut": "2026-11-19T11:00:00",
+      "fin": "2026-11-19T12:00:00",
+      "lieu": "Étude de Me Vasseur, Évry-Courcouronnes (adresse fictive)",
+      "description": "Point sur l'acte de liquidation du régime matrimonial (maison de Lisses)."
+    },
+    {
+      "id": "corbiere-signature-lefort",
+      "agenda": "corbiere",
+      "dossier": "2026-009",
+      "titre": "Signature de la convention de divorce Lefort",
+      "debut": "2026-12-03T15:00:00",
+      "fin": "2026-12-03T16:30:00",
+      "lieu": "Cabinet de Me Desforges, Corbeil-Essonnes (adresse fictive)",
+      "description": "Signature par les deux époux et les deux avocats, sous réserve de l'expiration du délai de réflexion. Dépôt ensuite au rang des minutes de Me Vasseur."
+    },
+    {
+      "id": "arnoult-rdv-garnier-1",
+      "agenda": "arnoult",
+      "dossier": "2026-021",
+      "titre": "Premier rendez-vous Mme Garnier",
+      "debut": "2026-09-15T17:00:00",
+      "fin": "2026-09-15T18:30:00",
+      "lieu": "Cabinet",
+      "description": "Licenciement pour insuffisance professionnelle notifié le 10 septembre. Ouverture du dossier 2026-021."
+    },
+    {
+      "id": "arnoult-conclusions-fournil",
+      "agenda": "arnoult",
+      "dossier": "2026-014",
+      "titre": "Rédaction des conclusions en défense - référé Fournil des Aubépines",
+      "debut": "2026-11-03T14:00:00",
+      "fin": "2026-11-03T17:00:00",
+      "lieu": "Cabinet"
+    },
+    {
+      "id": "arnoult-visio-garnier",
+      "agenda": "arnoult",
+      "dossier": "2026-021",
+      "titre": "Visio avec Mme Garnier - préparation du bureau de conciliation et d'orientation",
+      "debut": "2026-11-09T17:30:00",
+      "fin": "2026-11-09T18:30:00",
+      "description": "Expliquer le déroulement de l'audience et la marge de négociation sur la contrepartie de non-concurrence."
+    },
+    {
+      "id": "arnoult-appel-ollier",
+      "agenda": "arnoult",
+      "dossier": "2026-021",
+      "titre": "Appel avec Me Ollier (conseil de la SAS Techniflux) - piste de transaction",
+      "debut": "2026-11-12T10:00:00",
+      "fin": "2026-11-12T10:30:00"
+    }
+  ]
+}

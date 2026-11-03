@@ -2,7 +2,7 @@
 
 Chaque chiffre factuel utilisé dans le dépôt ou dans les livrables doit renvoyer à une ligne de ce fichier. Ajouter la source **en même temps** que le chiffre. Indiquer la date de consultation.
 
-Les références [S1] à [S20] ont été consultées le 3 novembre 2026. **Les sources secondaires** (sites d'entreprises privées, agrégateurs) sont signalées : pour les slides, remonter si possible à la source primaire.
+Les références [S1] à [S22] ont été consultées le 3 novembre 2026. **Les sources secondaires** (sites d'entreprises privées, agrégateurs) sont signalées : pour les slides, remonter si possible à la source primaire.
 
 | Réf. | Ce qu'elle appuie | Source | Type |
 |---|---|---|---|
@@ -27,6 +27,8 @@ Les références [S1] à [S20] ont été consultées le 3 novembre 2026. **Les s
 | S18 | ZimaCube : financement participatif largement au-delà de l'objectif | [Hackster.io](https://hackster.io/news/icewhale-unveils-the-zimacube-a-powerful-personal-cloud-box-with-private-gpt-capabilities-e94d5bdd3617) | Presse |
 | S19 | HDS non applicable à un cabinet qui héberge ses propres données ; coût typique 20 000 à 80 000€ sur 3 ans | [Legiscope, certification HDS](https://www.legiscope.com/blog/hds-hebergeur-donnees-sante-certification.html) | Secondaire : remonter à l'ANS (esante.gouv.fr) |
 | S20 | Activité « administration et exploitation du SI » dans le champ de la certification HDS | [AP-HP, affaires juridiques](https://affairesjuridiques.aphp.fr/?p=629194) | Secondaire institutionnelle |
+| S21 | Plages de numéros réservées par l'ARCEP aux œuvres de fiction (01 99 00 XX XX, 06 39 98 XX XX...), utilisées pour les contacts fictifs de la démo | [Numéros pour œuvres audiovisuelles](https://www.hteumeuleu.fr/numeros-pour-oeuvres-audiovisuelles/) ; [ARCEP, la numérotation](https://www.arcep.fr/la-regulation/grands-dossiers-thematiques-transverses/la-numerotation.html) | Secondaire : remonter à la décision de l'ARCEP |
+| S22 | Licences des briques de la plateforme : Nextcloud, Agenda, Contacts et Vaultwarden en AGPL-3.0, coffre web Bitwarden (bw_web_builds) en GPL-3.0, Caddy en Apache-2.0, Valkey en BSD-3-Clause, restic en BSD-2-Clause, PostgreSQL sous licence PostgreSQL | Dépôts officiels, champ « license » de l'API GitHub (nextcloud/server, nextcloud/calendar, nextcloud/contacts, dani-garcia/vaultwarden, dani-garcia/bw_web_builds, caddyserver/caddy, valkey-io/valkey, restic/restic) ; [licence PostgreSQL](https://www.postgresql.org/about/licence/) | Primaire (consulté le 3 novembre 2026) |
 
 ## À sourcer (manquant)
 
@@ -38,5 +40,5 @@ Les références [S1] à [S20] ont été consultées le 3 novembre 2026. **Les s
 - Concurrents indirects : services d'IA en ligne pour avocats, notamment hébergés en Europe.
 - Facteur d'émission de l'électricité en France (Base Empreinte de l'ADEME).
 - Aides et prêts publics pour créateurs de start-up innovantes.
-- Licences exactes des briques logicielles utilisées.
+- Licences exactes des briques de l'IA et du tableau de bord (celles de la plateforme sont en S22).
 - Licence et format des jeux de données ouverts envisagés pour le pack métier.

@@ -37,9 +37,9 @@ Règles valables tous les jours :
 - [ ] **Au moins 3 appels chacun entre 14h30 et 17h00** avec le script de [`entretiens/guide-entretien.md`](../entretiens/guide-entretien.md). Les cabinets sont joignables en journée, pas le soir.
 
 **DEV-1**
-- [ ] Installer l'OS et le moteur de conteneurs sur le matériel de démo.
-- [ ] Déployer Nextcloud (fichiers, agenda, contacts), Vaultwarden et un reverse proxy TLS local.
-- [ ] Créer le **jeu de données fictif** : un faux cabinet avec 3 faux dossiers clients (20 à 30 documents), un agenda rempli, des contacts. Bien marqué « fictif ».
+- [ ] Installer l'OS et le moteur de conteneurs sur le matériel de démo. *(3 nov : plateforme installée sur le portable de DEV-1, matériel proposé en attente de confirmation ; script Debian prêt, voir `docs/prototype.md`, section 2.)*
+- [x] Déployer Nextcloud (fichiers, agenda, contacts), Vaultwarden et un reverse proxy TLS local.
+- [x] Créer le **jeu de données fictif** : un faux cabinet avec 3 faux dossiers clients (20 à 30 documents), un agenda rempli, des contacts. Bien marqué « fictif ». *(30 documents, 20 événements, 14 contacts : `prototype/donnees-demo/`.)*
 
 **DEV-2**
 - [ ] Installer le moteur d'inférence local et télécharger 2 ou 3 modèles candidats.
@@ -92,9 +92,9 @@ Règles valables tous les jours :
 - [ ] **Executive summary v1 à 18h00** dans [`livrables/executive-summary.md`](../livrables/executive-summary.md).
 
 **DEV-1**
-- [ ] Assistant de première configuration (« installeur ») : création du compte administrateur, choix des services, chiffrement activé, premier test de sauvegarde. Il doit tenir en quelques écrans.
-- [ ] Sauvegarde chiffrée vers un disque externe, testée **avec une restauration réelle**.
-- [ ] **16h00 : test de toute la démo câble réseau débranché.** Lister et corriger tout ce qui casse.
+- [x] Assistant de première configuration (« installeur ») : création du compte administrateur, choix des services, chiffrement activé, premier test de sauvegarde. Il doit tenir en quelques écrans. *(Fait le 3 nov : `./box.sh assistant`, 5 écrans. Le chiffrement du disque est vérifié, pas activé : il se choisit à l'installation de Debian.)*
+- [x] Sauvegarde chiffrée vers un disque externe, testée **avec une restauration réelle**. *(Fait le 3 nov vers un dossier local ; à refaire avec le vrai disque USB sur le matériel de démo.)*
+- [ ] **16h00 : test de toute la démo câble réseau débranché.** Lister et corriger tout ce qui casse. *(Outil prêt : `./box.sh verifier-hors-ligne`.)*
 
 **DEV-2**
 - [ ] Assistant IA qui cherche dans les fichiers **et** l'agenda, respecte les droits de l'utilisateur, **n'accède jamais au coffre-fort**, et cite ses sources.

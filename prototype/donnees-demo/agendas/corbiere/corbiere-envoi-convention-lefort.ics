@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:corbiere-envoi-convention-lefort@corbiere-avocats.example
+DTSTAMP:20261101T090000Z
+DTSTART;VALUE=DATE:20261113
+DTEND;VALUE=DATE:20261114
+SUMMARY:Envoi en recommandé du projet de convention à M. Lefort
+DESCRIPTION:Le délai de réflexion de 15 jours court à compter de la réc
+ eption de la lettre recommandée (article 229-4 du Code civil). La convent
+ ion ne peut pas être signée avant l'expiration de ce délai.\n\nÉvénem
+ ent FICTIF (données de démonstration).
+CATEGORIES:Dossier 2026-009
+END:VEVENT
+END:VCALENDAR

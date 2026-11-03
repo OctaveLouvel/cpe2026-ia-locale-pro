@@ -1,0 +1,37 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+CALSCALE:GREGORIAN
+BEGIN:VTIMEZONE
+TZID:Europe/Paris
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:fournil-expertise@corbiere-avocats.example
+DTSTAMP:20261101T090000Z
+DTSTART;TZID=Europe/Paris:20261113T140000
+DTEND;TZID=Europe/Paris:20261113T153000
+SUMMARY:Réunion d'expertise de l'assureur dans les locaux du Fournil des A
+ ubépines
+LOCATION:Fournil des Aubépines\, 12 place du Marché-Neuf\, 91000 Évry-Co
+ urcouronnes (adresse fictive)
+DESCRIPTION:Réunion avec M. Hugo Perrin\, expert mandaté par l'assureur d
+ u locataire\, sur la perte d'exploitation pendant la fermeture du 15 juin 
+ au 2 août 2026. Présence de M. Bensaïd. Me Arnoult y assiste.\n\nÉvén
+ ement FICTIF (données de démonstration).
+CATEGORIES:Dossier 2026-014
+END:VEVENT
+END:VCALENDAR

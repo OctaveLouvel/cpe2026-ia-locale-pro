@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:garnier-depot-requete@corbiere-avocats.example
+DTSTAMP:20261101T090000Z
+DTSTART;VALUE=DATE:20261020
+DTEND;VALUE=DATE:20261021
+SUMMARY:Dépôt de la requête au conseil de prud'hommes - Garnier c. SAS T
+ echniflux
+DESCRIPTION:Requête déposée au greffe du conseil de prud'hommes de Longj
+ umeau. Responsable : Me Arnoult.\n\nÉvénement FICTIF (données de démon
+ stration).
+CATEGORIES:Dossier 2026-021
+END:VEVENT
+END:VCALENDAR

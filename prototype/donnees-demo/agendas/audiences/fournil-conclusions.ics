@@ -1,0 +1,18 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:fournil-conclusions@corbiere-avocats.example
+DTSTAMP:20261101T090000Z
+DTSTART;VALUE=DATE:20261110
+DTEND;VALUE=DATE:20261111
+SUMMARY:Échéance : conclusions et pièces à communiquer à Me Lucet - r
+ éféré Fournil des Aubépines
+DESCRIPTION:Communiquer les conclusions en défense et le bordereau de piè
+ ces au conseil du bailleur avant l'audience du 17 novembre. Projet de conc
+ lusions rédigé par Me Arnoult\, relecture par Me Corbière.\n\nÉvéneme
+ nt FICTIF (données de démonstration).
+CATEGORIES:Dossier 2026-014
+END:VEVENT
+END:VCALENDAR

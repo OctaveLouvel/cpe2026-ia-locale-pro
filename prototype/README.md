@@ -15,6 +15,12 @@ prototype/
 
 Chaque dossier contient un `README.md` qui explique en quelques lignes comment lancer sa partie.
 
+## État au 3 novembre
+
+- **Plateforme (DEV-1), prête** : [`plateforme/README.md`](plateforme/README.md). Deux commandes, `./box.sh installer` puis `./box.sh donnees-demo`, donnent une box complète avec le cabinet fictif. Sauvegarde chiffrée avec restauration testée, assistant d'installation, vérification hors ligne.
+- **Données de démo, prêtes** : [`donnees-demo/README.md`](donnees-demo/README.md). Les PDF et DOCX sont utilisables tout de suite par DEV-2 pour le premier prototype de recherche, avec la liste des comptes qui peuvent lire chaque document (`index.json`).
+- IA (DEV-2), interface (DEV-3), sécurité (DEV-4) : à brancher sur le réseau `interne` de la plateforme, voir la section « Pour les autres équipes » du README de la plateforme.
+
 ## Rappels
 
 - Tout doit fonctionner **câble réseau débranché** : aucune ressource chargée depuis internet à l'exécution.

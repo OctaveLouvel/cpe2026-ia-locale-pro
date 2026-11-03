@@ -27,7 +27,17 @@ Décision de DEV-1 **avant mardi 3 novembre à 14h00**. Prendre ce qui est dispo
 
 Recommandation : développer sur la VM si c'est plus rapide, mais **faire la démo du vendredi sur une machine physique posée sur la table**.
 
-Noter ici le matériel retenu et ses caractéristiques (processeur, mémoire, GPU, stockage) : **_à compléter par DEV-1_**.
+**Proposition de DEV-1 (3 novembre, à confirmer au point de 17h30)** : développer et, faute de mieux, faire la démo sur le portable de DEV-1, un Dell Inspiron 14 5435.
+
+| Caractéristique | Valeur relevée |
+|---|---|
+| Processeur | AMD Ryzen 7 7730U, 8 cœurs, 16 threads |
+| Mémoire | 16 Go (14,9 Gio utilisables) |
+| GPU | AMD Radeon intégré, pas de GPU dédié |
+| Stockage | SSD NVMe 1 To, non chiffré |
+| Système | Arch Linux, Docker 29.9, Docker Compose 5.6 |
+
+La plateforme y tourne : les 6 services (sans l'IA) occupent environ 375 Mo de mémoire (mesure `docker stats` du 3 novembre). Limites : sans GPU dédié, le modèle d'IA tourne sur le processeur, donc petit modèle et réponses plus lentes (à mesurer par DEV-2) ; le disque n'est pas chiffré ; un portable ressemble moins à une box. **Si un mini-PC avec 32 Go de mémoire ou un portable avec GPU est disponible d'ici mercredi midi, basculer dessus** : la box s'y réinstalle en une commande (`./box.sh installer`), ou s'y restaure depuis une sauvegarde (`./box.sh restaurer`). Préparation d'une Debian neuve avec disque chiffré : [`prototype/plateforme/systeme/preparer-debian.sh`](../prototype/plateforme/systeme/preparer-debian.sh).
 
 ## 3. Architecture
 
@@ -57,21 +67,23 @@ flowchart TB
   BK -.->|"optionnel, chiffré côté client"| OFF["Stockage hors site"]
 ```
 
+**Mise en œuvre de la plateforme (DEV-1, 3 novembre)** : [`prototype/plateforme/`](../prototype/plateforme/), pilotée par `./box.sh`. Tous les services sont sur un réseau Docker marqué `internal`, sans aucune route vers internet : seul le reverse proxy reçoit les connexions des postes. L'absence de connexion sortante ne repose donc pas seulement sur des réglages, elle est garantie par le réseau. Le jeu de données fictif (cabinet Corbière Avocats, 4 comptes, 3 dossiers, 30 documents, 3 agendas, 14 contacts, droits par groupe) est dans [`prototype/donnees-demo/`](../prototype/donnees-demo/).
+
 ### Briques
 
 | Brique | Choix proposé (à confirmer) | Pourquoi | Responsable |
 |---|---|---|---|
-| Système | Linux stable (par exemple Debian) + chiffrement du disque | Stable, connu de l'équipe | DEV-1 |
-| Conteneurs | Docker Compose ou Podman | Déploiement reproductible, base de l'installeur | DEV-1 |
-| Reverse proxy | Caddy (ou équivalent) avec autorité de certification locale | TLS sans internet | DEV-1 |
-| Fichiers, agenda, contacts | Nextcloud | Standard libre, CalDAV et CardDAV | DEV-1 |
-| Coffre-fort | Vaultwarden | Compatible avec les clients Bitwarden | DEV-1 |
+| Système | Debian 13 + chiffrement LUKS (script prêt, pas encore testé sur machine réelle) | Stable, connu de l'équipe | DEV-1 |
+| Conteneurs | **Retenu** : Docker Compose (Docker 25 ou plus) | Déploiement reproductible, base de l'installeur | DEV-1 |
+| Reverse proxy | **Retenu** : Caddy 2.11.7 avec autorité de certification locale | TLS sans internet | DEV-1 |
+| Fichiers, agenda, contacts | **Retenu** : Nextcloud 34.0.5 + Agenda 6.6.4 + Contacts 8.9.3, PostgreSQL 17, Valkey 8.1 | Standard libre, CalDAV et CardDAV | DEV-1 |
+| Coffre-fort | **Retenu** : Vaultwarden 1.37.5 | Compatible avec les clients Bitwarden | DEV-1 |
 | Moteur d'inférence | Ollama ou serveur llama.cpp | Simple, fonctionne hors ligne | DEV-2 |
 | Modèle | Choisi par mesure (section 5) | Qualité en français et vitesse sur le matériel réel | DEV-2 |
 | Recherche dans les documents (RAG) | Service maison : extraction de texte, embeddings locaux, base vectorielle locale | C'est notre couche : droits d'accès, citations, croisement des services | DEV-2 |
 | Tableau de bord | Application web maison, servie localement | État des services, sauvegardes, mises à jour, journal, accès à l'assistant | DEV-3 |
-| Installeur | Assistant web de premier démarrage (maison) | « Quelques clics » au lieu d'une installation technique | DEV-1 + DEV-3 |
-| Sauvegarde | restic ou BorgBackup | Chiffrement côté client, déduplication | DEV-1 + DEV-4 |
+| Installeur | **Fait** : assistant web de premier démarrage en 5 écrans (maison, Python sans dépendance) | « Quelques clics » au lieu d'une installation technique | DEV-1 + DEV-3 |
+| Sauvegarde | **Retenu** : restic 0.19.1, restauration testée | Chiffrement côté client, déduplication | DEV-1 + DEV-4 |
 | Accès distant | WireGuard, désactivé par défaut | Support possible sans ouvrir de port public permanent | DEV-4 |
 | Journal d'audit | Maison | Preuve pour le client de ce qui s'est passé | DEV-4 |
 
@@ -114,7 +126,9 @@ flowchart TB
 | Consommation au repos (W) | _à mesurer_ | Wattmètre, 5 minutes |
 | Consommation en charge (W) | _à mesurer_ | Wattmètre, pendant 5 questions à l'assistant |
 | Temps de réponse des 3 questions de démo | _à mesurer_ | Chronomètre, 3 essais chacune |
-| Durée d'une restauration de sauvegarde | _à mesurer_ | Restauration réelle |
+| Durée d'une restauration de sauvegarde | 39 à 40 s (deux essais), mesurées le 3 novembre sur le portable de développement, jeu de démo, dossier local à la place du disque USB. **À refaire sur le matériel de démo avec le disque externe** | Restauration réelle et vérifiée : `./box.sh tester-restauration` |
+| Durée d'une sauvegarde | 5 à 8 s, mêmes conditions | `./box.sh sauvegarder` |
+| Mémoire utilisée par la plateforme, sans l'IA | environ 375 Mo pour les 6 services, mêmes conditions | `docker stats` |
 
 ## 6. Scénario de démo (environ 4 minutes)
 
@@ -128,7 +142,7 @@ Piloté par DEV-3, commenté par DEV-2.
 6. Journal d'audit : la question est tracée, rien n'est sorti de la box.
 7. Option : 30 secondes de vidéo de l'installeur.
 
-Les 3 questions exactes et leurs réponses attendues sont écrites ici par DEV-2 le mercredi : **_à compléter_**.
+Les 3 questions exactes et leurs réponses attendues sont écrites ici par DEV-2 le mercredi : **_à compléter_**. Propositions de DEV-1, avec les réponses attendues et les documents à citer : [`prototype/donnees-demo/README.md`](../prototype/donnees-demo/README.md), section « Questions de démonstration proposées ».
 
 **Plan B** : si la démo plante, passer immédiatement la vidéo de secours (enregistrée le jeudi à 16h30) sans s'excuser longuement.
 
@@ -157,6 +171,8 @@ Enjeux de R&D à citer : qualité des réponses en français sur des documents j
 | Rançongiciel sur un poste du cabinet | Sauvegardes versionnées et non modifiables depuis les postes |
 
 ## 9. Liste de vérification hors ligne (mercredi 16h00 et vendredi matin)
+
+`./box.sh verifier-hors-ligne` automatise une grande partie de cette liste : coupure réseau, services, isolement réseau, pages sans ressource externe, données, refus d'accès, journal d'audit de Nextcloud, adresse d'écoute. Il reste à vérifier à la main les questions de démo, le tableau de bord et l'ordinateur de présentation.
 
 - [ ] Câble réseau débranché, wifi coupé sur la box.
 - [ ] Le tableau de bord se charge sans erreur ni ressource manquante.

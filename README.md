@@ -206,7 +206,7 @@ Chaque piège ci-dessous a été identifié pendant l'analyse du projet. **Un ag
 |---|---|---|---|
 | Nom du projet | BIZ | Mardi 3 nov, 18h00 | Court, disponible en nom de domaine, pas déjà pris par un concurrent |
 | Numéro d'équipe et salle de coaching | Toute l'équipe | Immédiat | À reporter dans [`docs/attendus-challenge.md`](docs/attendus-challenge.md) |
-| Matériel de la démo | DEV-1 | Mardi 3 nov, 14h00 | Ce qui est disponible tout de suite et fait tourner un modèle local correct |
+| Matériel de la démo | DEV-1 | Mardi 3 nov, 14h00 | Ce qui est disponible tout de suite et fait tourner un modèle local correct. **Proposition du 3 nov** : portable de DEV-1 (16 Go, sans GPU dédié), à remplacer par un mini-PC ou un portable avec GPU s'il y en a un d'ici mercredi midi. Détail dans [`docs/prototype.md`](docs/prototype.md), section 2. À confirmer au point de 17h30 |
 | Prix des offres | BIZ + DEV-4 | Mercredi 4 nov, 17h30 | Coût matériel réel + réponses des entretiens |
 
 ---
@@ -234,6 +234,8 @@ livrables/
   executive-summary.md       Brouillon de l'executive summary (2 pages)
   plan-pitch.md              Déroulé des 15 minutes, qui parle quand
   questions-jury.md          Questions probables et éléments de réponse
-prototype/                   Code de la démo (à créer par les développeurs)
+prototype/                   Code de la démo (une partie par développeur, voir prototype/README.md)
+  plateforme/                DEV-1 : box.sh, services Docker, installeur, sauvegarde, vérification hors ligne
+  donnees-demo/              Cabinet FICTIF de la démo : documents, agendas, contacts, droits
 reference/                   PDF officiel du challenge
 ```

@@ -103,6 +103,15 @@ flowchart TB
 - Modèles de documents utiles au cabinet (à définir avec les entretiens).
 - Si l'intégration ne tient pas en une demi-journée le mercredi, le pack passe dans la roadmap et n'est pas montré.
 
+**Vérification faite par DEV-2 le 3 novembre** :
+
+| Jeu de données | Licence | Format et taille | Mise à jour |
+|---|---|---|---|
+| LEGI, codes, lois et règlements consolidés (DILA) [S23] | Licence ouverte Etalab | XML, plusieurs fichiers par article et par version ; archive complète de 1,17 Go (juillet 2025) | Quotidienne : une archive de modifications par jour (dernière : 2 novembre 2026) |
+| Jurisprudence pseudonymisée de la Cour de cassation, depuis septembre 2018 [S24] | Licence ouverte 2.0 | à examiner | à examiner |
+
+**Décision : le pack métier passe dans la roadmap et n'est pas montré.** Pour avoir les articles en vigueur, il faut l'archive complète plus toutes les archives quotidiennes depuis juillet 2025, puis choisir pour chaque article la version en vigueur : ça ne tient pas en une demi-journée, avec en plus un réseau à 1 ou 2 Mo/s à l'école. Plan pour la V1 : extraire les codes utiles à un petit cabinet (civil, commerce, travail, procédure civile), les mettre à jour chaque mois pendant la fenêtre de maintenance (connexion sortante journalisée), et faire citer par l'assistant l'article et sa date de version.
+
 ## 4. Priorités
 
 | Priorité | Élément |
@@ -116,9 +125,11 @@ flowchart TB
 
 À remplir avec des **valeurs mesurées**, jamais estimées.
 
+Mesures de DEV-2 sur le portable de démo (section 2), applications fermées, avec le banc [`prototype/ia/mesures/`](../prototype/ia/mesures/) : 5 questions types sur le jeu de données fictif, qualité = part des faits attendus présents dans la réponse (0 si un fait interdit, par exemple un montant inventé, apparaît).
+
 | Modèle testé | Mémoire utilisée | Temps jusqu'au premier mot | Tokens par seconde | Qualité en français (note sur 5, 5 questions types) | Retenu |
 |---|---|---|---|---|---|
-| _à compléter_ | | | | | |
+| Qwen3.6-35B-A3B int4 avec Colibri 2.1.0, sur processeur (3 novembre) | 2,9 Go résidents, 9,5 Go alloués par le moteur ; le reste du modèle (18 Go d'experts) est relu en continu sur le SSD | Question courte (27 tokens) : réponse complète en 16,5 s. Question de résumé (environ 1 000 tokens de contexte) : pas de réponse après 14 min, 526 Go lus sur le disque, mesure arrêtée | Environ 1,8 (0,56 s par token, journal du moteur, question courte) | Non mesurée (mesure arrêtée) | **Non** sur 16 Go : le modèle doit tenir en mémoire. À réessayer sur une box d'au moins 32 Go |
 | _à compléter_ | | | | | |
 
 | Mesure | Valeur | Méthode |

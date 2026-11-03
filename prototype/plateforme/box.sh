@@ -59,9 +59,10 @@ verifier_prerequis() {
 }
 
 # Attend qu'un service soit « healthy » (ou « running » s'il n'a pas de test de santé).
+# 3e argument facultatif : nom d'un autre projet compose (restauration de test).
 attendre() {
-    local service=$1 limite=${2:-600} debut=$SECONDS id etat
-    id=$("${COMPOSE[@]}" ps -q "$service")
+    local service=$1 limite=${2:-600} projet=${3:-box} debut=$SECONDS id etat
+    id=$(docker compose -p "$projet" ps -q "$service")
     [ -n "$id" ] || echec "service $service introuvable"
     while :; do
         etat=$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$id")
@@ -161,6 +162,234 @@ cmd_donnees_demo() {
 EOF
 }
 
+# ---------------------------------------------------------------- sauvegarde chiffrée (restic)
+#
+# Contenu d'un instantané : export de la base Nextcloud, copie cohérente de la base du coffre-fort,
+# fichier .env (secrets), configuration et applications de Nextcloud, fichiers des utilisateurs,
+# données du coffre-fort, autorité de certification locale. Le code des logiciels n'est pas
+# sauvegardé : il vient des images. Le dépôt est chiffré par restic (AES-256) avec
+# SAUVEGARDE_MOT_DE_PASSE : sans lui, la sauvegarde est illisible, y compris pour nous.
+
+NC_IMAGE=box/nextcloud:34.0.5-1
+PREPARATION="$SORTIE/sauvegarde-preparation"
+RESTAURATION="$SORTIE/restauration"
+PROJET_TEST=box-restauration
+
+occ() { "${COMPOSE[@]}" exec -T -u www-data nextcloud php occ "$@"; }
+restic_box() { "${COMPOSE[@]}" run --rm -T sauvegarde "$@"; }
+
+verifier_destination() {
+    local d=${SAUVEGARDE_DESTINATION:-}
+    [ -n "$d" ] || echec "SAUVEGARDE_DESTINATION est vide dans .env : brancher le disque externe et indiquer le dossier de sauvegarde"
+    [[ $d = /* ]] || echec "SAUVEGARDE_DESTINATION doit être un chemin absolu"
+    [ -d "$d" ] || echec "dossier de sauvegarde introuvable : $d (disque externe branché et monté ?)"
+    # Dossiers montés dans le conteneur de sauvegarde : créés ici pour ne pas appartenir à root.
+    mkdir -p "$PREPARATION" "$RESTAURATION"
+    chmod 700 "$PREPARATION"
+}
+
+# Fichiers en clair (export de base, .env) : supprimés dès que l'instantané chiffré est fait.
+nettoyer_preparation() { rm -f "$PREPARATION"/{nextcloud.pgdump,roles.sql,coffre.sqlite3,env,manifeste.txt}; }
+
+# Les fichiers restaurés appartiennent à www-data ou root : suppression depuis un conteneur.
+nettoyer_restauration() {
+    [ -d "$RESTAURATION" ] || return 0
+    docker run --rm --entrypoint sh -v "$RESTAURATION:/r" "$NC_IMAGE" -c 'rm -rf /r/sources' >/dev/null
+}
+
+cmd_sauvegarder() {
+    charger_env
+    verifier_destination
+    local debut=$SECONDS fichier instantane
+    if ! restic_box cat config >/dev/null 2>&1; then
+        info "Initialisation du dépôt de sauvegarde chiffré dans $SAUVEGARDE_DESTINATION"
+        restic_box init
+    fi
+    info "Nextcloud en mode maintenance pendant la copie"
+    occ maintenance:mode --on >/dev/null
+    trap 'occ maintenance:mode --off >/dev/null 2>&1 || true; nettoyer_preparation' EXIT
+    info "Export de la base de données de Nextcloud"
+    "${COMPOSE[@]}" exec -T db pg_dump -U nextcloud -Fc nextcloud > "$PREPARATION/nextcloud.pgdump"
+    # Rôles PostgreSQL : Nextcloud se connecte avec son propre rôle (oc_<admin>), propriétaire des tables.
+    "${COMPOSE[@]}" exec -T db pg_dumpall -U nextcloud --globals-only > "$PREPARATION/roles.sql"
+    info "Copie cohérente de la base du coffre-fort"
+    fichier=$("${COMPOSE[@]}" exec -T coffre /vaultwarden backup 2>/dev/null | grep -o 'db_[0-9_]*\.sqlite3' | head -1)
+    [ -n "$fichier" ] || echec "la copie de la base du coffre-fort a échoué"
+    "${COMPOSE[@]}" cp "coffre:/data/$fichier" "$PREPARATION/coffre.sqlite3" >/dev/null
+    "${COMPOSE[@]}" exec -T coffre rm -f "/data/$fichier"
+    cp .env "$PREPARATION/env"
+    { echo "date=$(date -Iseconds)"; "${COMPOSE[@]}" config --images | sed 's/^/image=/'; } > "$PREPARATION/manifeste.txt"
+    info "Instantané chiffré (restic)"
+    restic_box backup --host box --tag box --quiet \
+        --exclude '/sources/nextcloud-donnees/appdata_*/preview' \
+        --exclude '/sources/coffre/db.sqlite3*' --exclude '/sources/coffre/icon_cache' --exclude '/sources/coffre/tmp' \
+        /sources/preparation /sources/nextcloud-html/config /sources/nextcloud-html/custom_apps \
+        /sources/nextcloud-html/themes /sources/nextcloud-donnees /sources/coffre /sources/caddy
+    occ maintenance:mode --off >/dev/null
+    nettoyer_preparation
+    trap - EXIT
+    info "Rotation : 7 sauvegardes quotidiennes, 4 hebdomadaires, 12 mensuelles"
+    restic_box forget --host box --keep-daily 7 --keep-weekly 4 --keep-monthly 12 --prune --quiet
+    instantane=$(restic_box snapshots --host box --latest 1 --compact | awk 'NR==3 {print $1}')
+    journal sauvegarde "instantané $instantane dans $SAUVEGARDE_DESTINATION en $((SECONDS - debut)) s"
+    ok "sauvegarde $instantane terminée en $((SECONDS - debut)) s"
+}
+
+cmd_sauvegardes() {
+    charger_env
+    verifier_destination
+    restic_box snapshots --host box
+}
+
+# Restaure un instantané dans un projet compose : « box » (la vraie box) ou le projet de test,
+# qui ne publie aucun port et ne gêne pas la box en service.
+restaurer_dans() {
+    local projet=$1 instantane=$2 src="$RESTAURATION/sources" services=(db cache nextcloud coffre)
+    [ "$projet" = box ] && services+=(proxy nextcloud-cron)
+    nettoyer_restauration
+    info "Lecture de l'instantané $instantane"
+    restic_box restore "$instantane" --host box --target /restauration --quiet
+    [ -s "$src/preparation/nextcloud.pgdump" ] || echec "instantané incomplet : export de la base absent"
+    # Les secrets restaurés doivent correspondre aux données restaurées : environnement propre.
+    local P=(env -i "PATH=$PATH" "HOME=$HOME" docker compose -p "$projet" --env-file "$src/preparation/env")
+    "${P[@]}" down -v --remove-orphans >/dev/null 2>&1 || true
+    "${P[@]}" up --no-start "${services[@]}" 2>/dev/null
+    info "Recopie des fichiers dans les volumes"
+    docker run --rm --entrypoint sh -v "${projet}_nextcloud_html:/var/www/html" -v "$src/nextcloud-html:/restaure:ro" "$NC_IMAGE" \
+        -c 'rsync -rlDog --chown www-data:www-data /usr/src/nextcloud/ /var/www/html/ && cp -a /restaure/. /var/www/html/'
+    docker run --rm --entrypoint sh -v "${projet}_nextcloud_donnees:/dst" -v "$src/nextcloud-donnees:/src:ro" "$NC_IMAGE" \
+        -c 'cp -a /src/. /dst/'
+    docker run --rm --entrypoint sh -v "${projet}_coffre_donnees:/dst" -v "$src/coffre:/src:ro" -v "$src/preparation:/prep:ro" "$NC_IMAGE" \
+        -c 'cp -a /src/. /dst/ && cp /prep/coffre.sqlite3 /dst/db.sqlite3'
+    if [ "$projet" = box ]; then
+        docker run --rm --entrypoint sh -v "${projet}_caddy_donnees:/dst" -v "$src/caddy:/src:ro" "$NC_IMAGE" -c 'cp -a /src/. /dst/'
+    fi
+    info "Restauration de la base de données"
+    "${P[@]}" up -d db 2>/dev/null
+    attendre db 120 "$projet"
+    # Rôles d'abord (le rôle « nextcloud » existe déjà dans la base neuve), puis les tables avec leurs propriétaires.
+    sed '/^CREATE ROLE nextcloud;$/d' "$src/preparation/roles.sql" \
+        | "${P[@]}" exec -T db psql -v ON_ERROR_STOP=1 -q -U nextcloud -d postgres >/dev/null
+    "${P[@]}" exec -T db pg_restore -U nextcloud -d nextcloud --exit-on-error < "$src/preparation/nextcloud.pgdump"
+    "${P[@]}" up -d "${services[@]}" 2>/dev/null
+    attendre nextcloud 600 "$projet"
+    # La sauvegarde est faite en mode maintenance : on en sort après restauration.
+    "${P[@]}" exec -T -u www-data nextcloud php occ maintenance:mode --off >/dev/null
+}
+
+# Encodage d'URL octet par octet (chemins avec espaces et accents).
+encoder_url() {
+    local LC_ALL=C s=$1 i c sortie=""
+    for (( i = 0; i < ${#s}; i++ )); do
+        c=${s:i:1}
+        case $c in
+            [a-zA-Z0-9.~_/-]) sortie+=$c ;;
+            *) printf -v c '%%%02X' "'$c"; sortie+=$c ;;
+        esac
+    done
+    printf '%s' "$sortie"
+}
+
+compter() { # projet, requête SQL
+    docker compose -p "$1" exec -T db psql -U nextcloud -d nextcloud -tAc "$2" | tr -d '[:space:]'
+}
+
+verifier_restauration() {
+    local projet=$1 src="$RESTAURATION/sources" erreurs=0 table vivant restaure
+    local P=(docker compose -p "$projet")
+    if "${P[@]}" exec -T nextcloud curl -fsS http://localhost/status.php | grep -q '"installed":true,"maintenance":false'; then
+        ok "Nextcloud restauré : installé, hors maintenance"
+    else
+        alerte "Nextcloud restauré : état incorrect"; erreurs=$((erreurs + 1))
+    fi
+    for table in oc_users oc_filecache oc_share oc_calendarobjects oc_cards; do
+        vivant=$(compter box "select count(*) from $table")
+        restaure=$(compter "$projet" "select count(*) from $table")
+        if [ "$vivant" = "$restaure" ]; then
+            ok "$table : $restaure lignes, identique à la box en service"
+        else
+            alerte "$table : $restaure lignes restaurées contre $vivant dans la box en service"; erreurs=$((erreurs + 1))
+        fi
+    done
+    # Un document du jeu de démonstration, relu par WebDAV dans la box restaurée, comparé à l'original.
+    local document="Dossiers clients/2026-014 Fournil des Aubépines - bail commercial/02 Bail commercial du 1er mars 2019.pdf"
+    local mdp empreinte_git empreinte_restauree
+    mdp=$(grep '^DEMO_MOT_DE_PASSE=' "$src/preparation/env" | cut -d= -f2-)
+    if [ -f "$ICI/../donnees-demo/fichiers/$document" ] && [ -n "$mdp" ]; then
+        empreinte_git=$(sha256sum "$ICI/../donnees-demo/fichiers/$document" | cut -d' ' -f1)
+        empreinte_restauree=$("${P[@]}" exec -T nextcloud curl -fsS -H 'Host: nextcloud' -u "hcorbiere:$mdp" \
+            "http://localhost/remote.php/dav/files/hcorbiere/$(encoder_url "$document")" | sha256sum | cut -d' ' -f1)
+        if [ "$empreinte_git" = "$empreinte_restauree" ]; then
+            ok "document relu par WebDAV avec le compte de l'associée : identique à l'original (sha256)"
+        else
+            alerte "document restauré différent de l'original"; erreurs=$((erreurs + 1))
+        fi
+    fi
+    # Test de santé intégré à l'image du coffre-fort (il attend la fin de son démarrage).
+    if (attendre coffre 120 "$projet") >/dev/null 2>&1; then
+        ok "coffre-fort restauré : démarré et en bonne santé"
+    else
+        alerte "coffre-fort restauré : ne démarre pas"; erreurs=$((erreurs + 1))
+    fi
+    # Le dossier de l'autorité locale n'est lisible que par root : lecture depuis un conteneur.
+    if [ -f "$SORTIE/autorite-locale.crt" ] && docker run --rm --entrypoint cat -v "$RESTAURATION:/r:ro" "$NC_IMAGE" \
+           /r/sources/caddy/caddy/pki/authorities/local/root.crt 2>/dev/null | cmp -s - "$SORTIE/autorite-locale.crt"; then
+        ok "autorité de certification locale restaurée : identique"
+    else
+        alerte "certificat racine restauré différent ou absent"; erreurs=$((erreurs + 1))
+    fi
+    return "$erreurs"
+}
+
+cmd_tester_restauration() {
+    charger_env
+    verifier_destination
+    local instantane=${1:-latest} debut=$SECONDS duree resultat=0
+    info "Restauration réelle de l'instantané $instantane dans un projet de test isolé ($PROJET_TEST, aucun port publié)"
+    # Quoi qu'il arrive, le projet de test et les fichiers restaurés en clair sont supprimés.
+    trap 'docker compose -p "$PROJET_TEST" down -v --remove-orphans >/dev/null 2>&1; nettoyer_restauration' EXIT
+    restaurer_dans "$PROJET_TEST" "$instantane"
+    duree=$((SECONDS - debut))
+    info "Vérifications"
+    verifier_restauration "$PROJET_TEST" || resultat=$?
+    info "Suppression du projet de test et des fichiers restaurés en clair"
+    docker compose -p "$PROJET_TEST" down -v --remove-orphans >/dev/null 2>&1
+    nettoyer_restauration
+    trap - EXIT
+    if [ "$resultat" -eq 0 ]; then
+        journal test_restauration "instantané $instantane restauré et vérifié en $duree s" ok
+        ok "restauration complète et vérifiée en $duree s (de la lecture du disque au service rendu)"
+    else
+        journal test_restauration "instantané $instantane : $resultat vérification(s) en échec" echec
+        echec "$resultat vérification(s) en échec"
+    fi
+}
+
+# Reconstruction de la box depuis une sauvegarde (box neuve, ou panne). Remplace toutes les données.
+cmd_restaurer() {
+    creer_env
+    charger_env
+    verifier_destination
+    local instantane=${1:-latest}
+    restic_box cat config >/dev/null 2>&1 \
+        || echec "dépôt illisible : vérifier SAUVEGARDE_DESTINATION et SAUVEGARDE_MOT_DE_PASSE (fiche de secours)"
+    alerte "Restauration de l'instantané $instantane : les données actuelles de la box seront REMPLACÉES."
+    read -r -p "Taper « restaurer » pour confirmer : " reponse
+    [ "$reponse" = restaurer ] || echec "annulé"
+    local debut=$SECONDS
+    "${COMPOSE[@]}" --profile outils down -v --remove-orphans
+    restaurer_dans box "$instantane"
+    # Les secrets de la sauvegarde deviennent ceux de la box (ils correspondent aux données).
+    cp .env ".env.avant-restauration"
+    install -m 600 "$RESTAURATION/sources/preparation/env" .env
+    nettoyer_restauration
+    charger_env
+    exporter_certificat
+    journal restauration "box restaurée depuis l'instantané $instantane en $((SECONDS - debut)) s"
+    ok "box restaurée en $((SECONDS - debut)) s (ancien .env conservé dans .env.avant-restauration)"
+    afficher_adresses
+}
+
 # Télécharge et construit toutes les images, puis les exporte dans une archive : la box peut ensuite
 # être installée sur une machine qui n'a jamais eu accès à internet (docker load -i ...).
 cmd_preparer_hors_ligne() {
@@ -199,6 +428,10 @@ Usage : ./box.sh <commande>
   etat                 État des services et adresses
   journaux [service]   Journaux des conteneurs
   certificat           Exporte le certificat racine local dans sortie/
+  sauvegarder          Instantané chiffré (restic) vers SAUVEGARDE_DESTINATION (disque externe)
+  sauvegardes          Liste des instantanés
+  tester-restauration  Restaure le dernier instantané dans un projet isolé et vérifie tout
+  restaurer [id]       Reconstruit la box depuis un instantané (REMPLACE les données)
   preparer-hors-ligne  Exporte toutes les images dans sortie/images-box.tar (installation sans internet)
   reinitialiser        Supprime conteneurs ET volumes (demande confirmation)
 EOF
@@ -214,6 +447,10 @@ case $commande in
     etat)                 cmd_etat ;;
     journaux)             cmd_journaux "$@" ;;
     certificat)           cmd_certificat ;;
+    sauvegarder)          cmd_sauvegarder ;;
+    sauvegardes)          cmd_sauvegardes ;;
+    tester-restauration)  cmd_tester_restauration "$@" ;;
+    restaurer)            cmd_restaurer "$@" ;;
     preparer-hors-ligne)  cmd_preparer_hors_ligne ;;
     reinitialiser)        cmd_reinitialiser ;;
     aide|-h|--help)       cmd_aide ;;

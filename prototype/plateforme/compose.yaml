@@ -157,6 +157,26 @@ services:
       - ../donnees-demo:/donnees-demo:ro
     networks: [interne]
 
+  # Outil ponctuel : sauvegarde chiffrée avec restic (./box.sh sauvegarder, tester-restauration).
+  # Aucun réseau : la sauvegarde locale vers le disque externe n'en a pas besoin.
+  sauvegarde:
+    image: restic/restic:0.19.1
+    profiles: [outils]
+    network_mode: none
+    environment:
+      RESTIC_REPOSITORY: /depot
+      RESTIC_PASSWORD: ${SAUVEGARDE_MOT_DE_PASSE:?}
+      RESTIC_CACHE_DIR: /cache
+    volumes:
+      - ${SAUVEGARDE_DESTINATION:-./sortie/sauvegarde-non-configuree}:/depot
+      - sauvegarde_cache:/cache
+      - ./sortie/sauvegarde-preparation:/sources/preparation:ro
+      - nextcloud_html:/sources/nextcloud-html:ro
+      - nextcloud_donnees:/sources/nextcloud-donnees:ro
+      - coffre_donnees:/sources/coffre:ro
+      - caddy_donnees:/sources/caddy:ro
+      - ./sortie/restauration:/restauration
+
 networks:
   # Seul réseau relié à l'hôte : il reçoit les connexions des postes du cabinet.
   frontal: {}
@@ -171,3 +191,4 @@ volumes:
   nextcloud_donnees:
   db_donnees:
   coffre_donnees:
+  sauvegarde_cache:

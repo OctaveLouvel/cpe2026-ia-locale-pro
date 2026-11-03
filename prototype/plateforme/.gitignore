@@ -1,0 +1,4 @@
+# Fichiers produits par box.sh (certificat racine, archives d images, journal, restaurations de test)
+sortie/
+# Copie de .env faite par ./box.sh restaurer (contient des secrets)
+.env.avant-restauration

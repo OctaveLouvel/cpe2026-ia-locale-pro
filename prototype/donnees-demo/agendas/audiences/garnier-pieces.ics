@@ -1,0 +1,17 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+CALSCALE:GREGORIAN
+BEGIN:VEVENT
+UID:garnier-pieces@corbiere-avocats.example
+DTSTAMP:20261101T090000Z
+DTSTART;VALUE=DATE:20261120
+DTEND;VALUE=DATE:20261121
+SUMMARY:Échéance : bordereau de pièces Garnier à communiquer à Me Olli
+ er
+DESCRIPTION:Communication des pièces au conseil de la SAS Techniflux avant
+  le bureau de conciliation et d'orientation.\n\nÉvénement FICTIF (donné
+ es de démonstration).
+CATEGORIES:Dossier 2026-021
+END:VEVENT
+END:VCALENDAR

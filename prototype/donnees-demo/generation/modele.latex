@@ -1,0 +1,44 @@
+% Modèle pandoc des documents PDF du cabinet FICTIF.
+% Chaque page porte la mention « DOCUMENT FICTIF » en en-tête.
+% Pas de césure : le texte extrait des PDF (pour l'assistant IA) garde des mots entiers.
+\documentclass[11pt,a4paper]{article}
+\usepackage{fontspec}
+\setmainfont{Liberation Serif}
+\setsansfont{Liberation Sans}
+\usepackage[a4paper,top=2.8cm,bottom=2.4cm,left=2.4cm,right=2.4cm,headheight=24pt]{geometry}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{calc}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{booktabs}
+\newcounter{none} % tableaux sans légende produits par pandoc 3
+\usepackage[hidelinks,pdfusetitle]{hyperref}
+\hypersetup{
+  pdftitle={$titre$},
+  pdfauthor={Corbière Avocats (cabinet fictif)},
+  pdfsubject={Document fictif - données de démonstration},
+  pdfkeywords={fictif, démonstration}
+}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+\setlength{\emergencystretch}{4em}
+\setcounter{secnumdepth}{-2}
+\makeatletter
+\renewcommand\section{\@startsection{section}{1}{\z@}{-2.2ex plus -1ex minus -.2ex}{1ex}{\normalfont\large\bfseries}}
+\renewcommand\subsection{\@startsection{subsection}{2}{\z@}{-1.8ex plus -.5ex minus -.2ex}{.6ex}{\normalfont\normalsize\bfseries}}
+\renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}{-1.4ex plus -.5ex minus -.2ex}{.3ex}{\normalfont\normalsize\itshape}}
+\makeatother
+\providecommand{\tightlist}{\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize\sffamily\textcolor{red!65!black}{\textbf{DOCUMENT FICTIF}} - données de démonstration}
+\fancyhead[R]{\footnotesize\sffamily $entete$}
+\fancyfoot[C]{\footnotesize\sffamily Page \thepage\ sur \pageref*{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\begin{document}
+$body$
+\end{document}

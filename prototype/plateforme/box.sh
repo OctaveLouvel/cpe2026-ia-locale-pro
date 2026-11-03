@@ -27,6 +27,9 @@ journal() {
 charger_env() {
     [ -f .env ] || echec "fichier .env absent : lancer d'abord ./box.sh installer"
     set -a; . ./.env; set +a
+    # L'assistant IA tourne avec l'identité de l'exploitant de la box (pas root) et écrit dans sortie/.
+    export BOX_UID=${BOX_UID:-$(id -u)} BOX_GID=${BOX_GID:-$(id -g)}
+    mkdir -p "$SORTIE/ia" "$SORTIE/journal"
 }
 
 # Chaîne aléatoire sans caractères ambigus. Longueur en argument (défaut 32).
@@ -96,6 +99,7 @@ afficher_adresses() {
   Tableau de bord       https://${BOX_DOMAIN}
   Fichiers et agenda    https://cloud.${BOX_DOMAIN}
   Coffre-fort           https://coffre.${BOX_DOMAIN}
+  Assistant IA          https://ia.${BOX_DOMAIN}
   Certificat racine     http://${BOX_DOMAIN}/autorite-locale.crt
 
   Mots de passe : fichier .env (NC_ADMIN_PASSWORD, DEMO_MOT_DE_PASSE). Adresse d'écoute : ${BIND_ADDRESS}.
@@ -414,7 +418,8 @@ cmd_verifier_hors_ligne() {
     local echecs=0 alertes=0 ip=127.0.0.1 domaine=$BOX_DOMAIN mdp=$DEMO_MOT_DE_PASSE
     [ "$BIND_ADDRESS" != 0.0.0.0 ] && ip=$BIND_ADDRESS
     local CURL=(curl -sS --max-time 15 --cacert "$SORTIE/autorite-locale.crt"
-                --resolve "$domaine:443:$ip" --resolve "cloud.$domaine:443:$ip" --resolve "coffre.$domaine:443:$ip")
+                --resolve "$domaine:443:$ip" --resolve "cloud.$domaine:443:$ip" --resolve "coffre.$domaine:443:$ip"
+                --resolve "ia.$domaine:443:$ip")
     reussi() { ok "$*"; }
     rate() { printf '\033[1;31m ÉCHEC\033[0m %s\n' "$*"; echecs=$((echecs + 1)); }
     attention() { alerte "$*"; alertes=$((alertes + 1)); }
@@ -428,7 +433,7 @@ cmd_verifier_hors_ligne() {
 
     info "2. Services"
     local service etat
-    for service in proxy nextcloud nextcloud-cron db cache coffre; do
+    for service in proxy nextcloud nextcloud-cron db cache coffre ia-moteur assistant; do
         etat=$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
                "$("${COMPOSE[@]}" ps -q "$service" 2>/dev/null)" 2>/dev/null || echo absent)
         case $etat in healthy|running) reussi "$service : $etat" ;; *) rate "$service : $etat" ;; esac
@@ -461,7 +466,7 @@ cmd_verifier_hors_ligne() {
 
     info "4. Pages chargées sans ressource externe (CDN, polices, scripts)"
     local page html externes
-    for page in "https://$domaine/" "https://cloud.$domaine/login" "https://coffre.$domaine/"; do
+    for page in "https://$domaine/" "https://cloud.$domaine/login" "https://coffre.$domaine/" "https://ia.$domaine/"; do
         if ! html=$("${CURL[@]}" -f "$page"); then
             rate "$page ne se charge pas"; continue
         fi
@@ -508,6 +513,44 @@ cmd_verifier_hors_ligne() {
     fi
 }
 
+# ---------------------------------------------------------------- assistant IA (DEV-2)
+
+IA_IMAGE_MOTEUR=ollama/ollama:0.40.14
+
+# Seule connexion sortante prévue pour l'IA : le téléchargement des modèles, en atelier.
+# Un conteneur temporaire relié à internet remplit le volume des modèles, puis disparaît : le moteur de
+# la box, lui, reste sur le réseau interne.
+cmd_modeles_ia() {
+    charger_env
+    local modeles=("${IA_MODELE:-qwen3:4b}" "${IA_MODELE_EMBEDDINGS:-embeddinggemma-2:270m}" "$@")
+    "${COMPOSE[@]}" up --no-start ia-moteur 2>/dev/null
+    docker rm -f box-ia-telechargement >/dev/null 2>&1 || true
+    docker run -d --name box-ia-telechargement -v box_ia_modeles:/root/.ollama "$IA_IMAGE_MOTEUR" >/dev/null
+    trap 'docker rm -f box-ia-telechargement >/dev/null 2>&1 || true' EXIT
+    local essai
+    for essai in $(seq 1 30); do docker exec box-ia-telechargement ollama list >/dev/null 2>&1 && break; sleep 1; done
+    local modele
+    for modele in "${modeles[@]}"; do
+        info "Téléchargement de $modele (registry.ollama.ai, HTTPS)"
+        journal connexion_sortante "téléchargement du modèle $modele depuis registry.ollama.ai" en_cours
+        docker exec box-ia-telechargement ollama pull "$modele" | tail -1
+        journal connexion_sortante "modèle $modele téléchargé" ok
+    done
+    docker exec box-ia-telechargement ollama list
+    docker rm -f box-ia-telechargement >/dev/null
+    trap - EXIT
+    ok "modèles prêts dans le volume box_ia_modeles"
+}
+
+# Prépare l'index de recherche pour la démo, avec le compte de l'associée (qui voit tous les dossiers).
+cmd_indexer_ia() {
+    charger_env
+    attendre assistant 300
+    info "Indexation des documents visibles par hcorbiere"
+    "${COMPOSE[@]}" exec -T -e IA_MOT_DE_PASSE="$DEMO_MOT_DE_PASSE" assistant python -m assistant indexer hcorbiere
+    journal indexation_ia "index de recherche préparé avec le compte de démonstration hcorbiere"
+}
+
 # Télécharge et construit toutes les images, puis les exporte dans une archive : la box peut ensuite
 # être installée sur une machine qui n'a jamais eu accès à internet (docker load -i ...).
 cmd_preparer_hors_ligne() {
@@ -551,6 +594,8 @@ Usage : ./box.sh <commande>
   tester-restauration  Restaure le dernier instantané dans un projet isolé et vérifie tout
   restaurer [id]       Reconstruit la box depuis un instantané (REMPLACE les données)
   verifier-hors-ligne  Liste de vérification de la démo, à lancer câble débranché
+  modeles-ia [modèle]  Télécharge les modèles d'IA (atelier, connexion sortante journalisée)
+  indexer-ia           Prépare l'index de recherche de l'assistant pour la démo
   assistant [adresse]  Assistant web de première configuration (défaut 127.0.0.1:8090)
   preparer-hors-ligne  Exporte toutes les images dans sortie/images-box.tar (installation sans internet)
   reinitialiser        Supprime conteneurs ET volumes (demande confirmation)
@@ -572,6 +617,8 @@ case $commande in
     tester-restauration)  cmd_tester_restauration "$@" ;;
     restaurer)            cmd_restaurer "$@" ;;
     verifier-hors-ligne)  cmd_verifier_hors_ligne ;;
+    modeles-ia)           cmd_modeles_ia "$@" ;;
+    indexer-ia)           cmd_indexer_ia ;;
     assistant)            exec python3 "$ICI/installeur/assistant.py" "$@" ;;
     preparer-hors-ligne)  cmd_preparer_hors_ligne ;;
     reinitialiser)        cmd_reinitialiser ;;

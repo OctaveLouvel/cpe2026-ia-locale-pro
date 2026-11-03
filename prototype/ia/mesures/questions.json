@@ -1,0 +1,77 @@
+{
+  "avertissement": "Questions de mesure construites sur le jeu de données FICTIF (prototype/donnees-demo). Les extraits sont ceux que la recherche documentaire fournirait au modèle : la mesure porte sur le modèle seul.",
+  "aujourdhui": "2026-11-06T16:00:00",
+  "personne": "Me Hélène Corbière (hcorbiere)",
+  "questions": [
+    {
+      "id": "resume",
+      "titre": "Résumé d'un dossier et échéances",
+      "question": "Résume le dossier Fournil des Aubépines et liste les prochaines échéances.",
+      "resume": true,
+      "extraits": [
+        {"etiquette": "Document « 08 Assignation en référé du 29 octobre 2026.pdf », dossier 2026-014, page 1", "texte": "Par acte sous seing privé du 1er mars 2019, la SCI Montaury a donné à bail commercial à la SARL Fournil des Aubépines des locaux situés 12 place du Marché-Neuf à Évry-Courcouronnes, pour l'exploitation d'une boulangerie. Le locataire a cessé de payer ses loyers à compter du mois de juillet 2026. Par acte du 22 septembre 2026, la SCI Montaury lui a fait délivrer un commandement de payer la somme de 8 250 euros visant la clause résolutoire de l'article 12 du bail. Le locataire n'a versé que 2 750 euros le 15 octobre 2026. Le commandement est donc resté infructueux à l'expiration du délai d'un mois, le 22 octobre 2026."},
+        {"etiquette": "Document « 08 Assignation en référé du 29 octobre 2026.pdf », dossier 2026-014, page 2", "texte": "Il est demandé au juge des référés de : CONSTATER l'acquisition de la clause résolutoire du bail du 1er mars 2019 à la date du 22 octobre 2026 ; ORDONNER l'expulsion de la SARL Fournil des Aubépines ; CONDAMNER la SARL Fournil des Aubépines à payer à la SCI Montaury, à titre provisionnel, la somme de 5 500 euros au titre de l'arriéré locatif arrêté au 28 octobre 2026, et la somme de 550 euros au titre de la clause pénale ; CONDAMNER la SARL Fournil des Aubépines à payer la somme de 2 000 euros au titre de l'article 700 du Code de procédure civile."},
+        {"etiquette": "Document « 05 Rapport d'expertise de l'assureur du 9 juillet 2026.pdf », dossier 2026-014, page 1", "texte": "Cause du sinistre. Les infiltrations proviennent de la vétusté et du défaut d'entretien de la couverture, qui relèvent du propriétaire des murs. L'orage du 14 juin 2026 n'a fait qu'aggraver un désordre ancien. Durée prévisible de la fermeture : compte tenu des travaux de couverture et du temps de séchage, la reprise de l'activité n'est pas envisageable avant le début du mois d'août 2026."},
+        {"etiquette": "Document « 07 Décompte locatif au 3 novembre 2026.pdf », dossier 2026-014, page 2", "texte": "Reste dû au 3 novembre 2026 : 5 500 euros (échéances d'août et de septembre 2026). Les loyers courants sont payés depuis octobre. Le commerce a été fermé du lundi 15 juin au dimanche 2 août 2026 inclus, soit 7 semaines, à cause des infiltrations par la toiture. Loyer correspondant à la période de fermeture, hors charges : 4 038,46 euros. C'est la part de la créance du bailleur que nous contestons, faute de jouissance des locaux."},
+        {"etiquette": "Agenda « Audiences et échéances » : mardi 10 novembre 2026 (journée entière)", "texte": "Échéance : conclusions et pièces à communiquer à Me Lucet - référé Fournil des Aubépines."},
+        {"etiquette": "Agenda « Audiences et échéances » : mardi 17 novembre 2026, de 9 h 30 à 11 h 30, lieu : Tribunal judiciaire d'Évry, juge des référés", "texte": "Audience de référé - SCI Montaury c. SARL Fournil des Aubépines (RG 26/01482). Plaidoirie : Me Corbière. Nous demandons des délais de paiement et la suspension des effets de la clause résolutoire."}
+      ],
+      "attendus": ["22 septembre", "8 ?250", "5 ?500", "17 novembre", "10 novembre", "clause resolutoire", "toiture|couverture"],
+      "interdits": []
+    },
+    {
+      "id": "clause",
+      "titre": "Retrouver une clause dans un contrat",
+      "question": "Retrouve la clause de non-concurrence dans les contrats du dossier Garnier.",
+      "resume": false,
+      "extraits": [
+        {"etiquette": "Document « 02 Contrat de travail du 4 janvier 2021.pdf », dossier 2026-021, page 2", "texte": "Article 10 - Confidentialité. Pendant toute la durée du contrat et après sa cessation, la Salariée s'engage à ne divulguer aucune information confidentielle concernant la Société, ses clients, ses tarifs, ses marges et ses projets. Article 11 - Exclusivité. Pendant toute la durée du contrat, la Salariée consacre son activité professionnelle exclusivement à la Société."},
+        {"etiquette": "Document « 02 Contrat de travail du 4 janvier 2021.pdf », dossier 2026-021, page 2", "texte": "Article 12 - Clause de non-concurrence. 12.1 Compte tenu de la nature de ses fonctions et des informations commerciales auxquelles elle a accès, la Salariée s'interdit, pendant une durée de douze (12) mois à compter de la cessation effective de son contrat de travail, quelle qu'en soit la cause, d'entrer au service d'une entreprise exerçant une activité concurrente de celle de la Société, à savoir la conception, la distribution ou la maintenance d'équipements de mesure industrielle. 12.2 Cette interdiction est limitée au territoire de la région Île-de-France. 12.3 En contrepartie, la Salariée percevra, pendant toute la durée de l'interdiction, une indemnité mensuelle brute égale à 30 % de sa rémunération brute mensuelle moyenne des douze derniers mois précédant la cessation effective du contrat."},
+        {"etiquette": "Document « 02 Contrat de travail du 4 janvier 2021.pdf », dossier 2026-021, page 2", "texte": "12.4 La Société pourra renoncer au bénéfice de la présente clause, ou en réduire la durée, en informant la Salariée par lettre recommandée avec accusé de réception au plus tard dans les quinze (15) jours suivant la notification de la rupture du contrat de travail, quelle que soit la partie qui en a pris l'initiative. En cas de renonciation dans ce délai, aucune indemnité ne sera due. 12.5 Toute violation de la présente clause libérera la Société du versement de la contrepartie et rendra la Salariée redevable d'une pénalité égale à six mois de contrepartie."},
+        {"etiquette": "Document « 03 Avenant n° 1 du 1er février 2023.pdf », dossier 2026-021, page 1", "texte": "Article 3 - Autres clauses. Les autres clauses du contrat de travail du 4 janvier 2021 restent inchangées, notamment la clause de non-concurrence prévue à l'article 12."}
+      ],
+      "attendus": ["article 12", "12\\)? mois|douze", "ile-de-france", "30 ?%", "quinze|15\\)? jours", "recommande"],
+      "interdits": []
+    },
+    {
+      "id": "delai",
+      "titre": "Raisonner sur un délai à partir de plusieurs documents",
+      "question": "L'employeur a-t-il renoncé à la clause de non-concurrence dans le délai prévu par le contrat ?",
+      "resume": false,
+      "extraits": [
+        {"etiquette": "Document « 02 Contrat de travail du 4 janvier 2021.pdf », dossier 2026-021, page 2", "texte": "12.4 La Société pourra renoncer au bénéfice de la présente clause, ou en réduire la durée, en informant la Salariée par lettre recommandée avec accusé de réception au plus tard dans les quinze (15) jours suivant la notification de la rupture du contrat de travail. En cas de renonciation dans ce délai, aucune indemnité ne sera due."},
+        {"etiquette": "Document « 05 Lettre de licenciement du 8 septembre 2026.pdf », dossier 2026-021, page 1", "texte": "Nous vous rappelons que vous restez tenue par l'obligation de non-concurrence prévue à l'article 12 de votre contrat de travail. Lettre présentée pour la première fois au domicile de Mme Garnier le jeudi 10 septembre 2026 (avis de réception)."},
+        {"etiquette": "Document « 06 Courriel de Techniflux du 2 octobre 2026 - renonciation à la clause de non-concurrence.pdf », dossier 2026-021, page 1", "texte": "De : Caroline Weber. Date : vendredi 2 octobre 2026. Objet : Votre clause de non-concurrence. Nous vous informons que la société Techniflux renonce à l'application de la clause de non-concurrence prévue à l'article 12 de votre contrat de travail. Courriel transféré au cabinet par Mme Garnier le 5 octobre 2026. Aucune lettre recommandée n'a été reçue."}
+      ],
+      "attendus": ["\\bnon\\b|tardi|hors (du )?delai|apres l.expiration|depasse|expire", "quinze|15\\)? jours", "10 septembre", "2 octobre", "recommande|courriel"],
+      "interdits": ["\\boui, l.employeur a renonce dans le delai"]
+    },
+    {
+      "id": "absent",
+      "titre": "Question dont la réponse n'est pas dans les extraits",
+      "question": "Quel est le montant de la prestation compensatoire proposée à Mme Lefort ?",
+      "resume": false,
+      "extraits": [
+        {"etiquette": "Document « 02 Bail commercial du 1er mars 2019.pdf », dossier 2026-014, page 1", "texte": "Article 4 - Loyer. Le bail est consenti moyennant un loyer annuel de 27 000 euros hors taxes et hors charges, payable mensuellement et d'avance, le premier jour de chaque mois, soit 2 250 euros par mois."},
+        {"etiquette": "Document « 07 Décompte locatif au 3 novembre 2026.pdf », dossier 2026-014, page 2", "texte": "Reste dû au 3 novembre 2026 : 5 500 euros (échéances d'août et de septembre 2026). Les loyers courants sont payés depuis octobre."}
+      ],
+      "attendus": ["ne trouve pas"],
+      "interdits": ["prestation compensatoire[^.]{0,60}\\d"]
+    },
+    {
+      "id": "agenda",
+      "titre": "Prochaines échéances à partir de l'agenda",
+      "question": "Quelles sont les prochaines échéances du dossier Garnier ?",
+      "resume": false,
+      "extraits": [
+        {"etiquette": "Agenda « Audiences et échéances » : mardi 20 octobre 2026 (journée entière)", "texte": "Dépôt de la requête au conseil de prud'hommes - Garnier c. SAS Techniflux. Requête déposée au greffe du conseil de prud'hommes de Longjumeau."},
+        {"etiquette": "Agenda « Agenda de Me Arnoult » : lundi 9 novembre 2026, de 17 h 30 à 18 h 30", "texte": "Visio avec Mme Garnier - préparation du bureau de conciliation et d'orientation."},
+        {"etiquette": "Agenda « Agenda de Me Arnoult » : jeudi 12 novembre 2026, de 10 h à 10 h 30", "texte": "Appel avec Me Ollier (conseil de la SAS Techniflux) - piste de transaction."},
+        {"etiquette": "Agenda « Audiences et échéances » : vendredi 20 novembre 2026 (journée entière)", "texte": "Échéance : bordereau de pièces Garnier à communiquer à Me Ollier."},
+        {"etiquette": "Agenda « Audiences et échéances » : mardi 24 novembre 2026, de 14 h à 15 h, lieu : Conseil de prud'hommes de Longjumeau", "texte": "Conseil de prud'hommes - bureau de conciliation et d'orientation - Garnier c. SAS Techniflux. Me Arnoult. Mme Garnier doit être présente en personne."}
+      ],
+      "attendus": ["9 novembre", "12 novembre", "20 novembre", "24 novembre", "14 ?h|14:00", "longjumeau"],
+      "interdits": []
+    }
+  ]
+}

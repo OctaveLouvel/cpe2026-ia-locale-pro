@@ -139,6 +139,64 @@ services:
       - coffre_donnees:/data
     networks: [interne]
 
+  # Moteur d'inférence local (DEV-2). Les modèles sont téléchargés une fois, en atelier,
+  # par ./box.sh modeles-ia ; ensuite le moteur n'a plus aucun accès à internet.
+  ia-moteur:
+    image: ollama/ollama:0.40.14
+    restart: unless-stopped
+    environment:
+      OLLAMA_HOST: 0.0.0.0:11434
+      OLLAMA_KEEP_ALIVE: 24h
+      OLLAMA_NUM_PARALLEL: "1"
+      OLLAMA_MAX_LOADED_MODELS: "2"
+      OLLAMA_CONTEXT_LENGTH: "4096"
+    volumes:
+      - ia_modeles:/root/.ollama
+    networks: [interne]
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 1m
+
+  # Assistant IA du cabinet (DEV-2) : recherche dans les fichiers, l'agenda et les contacts avec les
+  # droits de la personne connectée, réponses avec citations. Aucun accès au coffre-fort.
+  assistant:
+    build: ../ia
+    image: box/assistant:0.1
+    restart: unless-stopped
+    user: "${BOX_UID:-1000}:${BOX_GID:-1000}"
+    environment:
+      NC_URL: http://nextcloud
+      # Moteur de rédaction : Ollama dans la box (choix de la démo), ou serveur compatible OpenAI (Colibri)
+      # avec IA_MOTEUR=openai et IA_MOTEUR_URL. Voir prototype/ia/README.md.
+      IA_MOTEUR: ${IA_MOTEUR:-ollama}
+      IA_MOTEUR_URL: ${IA_MOTEUR_URL:-http://ia-moteur:11434}
+      IA_MOTEUR_CLE: ${IA_MOTEUR_CLE:-}
+      IA_MODELE: ${IA_MODELE:-qwen3:4b}
+      IA_EMBEDDINGS_URL: ${IA_EMBEDDINGS_URL:-http://ia-moteur:11434}
+      IA_MODELE_EMBEDDINGS: ${IA_MODELE_EMBEDDINGS:-embeddinggemma-2:270m}
+      BOX_DOMAIN: ${BOX_DOMAIN:-cabinet.localhost}
+      IA_DONNEES: /donnees
+      IA_JOURNAL: /journal/assistant.jsonl
+      TZ: Europe/Paris
+    volumes:
+      - ./sortie/ia:/donnees
+      - ./sortie/journal:/journal
+    networks: [interne]
+    depends_on:
+      nextcloud:
+        condition: service_healthy
+      ia-moteur:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/etat', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 1m
+
   # Outil ponctuel : chargement du jeu de données fictif (./box.sh donnees-demo).
   outils:
     image: python:3.12-slim
@@ -192,3 +250,4 @@ volumes:
   db_donnees:
   coffre_donnees:
   sauvegarde_cache:
+  ia_modeles:

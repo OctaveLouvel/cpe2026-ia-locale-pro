@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Assistant du cabinet</title>
+<!-- Interface de l'assistant IA (DEV-2). Aucune ressource externe : fonctionne câble débranché.
+     DEV-3 peut l'intégrer au tableau de bord ou reprendre son style. -->
+<style>
+:root{--fond:#f4f6f8;--carte:#fff;--texte:#1b2430;--doux:#5b6675;--accent:#1d3557;--bord:#d9dee5;--bulle:#e8eef6;--ok:#1e7a46;--ko:#b23a48;--cite:#fff4d6}
+@media (prefers-color-scheme:dark){:root{--fond:#11161d;--carte:#1a212b;--texte:#e6eaf0;--doux:#9aa5b4;--accent:#8fb3e8;--bord:#2c3542;--bulle:#22303f;--ok:#5cc28a;--ko:#ef8a96;--cite:#3a3320}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--fond);color:var(--texte);line-height:1.5}
+header{background:var(--carte);border-bottom:1px solid var(--bord)}
+.barre{max-width:900px;margin:0 auto;padding:14px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.barre h1{font-size:1.15rem;margin:0}
+.barre .promesse{color:var(--doux);font-size:.85rem;flex:1;min-width:200px}
+.pastille{font-size:.8rem;padding:3px 10px;border-radius:999px;border:1px solid var(--bord);color:var(--doux)}
+.pastille.pret{color:var(--ok);border-color:var(--ok)}
+main{max-width:900px;margin:0 auto;padding:20px 16px 140px}
+.carte{background:var(--carte);border:1px solid var(--bord);border-radius:10px;padding:20px;margin-bottom:16px}
+label{display:block;font-weight:600;margin:12px 0 4px}
+input,textarea{width:100%;padding:10px;border:1px solid var(--bord);border-radius:8px;background:var(--fond);color:var(--texte);font:inherit}
+button{padding:9px 16px;border:0;border-radius:8px;background:var(--accent);color:var(--carte);font:inherit;font-weight:600;cursor:pointer}
+button.lien{background:none;color:var(--accent);padding:4px 6px;font-weight:500}
+button:disabled{opacity:.5;cursor:default}
+.erreur{color:var(--ko);margin-top:10px}
+.question{background:var(--bulle);border-radius:10px;padding:10px 14px;margin:18px 0 8px;margin-left:15%}
+.etape{color:var(--doux);font-size:.9rem;font-style:italic}
+.reponse{white-space:normal}
+.reponse ul{margin:6px 0;padding-left:22px}
+.reponse p{margin:6px 0}
+a.cite{font-size:.75rem;vertical-align:super;text-decoration:none;color:var(--accent);font-weight:700;padding:0 1px}
+.sources{margin-top:12px;display:grid;gap:8px}
+.source{border:1px solid var(--bord);border-radius:8px;padding:8px 12px;font-size:.9rem}
+.source.citee{background:var(--cite)}
+.source .type{font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;color:var(--doux)}
+.source .liens a{margin-right:12px;font-size:.85rem;color:var(--accent)}
+.source .apercu{color:var(--doux);font-size:.8rem;margin-top:4px}
+details summary{cursor:pointer;color:var(--doux);font-size:.85rem;margin-top:8px}
+.pied{color:var(--doux);font-size:.8rem;margin-top:10px}
+.saisie{position:fixed;left:0;right:0;bottom:0;background:var(--carte);border-top:1px solid var(--bord)}
+.saisie form{max-width:900px;margin:0 auto;padding:12px 16px;display:flex;gap:10px;align-items:flex-end}
+.saisie textarea{resize:none;height:56px}
+.suggestions{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 0}
+.suggestions button{background:var(--fond);color:var(--accent);border:1px solid var(--bord);font-weight:500;font-size:.85rem}
+table.journal{width:100%;border-collapse:collapse;font-size:.85rem}
+table.journal td{border-bottom:1px solid var(--bord);padding:6px 4px;vertical-align:top}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header><div class="barre">
+  <h1>Assistant du cabinet</h1>
+  <span class="promesse">Fonctionne sur la box, sans internet. Ne voit que les documents auxquels vous avez accès.</span>
+  <span class="pastille" id="etat">…</span>
+  <span id="identite" hidden></span>
+  <button class="lien" id="voir-journal" hidden>Ce qui a été tracé</button>
+  <button class="lien" id="deconnexion" hidden>Se déconnecter</button>
+</div></header>
+
+<main>
+  <form class="carte" id="connexion" hidden>
+    <strong>Connexion avec votre compte du cabinet</strong>
+    <label for="login">Identifiant</label><input id="login" autocomplete="username" required>
+    <label for="mdp">Mot de passe</label><input id="mdp" type="password" autocomplete="current-password" required>
+    <div style="margin-top:14px"><button>Se connecter</button></div>
+    <div class="erreur" id="erreur-connexion"></div>
+  </form>
+
+  <section id="conversation" hidden>
+    <div class="carte" id="accueil">
+      Posez une question sur vos dossiers, vos audiences ou vos contacts. Chaque réponse cite ses sources :
+      vérifiez-les avant de les utiliser. L'assistant n'a jamais accès au coffre-fort de mots de passe.
+      <div class="suggestions">
+        <button type="button">Quelles sont mes prochaines audiences ?</button>
+        <button type="button">Que dit la charte du cabinet sur l'IA ?</button>
+      </div>
+    </div>
+    <div id="fil"></div>
+  </section>
+
+  <section class="carte" id="journal" hidden>
+    <strong>Ce qui a été tracé pour votre compte</strong>
+    <p class="pied">Journal d'audit de l'assistant, conservé sur la box. Aucune question n'est envoyée hors du cabinet.</p>
+    <table class="journal"><tbody id="lignes-journal"></tbody></table>
+  </section>
+</main>
+
+<div class="saisie" id="saisie" hidden><form id="formulaire">
+  <textarea id="question" placeholder="Votre question (Entrée pour envoyer, Maj+Entrée pour aller à la ligne)" required></textarea>
+  <button id="envoyer">Envoyer</button>
+</form></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let numeroQuestion = 0;
+
+function echapper(t) {
+  return t.replace(/[&<>"']/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+}
+
+// Mise en forme minimale : gras, listes, appels de sources [n] cliquables.
+function rendre(texte, q) {
+  const lignes = echapper(texte).split("\n");
+  let html = "", liste = false;
+  for (let ligne of lignes) {
+    ligne = ligne.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+                 .replace(/\[(\d+)\]/g, (m, n) => `<a class="cite" href="#source-${q}-${n}">[${n}]</a>`);
+    const puce = ligne.match(/^\s*[-*•]\s+(.*)/);
+    if (puce) { if (!liste) { html += "<ul>"; liste = true; } html += `<li>${puce[1]}</li>`; continue; }
+    if (liste) { html += "</ul>"; liste = false; }
+    if (ligne.trim()) html += `<p>${ligne}</p>`;
+  }
+  return html + (liste ? "</ul>" : "");
+}
+
+function carteSource(s, q) {
+  let details = "", liens = "";
+  if (s.type === "document") {
+    details = [s.dossier && `dossier ${s.dossier}`, s.page && `page ${s.page}`, s.section].filter(Boolean).join(" · ");
+    liens = `<a href="${s.lien}" target="_blank" rel="noopener">${s.page ? "Ouvrir à la page " + s.page : "Ouvrir"}</a>`
+          + `<a href="${s.lien_nextcloud}" target="_blank" rel="noopener">Voir dans les fichiers</a>`;
+  } else if (s.type === "agenda") {
+    details = `${s.quand} · ${s.agenda}`;
+    liens = `<a href="${s.lien_nextcloud}" target="_blank" rel="noopener">Ouvrir l'agenda</a>`;
+  } else {
+    details = s.carnet;
+    liens = `<a href="${s.lien_nextcloud}" target="_blank" rel="noopener">Ouvrir les contacts</a>`;
+  }
+  const libelle = {document: "Document", agenda: "Agenda", contact: "Contact"}[s.type];
+  return `<div class="source${s.citee ? " citee" : ""}" id="source-${q}-${s.numero}">
+    <div class="type">[${s.numero}] ${libelle}</div><strong>${echapper(s.titre)}</strong>
+    <div>${echapper(details || "")}</div>
+    ${s.extrait ? `<div class="apercu">« ${echapper(s.extrait)}… »</div>` : ""}
+    <div class="liens">${liens}</div></div>`;
+}
+
+async function verifierEtat() {
+  try {
+    const e = await (await fetch("/api/etat")).json();
+    $("etat").textContent = e.pret ? `Prêt · ${e.modele}` : e.message;
+    $("etat").className = "pastille" + (e.pret ? " pret" : "");
+    if (!e.pret) setTimeout(verifierEtat, 5000);
+  } catch { $("etat").textContent = "Hors service"; setTimeout(verifierEtat, 5000); }
+}
+
+async function verifierSession() {
+  const s = await (await fetch("/api/session")).json();
+  const connecte = s.connecte;
+  $("connexion").hidden = connecte;
+  for (const id of ["conversation", "saisie", "identite", "deconnexion", "voir-journal"]) $(id).hidden = !connecte;
+  if (connecte) { $("identite").textContent = s.nom; $("question").focus(); } else { $("login").focus(); }
+}
+
+$("connexion").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  $("erreur-connexion").textContent = "";
+  const r = await fetch("/api/connexion", {method: "POST", headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({login: $("login").value, mot_de_passe: $("mdp").value})});
+  $("mdp").value = "";
+  if (!r.ok) { $("erreur-connexion").textContent = (await r.json()).erreur; return; }
+  verifierSession();
+});
+
+$("deconnexion").addEventListener("click", async () => {
+  await fetch("/api/deconnexion", {method: "POST", headers: {"Content-Type": "application/json"}, body: "{}"});
+  $("fil").innerHTML = ""; $("journal").hidden = true; verifierSession();
+});
+
+$("voir-journal").addEventListener("click", async () => {
+  const lignes = await (await fetch("/api/journal")).json();
+  $("lignes-journal").innerHTML = lignes.reverse().map((l) => {
+    const d = l.detail || {};
+    const quoi = d.question ? `« ${echapper(d.question)} »` : "";
+    const sources = d.sources ? `<br><span class="pied">Sources : ${echapper(d.sources.join(", "))}</span>` : "";
+    return `<tr><td>${new Date(l.date).toLocaleString("fr-FR")}</td><td>${echapper(l.type)}</td><td>${quoi}${sources}</td><td>${echapper(l.resultat)}</td></tr>`;
+  }).join("") || "<tr><td>Aucune entrée.</td></tr>";
+  $("journal").hidden = false;
+  $("journal").scrollIntoView({behavior: "smooth"});
+});
+
+async function poser(question) {
+  const q = ++numeroQuestion;
+  $("accueil").hidden = true;
+  const bloc = document.createElement("div");
+  bloc.innerHTML = `<div class="question">${echapper(question)}</div>
+    <div class="carte"><div class="etape">Envoi…</div><div class="reponse"></div><div class="sources"></div><div class="pied"></div></div>`;
+  $("fil").append(bloc);
+  bloc.scrollIntoView({behavior: "smooth"});
+  const etape = bloc.querySelector(".etape"), reponse = bloc.querySelector(".reponse");
+  let texte = "";
+  $("envoyer").disabled = true;
+  try {
+    const r = await fetch("/api/question", {method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({question})});
+    if (r.status === 401) { verifierSession(); return; }
+    const lecteur = r.body.getReader(), decodeur = new TextDecoder();
+    let tampon = "";
+    while (true) {
+      const {value, done} = await lecteur.read();
+      if (done) break;
+      tampon += decodeur.decode(value, {stream: true});
+      let fin;
+      while ((fin = tampon.indexOf("\n\n")) >= 0) {
+        const brut = tampon.slice(0, fin); tampon = tampon.slice(fin + 2);
+        if (!brut.startsWith("data: ")) continue;
+        const ev = JSON.parse(brut.slice(6));
+        if (ev.type === "etape") etape.textContent = ev.texte + "…";
+        else if (ev.type === "texte") { etape.hidden = true; texte += ev.texte; reponse.innerHTML = rendre(texte, q); }
+        else if (ev.type === "erreur") { etape.hidden = true; reponse.innerHTML = `<p class="erreur">${echapper(ev.texte)}</p>`; }
+        else if (ev.type === "fin") {
+          const citees = ev.sources.filter((s) => s.citee), autres = ev.sources.filter((s) => !s.citee);
+          bloc.querySelector(".sources").innerHTML = citees.map((s) => carteSource(s, q)).join("")
+            + (autres.length ? `<details><summary>${autres.length} autre(s) extrait(s) consulté(s), non cité(s)</summary>`
+               + autres.map((s) => carteSource(s, q)).join("") + "</details>" : "");
+          const m = ev.mesures || {};
+          bloc.querySelector(".pied").textContent = `Réponse en ${String(ev.duree_s).replace(".", ",")} s`
+            + (m.premier_mot_s ? ` (premier mot à ${String(m.premier_mot_s).replace(".", ",")} s)` : "")
+            + ` · modèle local ${ev.modele} · rien n'est sorti de la box`;
+        }
+      }
+    }
+  } catch (e) {
+    reponse.innerHTML = `<p class="erreur">Connexion à l'assistant interrompue.</p>`;
+  } finally {
+    $("envoyer").disabled = false; $("question").focus();
+  }
+}
+
+$("formulaire").addEventListener("submit", (ev) => {
+  ev.preventDefault();
+  const question = $("question").value.trim();
+  if (question) { $("question").value = ""; poser(question); }
+});
+$("question").addEventListener("keydown", (ev) => {
+  if (ev.key === "Enter" && !ev.shiftKey) { ev.preventDefault(); $("formulaire").requestSubmit(); }
+});
+for (const b of document.querySelectorAll(".suggestions button")) b.addEventListener("click", () => poser(b.textContent));
+
+verifierEtat();
+verifierSession();
+</script>
+</body>
+</html>

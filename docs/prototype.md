@@ -81,7 +81,7 @@ flowchart TB
 | Moteur d'inférence | **Retenu** : Ollama 0.40.14, conteneur sur le réseau interne. Colibri testé (section 5) | Simple, fonctionne hors ligne | DEV-2 |
 | Modèle | qwen3:4b pour la rédaction, embeddinggemma-2:270m pour la recherche par le sens ; choix par mesure (section 5) | Qualité en français et vitesse sur le matériel réel | DEV-2 |
 | Recherche dans les documents (RAG) | **Fait** : service maison [`prototype/ia/`](../prototype/ia/), extraction par page et par article, recherche par mots et par sens, droits lus dans Nextcloud à chaque question | C'est notre couche : droits d'accès, citations, croisement des services | DEV-2 |
-| Tableau de bord | Application web maison, servie localement | État des services, sauvegardes, mises à jour, journal, accès à l'assistant | DEV-3 |
+| Tableau de bord | **Fait (v1, 4 novembre)** : service maison [`prototype/interface/tableau-de-bord/`](../prototype/interface/tableau-de-bord/), Python sans dépendance, page d'accueil https://cabinet.localhost | État des services, dernière sauvegarde et test de restauration, connexions sortantes, vérification hors ligne, versions, accès aux services et au journal d'audit de DEV-4 | DEV-3 |
 | Installeur | **Fait** : assistant web de premier démarrage en 5 écrans (maison, Python sans dépendance) | « Quelques clics » au lieu d'une installation technique | DEV-1 + DEV-3 |
 | Sauvegarde | **Retenu** : restic 0.19.1, restauration testée | Chiffrement côté client, déduplication | DEV-1 + DEV-4 |
 | Accès distant | WireGuard, désactivé par défaut | Support possible sans ouvrir de port public permanent | DEV-4 |

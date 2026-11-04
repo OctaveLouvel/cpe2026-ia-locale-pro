@@ -44,14 +44,15 @@ services:
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - ./caddy/sites:/etc/caddy/sites:ro
-      - ./accueil:/srv/accueil:ro
       - caddy_donnees:/data
       - caddy_config:/config
-    networks: [frontal, interne]
+    networks: [frontal, interne, coffre]
     depends_on:
       nextcloud:
         condition: service_started
       coffre:
+        condition: service_started
+      tableau-de-bord:
         condition: service_started
 
   # Fichiers, agenda, contacts. Image dérivée : Agenda et Contacts intégrés, durcissement hors ligne.
@@ -137,7 +138,9 @@ services:
       TZ: Europe/Paris
     volumes:
       - coffre_donnees:/data
-    networks: [interne]
+    # Réseau à lui : seul le reverse proxy (et l'outil d'invitation) peut le joindre. L'assistant IA, sur le
+    # réseau interne, ne peut pas l'atteindre : c'est garanti par le réseau, pas seulement par le code.
+    networks: [coffre]
 
   # Moteur d'inférence local (DEV-2). Les modèles sont téléchargés une fois, en atelier,
   # par ./box.sh modeles-ia ; ensuite le moteur n'a plus aucun accès à internet.
@@ -209,6 +212,31 @@ services:
       retries: 5
       start_period: 1m
 
+  # Tableau de bord de la box (DEV-3), page d'accueil https://<domaine> : état des services, sauvegardes,
+  # connexions sortantes, versions, lien vers le journal d'audit de DEV-4. Bibliothèque standard de Python :
+  # aucune image à construire. Il ne lit aucune donnée du cabinet, seulement les routes de santé et les journaux.
+  tableau-de-bord:
+    image: python:3.12-slim
+    restart: unless-stopped
+    user: "${BOX_UID:-1000}:${BOX_GID:-1000}"
+    working_dir: /app
+    command: ["python", "-u", "-m", "tableau_de_bord"]
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      NC_URL: http://nextcloud
+      TZ: Europe/Paris
+    volumes:
+      - ../interface/tableau-de-bord:/app:ro
+      - ./sortie/journal:/journal:ro
+      - ./compose.yaml:/box/compose.yaml:ro
+    networks: [interne]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/sante', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
   # Outil ponctuel : chargement du jeu de données fictif (./box.sh donnees-demo).
   outils:
     image: python:3.12-slim
@@ -225,7 +253,7 @@ services:
     volumes:
       - ./outils:/outils:ro
       - ../donnees-demo:/donnees-demo:ro
-    networks: [interne]
+    networks: [interne, coffre]
 
   # Outil ponctuel : sauvegarde chiffrée avec restic (./box.sh sauvegarder, tester-restauration).
   # Aucun réseau : la sauvegarde locale vers le disque externe n'en a pas besoin.
@@ -254,6 +282,9 @@ networks:
   sortie: {}
   # Réseau des services : « internal » interdit toute sortie vers internet.
   interne:
+    internal: true
+  # Réseau du coffre-fort de mots de passe, séparé des autres services (dont l'assistant IA).
+  coffre:
     internal: true
 
 volumes:

@@ -47,7 +47,7 @@ services:
       - ./accueil:/srv/accueil:ro
       - caddy_donnees:/data
       - caddy_config:/config
-    networks: [frontal, interne]
+    networks: [frontal, interne, coffre]
     depends_on:
       nextcloud:
         condition: service_started
@@ -137,7 +137,9 @@ services:
       TZ: Europe/Paris
     volumes:
       - coffre_donnees:/data
-    networks: [interne]
+    # Réseau à lui : seul le reverse proxy (et l'outil d'invitation) peut le joindre. L'assistant IA, sur le
+    # réseau interne, ne peut pas l'atteindre : c'est garanti par le réseau, pas seulement par le code.
+    networks: [coffre]
 
   # Moteur d'inférence local (DEV-2). Les modèles sont téléchargés une fois, en atelier,
   # par ./box.sh modeles-ia ; ensuite le moteur n'a plus aucun accès à internet.
@@ -225,7 +227,7 @@ services:
     volumes:
       - ./outils:/outils:ro
       - ../donnees-demo:/donnees-demo:ro
-    networks: [interne]
+    networks: [interne, coffre]
 
   # Outil ponctuel : sauvegarde chiffrée avec restic (./box.sh sauvegarder, tester-restauration).
   # Aucun réseau : la sauvegarde locale vers le disque externe n'en a pas besoin.
@@ -254,6 +256,9 @@ networks:
   sortie: {}
   # Réseau des services : « internal » interdit toute sortie vers internet.
   interne:
+    internal: true
+  # Réseau du coffre-fort de mots de passe, séparé des autres services (dont l'assistant IA).
+  coffre:
     internal: true
 
 volumes:

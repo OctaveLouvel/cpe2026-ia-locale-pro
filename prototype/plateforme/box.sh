@@ -475,6 +475,12 @@ cmd_verifier_hors_ligne() {
                      "$("${COMPOSE[@]}" ps -q ia-moteur)" 2>/dev/null | xargs)
     [ "$reseaux_moteur" = box_interne ] && reussi "le moteur d'IA n'est relié qu'au réseau interne (pas d'internet)" \
                                         || rate "réseaux du moteur d'IA : ${reseaux_moteur:-inconnu}"
+    if "${COMPOSE[@]}" exec -T assistant python -c \
+         "import urllib.request; urllib.request.urlopen('http://coffre/alive', timeout=3)" >/dev/null 2>&1; then
+        rate "l'assistant IA arrive à joindre le coffre-fort"
+    else
+        reussi "l'assistant IA ne peut pas joindre le coffre-fort (réseau séparé)"
+    fi
     if "${COMPOSE[@]}" exec -T nextcloud curl -sS --max-time 5 -o /dev/null https://www.example.com 2>/dev/null; then
         rate "Nextcloud arrive à joindre internet"
     else

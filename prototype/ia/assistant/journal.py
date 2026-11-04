@@ -27,3 +27,24 @@ def lire(utilisateur: str, nombre: int = 20) -> list[dict]:
         return []
     lignes = [json.loads(l) for l in config.JOURNAL.read_text(encoding="utf-8").splitlines() if l.strip()]
     return [l for l in lignes if l.get("utilisateur") == utilisateur][-nombre:]
+
+
+def lire_tout(nombre: int = 500) -> list[dict]:
+    """Journal complet de la box, pour les administrateurs : journal de la plateforme (installation,
+    sauvegardes, connexions sortantes, modèles) et journal de l'assistant (connexions, questions, refus)."""
+    entrees = []
+    for fichier in sorted(config.JOURNAL.parent.glob("*.jsonl")):
+        for ligne in fichier.read_text(encoding="utf-8").splitlines():
+            try:
+                entree = json.loads(ligne)
+            except ValueError:
+                continue
+            detail = entree.get("detail")
+            if isinstance(detail, dict):
+                detail = " · ".join(f"{cle} : {', '.join(map(str, v)) if isinstance(v, list) else v}"
+                                    for cle, v in detail.items() if v not in (None, "", []))
+            entrees.append({"date": entree.get("date", ""), "source": entree.get("source", ""),
+                            "type": entree.get("type", ""), "utilisateur": entree.get("utilisateur"),
+                            "detail": detail or "", "resultat": entree.get("resultat", "")})
+    entrees.sort(key=lambda e: e["date"], reverse=True)
+    return entrees[:nombre]

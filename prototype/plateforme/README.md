@@ -17,8 +17,8 @@ Prérequis : Linux, Docker Engine 25 ou plus avec le greffon `docker compose`, p
 
 ```bash
 cd prototype/plateforme
-./box.sh installer        # crée .env (secrets aléatoires), construit l'image Nextcloud, démarre, attend (2 à 3 min)
-./box.sh donnees-demo     # charge le cabinet FICTIF : 4 comptes, 3 dossiers, 30 documents, agendas, contacts
+./box.sh installer --demo   # en une commande : toute la box (assistant IA compris) et le cabinet FICTIF
+                            # (sans --demo : box vide, puis ./box.sh donnees-demo plus tard)
 ```
 
 Puis ouvrir https://cloud.cabinet.localhost et se connecter avec un compte du tableau ci-dessous. Le mot de passe commun est `DEMO_MOT_DE_PASSE` dans le fichier `.env`.

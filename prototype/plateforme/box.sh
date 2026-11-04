@@ -9,7 +9,7 @@ cd "$ICI"
 SORTIE="$ICI/sortie"
 JOURNAL="$SORTIE/journal/evenements.jsonl"
 COMPOSE=(docker compose)
-CLES_SECRETES=(NC_ADMIN_PASSWORD NC_DB_PASSWORD CACHE_PASSWORD VW_ADMIN_TOKEN DEMO_MOT_DE_PASSE SAUVEGARDE_MOT_DE_PASSE)
+CLES_SECRETES=(NC_ADMIN_PASSWORD NC_DB_PASSWORD CACHE_PASSWORD VW_ADMIN_TOKEN DEMO_MOT_DE_PASSE SAUVEGARDE_MOT_DE_PASSE IA_MOTEUR_CLE)
 
 info()   { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
 ok()     { printf '\033[1;32m ok\033[0m %s\n' "$*"; }
@@ -27,6 +27,9 @@ journal() {
 charger_env() {
     [ -f .env ] || echec "fichier .env absent : lancer d'abord ./box.sh installer"
     set -a; . ./.env; set +a
+    # L'assistant IA tourne avec l'identité de l'exploitant de la box (pas root) et écrit dans sortie/.
+    export BOX_UID=${BOX_UID:-$(id -u)} BOX_GID=${BOX_GID:-$(id -g)}
+    mkdir -p "$SORTIE/ia" "$SORTIE/journal"
 }
 
 # Chaîne aléatoire sans caractères ambigus. Longueur en argument (défaut 32).
@@ -96,6 +99,8 @@ afficher_adresses() {
   Tableau de bord       https://${BOX_DOMAIN}
   Fichiers et agenda    https://cloud.${BOX_DOMAIN}
   Coffre-fort           https://coffre.${BOX_DOMAIN}
+  Assistant IA          https://ia.${BOX_DOMAIN}
+  Modèles d'IA          https://ia.${BOX_DOMAIN}/modeles
   Certificat racine     http://${BOX_DOMAIN}/autorite-locale.crt
 
   Mots de passe : fichier .env (NC_ADMIN_PASSWORD, DEMO_MOT_DE_PASSE). Adresse d'écoute : ${BIND_ADDRESS}.
@@ -103,6 +108,8 @@ EOF
 }
 
 cmd_installer() {
+    local demo=non
+    [ "${1:-}" = --demo ] && demo=oui
     verifier_prerequis
     creer_env
     charger_env
@@ -120,11 +127,19 @@ cmd_installer() {
     attendre nextcloud 900
     attendre coffre 120
     attendre proxy 60
+    attendre ia-moteur 300
+    attendre assistant 300
     exporter_certificat
-    journal installation "services de base installés et démarrés"
+    journal installation "box installée : services de base et assistant IA"
+    if [ "$demo" = oui ]; then
+        cmd_donnees_demo
+        "${COMPOSE[@]}" exec -T -e IA_MOT_DE_PASSE="$DEMO_MOT_DE_PASSE" assistant python -m assistant indexer hcorbiere \
+            || alerte "indexation à refaire quand un modèle sera actif : ./box.sh indexer-ia"
+    fi
     afficher_adresses
     echo
-    info "Étape suivante pour la démo : ./box.sh donnees-demo"
+    info "Choisir et installer le modèle d'IA : https://ia.${BOX_DOMAIN}/modeles (compte administrateur du cabinet)"
+    [ "$demo" = oui ] || info "Pour charger le cabinet fictif de démonstration : ./box.sh donnees-demo"
 }
 
 cmd_demarrer() {
@@ -414,7 +429,8 @@ cmd_verifier_hors_ligne() {
     local echecs=0 alertes=0 ip=127.0.0.1 domaine=$BOX_DOMAIN mdp=$DEMO_MOT_DE_PASSE
     [ "$BIND_ADDRESS" != 0.0.0.0 ] && ip=$BIND_ADDRESS
     local CURL=(curl -sS --max-time 15 --cacert "$SORTIE/autorite-locale.crt"
-                --resolve "$domaine:443:$ip" --resolve "cloud.$domaine:443:$ip" --resolve "coffre.$domaine:443:$ip")
+                --resolve "$domaine:443:$ip" --resolve "cloud.$domaine:443:$ip" --resolve "coffre.$domaine:443:$ip"
+                --resolve "ia.$domaine:443:$ip")
     reussi() { ok "$*"; }
     rate() { printf '\033[1;31m ÉCHEC\033[0m %s\n' "$*"; echecs=$((echecs + 1)); }
     attention() { alerte "$*"; alertes=$((alertes + 1)); }
@@ -428,7 +444,7 @@ cmd_verifier_hors_ligne() {
 
     info "2. Services"
     local service etat
-    for service in proxy nextcloud nextcloud-cron db cache coffre; do
+    for service in proxy nextcloud nextcloud-cron db cache coffre ia-moteur ia-telechargeur assistant; do
         etat=$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
                "$("${COMPOSE[@]}" ps -q "$service" 2>/dev/null)" 2>/dev/null || echo absent)
         case $etat in healthy|running) reussi "$service : $etat" ;; *) rate "$service : $etat" ;; esac
@@ -448,6 +464,17 @@ cmd_verifier_hors_ligne() {
     else
         rate "conteneurs reliés au réseau de l'hôte : $relies"
     fi
+    relies=$(docker network inspect -f '{{range .Containers}}{{.Name}} {{end}}' box_sortie 2>/dev/null)
+    if [ -z "$relies" ] || { [ "$(echo "$relies" | wc -w)" -eq 1 ] && [[ $relies == *ia-telechargeur* ]]; }; then
+        reussi "réseau « sortie » : seul le conteneur de téléchargement des modèles y est relié"
+    else
+        rate "conteneurs reliés au réseau de téléchargement : $relies"
+    fi
+    local reseaux_moteur
+    reseaux_moteur=$(docker inspect -f '{{range $nom, $_ := .NetworkSettings.Networks}}{{$nom}} {{end}}' \
+                     "$("${COMPOSE[@]}" ps -q ia-moteur)" 2>/dev/null | xargs)
+    [ "$reseaux_moteur" = box_interne ] && reussi "le moteur d'IA n'est relié qu'au réseau interne (pas d'internet)" \
+                                        || rate "réseaux du moteur d'IA : ${reseaux_moteur:-inconnu}"
     if "${COMPOSE[@]}" exec -T nextcloud curl -sS --max-time 5 -o /dev/null https://www.example.com 2>/dev/null; then
         rate "Nextcloud arrive à joindre internet"
     else
@@ -461,7 +488,7 @@ cmd_verifier_hors_ligne() {
 
     info "4. Pages chargées sans ressource externe (CDN, polices, scripts)"
     local page html externes
-    for page in "https://$domaine/" "https://cloud.$domaine/login" "https://coffre.$domaine/"; do
+    for page in "https://$domaine/" "https://cloud.$domaine/login" "https://coffre.$domaine/" "https://ia.$domaine/"; do
         if ! html=$("${CURL[@]}" -f "$page"); then
             rate "$page ne se charge pas"; continue
         fi
@@ -508,6 +535,64 @@ cmd_verifier_hors_ligne() {
     fi
 }
 
+# ---------------------------------------------------------------- assistant IA (DEV-2)
+
+IA_IMAGE_MOTEUR=ollama/ollama:0.40.14
+
+# Moteur de rédaction Colibri, lancé directement sur la machine (il lit le modèle sur le SSD) mais
+# n'écoutant QUE sur l'adresse de l'hôte dans le réseau interne des conteneurs : l'assistant le joint,
+# le wifi et internet ne le voient pas, et les conteneurs restent sans accès à internet.
+cmd_moteur_ia() {
+    charger_env
+    local action=${1:-etat} ip port=5000
+    ip=$(docker network inspect box_interne -f '{{(index .IPAM.Config 0).Gateway}}' 2>/dev/null) \
+        || echec "réseau box_interne absent : lancer d'abord ./box.sh demarrer"
+    local cle=(); [ -n "${IA_MOTEUR_CLE:-}" ] && cle=(-H "Authorization: Bearer $IA_MOTEUR_CLE")
+    case $action in
+        demarrer)
+            [ -x "${COLIBRI_DIR:-}/c/coli" ] || echec "Colibri introuvable : renseigner COLIBRI_DIR dans .env"
+            [ -d "${COLIBRI_MODELE:-}" ] || echec "modèle introuvable : renseigner COLIBRI_MODELE dans .env"
+            info "Démarrage de Colibri sur $ip:$port (réseau interne seulement)"
+            # setsid : le lanceur et le moteur qu'il démarre forment un groupe, arrêté d'un coup.
+            setsid nohup "$COLIBRI_DIR/c/coli" serve --model "$COLIBRI_MODELE" --host "$ip" --port "$port" --no-think \
+                ${IA_MOTEUR_CLE:+--api-key "$IA_MOTEUR_CLE"} > "$SORTIE/ia/colibri.log" 2>&1 &
+            echo $! > "$SORTIE/ia/colibri.pid"
+            local essai
+            for essai in $(seq 1 120); do
+                curl -fsS "${cle[@]}" "http://$ip:$port/v1/models" >/dev/null 2>&1 && break
+                sleep 2
+            done
+            curl -fsS "${cle[@]}" "http://$ip:$port/v1/models" >/dev/null 2>&1 || echec "Colibri ne répond pas (voir sortie/ia/colibri.log)"
+            sed -i "s|^IA_COLIBRI_URL=.*|IA_COLIBRI_URL=http://$ip:$port|" .env
+            grep -q "^IA_COLIBRI_URL=" .env || echo "IA_COLIBRI_URL=http://$ip:$port" >> .env
+            # L'assistant lit cette adresse à son démarrage.
+            charger_env
+            "${COMPOSE[@]}" up -d assistant >/dev/null 2>&1
+            journal moteur_ia "Colibri démarré sur $ip:$port"
+            ok "Colibri prêt : http://$ip:$port/v1"
+            ;;
+        arreter)
+            [ -f "$SORTIE/ia/colibri.pid" ] && kill -TERM -- "-$(cat "$SORTIE/ia/colibri.pid")" 2>/dev/null || true
+            rm -f "$SORTIE/ia/colibri.pid"
+            journal moteur_ia "Colibri arrêté"
+            ok "Colibri arrêté"
+            ;;
+        etat)
+            if curl -fsS "${cle[@]}" "http://$ip:$port/v1/models" 2>/dev/null; then echo; else echo "Colibri arrêté"; fi
+            ;;
+        *) echec "usage : ./box.sh moteur-ia demarrer|arreter|etat" ;;
+    esac
+}
+
+# Prépare l'index de recherche pour la démo, avec le compte de l'associée (qui voit tous les dossiers).
+cmd_indexer_ia() {
+    charger_env
+    attendre assistant 300
+    info "Indexation des documents visibles par hcorbiere"
+    "${COMPOSE[@]}" exec -T -e IA_MOT_DE_PASSE="$DEMO_MOT_DE_PASSE" assistant python -m assistant indexer hcorbiere
+    journal indexation_ia "index de recherche préparé avec le compte de démonstration hcorbiere"
+}
+
 # Télécharge et construit toutes les images, puis les exporte dans une archive : la box peut ensuite
 # être installée sur une machine qui n'a jamais eu accès à internet (docker load -i ...).
 cmd_preparer_hors_ligne() {
@@ -532,6 +617,8 @@ cmd_reinitialiser() {
     read -r -p "Taper « effacer » pour confirmer : " reponse
     [ "$reponse" = effacer ] || echec "annulé"
     "${COMPOSE[@]}" --profile outils down -v --remove-orphans
+    # Index de l'assistant : il désigne les fichiers de l'ancienne installation. Le choix du modèle est gardé.
+    rm -f "$SORTIE/ia/index.json" "$SORTIE/ia/vecteurs.npy"
     journal reinitialisation "conteneurs et volumes supprimés"
     ok "box réinitialisée (le fichier .env est conservé)"
 }
@@ -540,7 +627,7 @@ cmd_aide() {
     cat <<'EOF'
 Usage : ./box.sh <commande>
 
-  installer            Crée .env (secrets), construit, démarre et attend que tout soit prêt
+  installer [--demo]   Installe toute la box en une commande (--demo : avec le cabinet fictif)
   donnees-demo         Charge le cabinet FICTIF : comptes, dossiers, droits, agendas, contacts
   demarrer | arreter   Démarre ou arrête les services
   etat                 État des services et adresses
@@ -551,6 +638,9 @@ Usage : ./box.sh <commande>
   tester-restauration  Restaure le dernier instantané dans un projet isolé et vérifie tout
   restaurer [id]       Reconstruit la box depuis un instantané (REMPLACE les données)
   verifier-hors-ligne  Liste de vérification de la démo, à lancer câble débranché
+  ia [commande]        Modèles d'IA : menu pour choisir, installer et activer (liste, installer, activer, supprimer)
+  moteur-ia ACTION     demarrer | arreter | etat : moteur Colibri sur le réseau interne
+  indexer-ia           Prépare l'index de recherche de l'assistant pour la démo
   assistant [adresse]  Assistant web de première configuration (défaut 127.0.0.1:8090)
   preparer-hors-ligne  Exporte toutes les images dans sortie/images-box.tar (installation sans internet)
   reinitialiser        Supprime conteneurs ET volumes (demande confirmation)
@@ -560,7 +650,7 @@ EOF
 commande=${1:-aide}
 shift || true
 case $commande in
-    installer)            cmd_installer ;;
+    installer)            cmd_installer "$@" ;;
     donnees-demo)         cmd_donnees_demo ;;
     demarrer)             cmd_demarrer ;;
     arreter)              cmd_arreter ;;
@@ -572,6 +662,9 @@ case $commande in
     tester-restauration)  cmd_tester_restauration "$@" ;;
     restaurer)            cmd_restaurer "$@" ;;
     verifier-hors-ligne)  cmd_verifier_hors_ligne ;;
+    moteur-ia)            cmd_moteur_ia "$@" ;;
+    ia)                   charger_env; exec python3 "$ICI/../ia/gerer_modeles.py" "$@" ;;
+    indexer-ia)           cmd_indexer_ia ;;
     assistant)            exec python3 "$ICI/installeur/assistant.py" "$@" ;;
     preparer-hors-ligne)  cmd_preparer_hors_ligne ;;
     reinitialiser)        cmd_reinitialiser ;;

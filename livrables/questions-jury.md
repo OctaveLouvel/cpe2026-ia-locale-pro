@@ -25,7 +25,10 @@ Parce qu'il faut savoir les installer, les sécuriser et les maintenir. Un petit
 L'installeur, le tableau de bord, le journal d'audit, le service d'assistant qui croise les données, respecte les droits et cite ses sources, et le pack métier. Les briques de base sont des logiciels libres reconnus, ce qui est un gage de sécurité.
 
 **Et si l'IA invente une réponse dans un dossier juridique ?**
-Elle cite toujours ses sources, répond « je ne trouve pas » quand rien n'est pertinent, et l'interface rappelle qu'il faut vérifier. L'assistant aide à chercher et résumer, il ne remplace pas le professionnel.
+Elle cite toujours ses sources, répond « je ne trouve pas » quand rien n'est pertinent, et l'interface rappelle qu'il faut vérifier. L'assistant aide à chercher et résumer, il ne remplace pas le professionnel. Dans le prototype, trois cas reçoivent une réponse fixe sans même appeler le modèle : une demande de mot de passe, un nom qui n'apparaît dans aucun document visible par la personne, et l'absence d'extrait pertinent. Chaque source citée s'ouvre à la bonne page.
+
+**Comment l'assistant respecte-t-il les droits d'accès ?**
+Il n'a aucun compte privilégié. À chaque question, il demande à Nextcloud ce que la personne connectée a le droit de voir, et ne lit que cela. Démonstration : la stagiaire demande le dossier de divorce réservé à l'associée, l'assistant répond qu'il ne trouve rien, sans même révéler que ce dossier existe.
 
 **Que se passe-t-il si la box est volée, tombe en panne ou brûle ?**
 Disque chiffré : un voleur ne lit rien. Sauvegarde locale et sauvegarde hors site chiffrée côté client. Box de remplacement et restauration sous [délai à définir].

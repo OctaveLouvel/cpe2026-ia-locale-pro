@@ -1,0 +1,8 @@
+# Assistant IA du cabinet (DEV-2).
+ia.{$BOX_DOMAIN} {
+	import entetes
+	# Réponses envoyées au fil de l'eau (text/event-stream) : pas de mise en tampon.
+	reverse_proxy assistant:8000 {
+		flush_interval -1
+	}
+}

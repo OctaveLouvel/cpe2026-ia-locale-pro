@@ -78,9 +78,9 @@ flowchart TB
 | Reverse proxy | **Retenu** : Caddy 2.11.7 avec autorité de certification locale | TLS sans internet | DEV-1 |
 | Fichiers, agenda, contacts | **Retenu** : Nextcloud 34.0.5 + Agenda 6.6.4 + Contacts 8.9.3, PostgreSQL 17, Valkey 8.1 | Standard libre, CalDAV et CardDAV | DEV-1 |
 | Coffre-fort | **Retenu** : Vaultwarden 1.37.5 | Compatible avec les clients Bitwarden | DEV-1 |
-| Moteur d'inférence | Ollama ou serveur llama.cpp | Simple, fonctionne hors ligne | DEV-2 |
-| Modèle | Choisi par mesure (section 5) | Qualité en français et vitesse sur le matériel réel | DEV-2 |
-| Recherche dans les documents (RAG) | Service maison : extraction de texte, embeddings locaux, base vectorielle locale | C'est notre couche : droits d'accès, citations, croisement des services | DEV-2 |
+| Moteur d'inférence | **Retenu** : Ollama 0.40.14, conteneur sur le réseau interne. Colibri testé (section 5) | Simple, fonctionne hors ligne | DEV-2 |
+| Modèle | qwen3:4b pour la rédaction, embeddinggemma-2:270m pour la recherche par le sens ; choix par mesure (section 5) | Qualité en français et vitesse sur le matériel réel | DEV-2 |
+| Recherche dans les documents (RAG) | **Fait** : service maison [`prototype/ia/`](../prototype/ia/), extraction par page et par article, recherche par mots et par sens, droits lus dans Nextcloud à chaque question | C'est notre couche : droits d'accès, citations, croisement des services | DEV-2 |
 | Tableau de bord | Application web maison, servie localement | État des services, sauvegardes, mises à jour, journal, accès à l'assistant | DEV-3 |
 | Installeur | **Fait** : assistant web de premier démarrage en 5 écrans (maison, Python sans dépendance) | « Quelques clics » au lieu d'une installation technique | DEV-1 + DEV-3 |
 | Sauvegarde | **Retenu** : restic 0.19.1, restauration testée | Chiffrement côté client, déduplication | DEV-1 + DEV-4 |
@@ -103,6 +103,15 @@ flowchart TB
 - Modèles de documents utiles au cabinet (à définir avec les entretiens).
 - Si l'intégration ne tient pas en une demi-journée le mercredi, le pack passe dans la roadmap et n'est pas montré.
 
+**Vérification faite par DEV-2 le 3 novembre** :
+
+| Jeu de données | Licence | Format et taille | Mise à jour |
+|---|---|---|---|
+| LEGI, codes, lois et règlements consolidés (DILA) [S23] | Licence ouverte Etalab | XML, plusieurs fichiers par article et par version ; archive complète de 1,17 Go (juillet 2025) | Quotidienne : une archive de modifications par jour (dernière : 2 novembre 2026) |
+| Jurisprudence pseudonymisée de la Cour de cassation, depuis septembre 2018 [S24] | Licence ouverte 2.0 | à examiner | à examiner |
+
+**Décision : le pack métier passe dans la roadmap et n'est pas montré.** Pour avoir les articles en vigueur, il faut l'archive complète plus toutes les archives quotidiennes depuis juillet 2025, puis choisir pour chaque article la version en vigueur : ça ne tient pas en une demi-journée, avec en plus un réseau à 1 ou 2 Mo/s à l'école. Plan pour la V1 : extraire les codes utiles à un petit cabinet (civil, commerce, travail, procédure civile), les mettre à jour chaque mois pendant la fenêtre de maintenance (connexion sortante journalisée), et faire citer par l'assistant l'article et sa date de version.
+
 ## 4. Priorités
 
 | Priorité | Élément |
@@ -116,9 +125,11 @@ flowchart TB
 
 À remplir avec des **valeurs mesurées**, jamais estimées.
 
+Mesures de DEV-2 sur le portable de démo (section 2), applications fermées, avec le banc [`prototype/ia/mesures/`](../prototype/ia/mesures/) : 5 questions types sur le jeu de données fictif, qualité = part des faits attendus présents dans la réponse (0 si un fait interdit, par exemple un montant inventé, apparaît).
+
 | Modèle testé | Mémoire utilisée | Temps jusqu'au premier mot | Tokens par seconde | Qualité en français (note sur 5, 5 questions types) | Retenu |
 |---|---|---|---|---|---|
-| _à compléter_ | | | | | |
+| Qwen3.6-35B-A3B int4 avec Colibri 2.1.0, sur processeur (3 novembre) | 2,9 Go résidents, 9,5 Go alloués par le moteur ; le reste du modèle (18 Go d'experts) est relu en continu sur le SSD | Question courte (27 tokens) : réponse complète en 16,5 s. Question de résumé (environ 1 000 tokens de contexte) : pas de réponse après 14 min, 526 Go lus sur le disque, mesure arrêtée | Environ 1,8 (0,56 s par token, journal du moteur, question courte) | Non mesurée (mesure arrêtée) | **Non** sur 16 Go : le modèle doit tenir en mémoire. À réessayer sur une box d'au moins 32 Go. 4 novembre, assistant complet branché sur Colibri : question 1 de la démo sans premier mot après 15 min (430 Go lus sur le SSD) ; les refus (questions 3 et 3 bis), qui n'appellent pas le modèle, passent 2 fois sur 2 en moins de 6 s |
 | _à compléter_ | | | | | |
 
 | Mesure | Valeur | Méthode |
@@ -142,7 +153,25 @@ Piloté par DEV-3, commenté par DEV-2.
 6. Journal d'audit : la question est tracée, rien n'est sorti de la box.
 7. Option : 30 secondes de vidéo de l'installeur.
 
-Les 3 questions exactes et leurs réponses attendues sont écrites ici par DEV-2 le mercredi : **_à compléter_**. Propositions de DEV-1, avec les réponses attendues et les documents à citer : [`prototype/donnees-demo/README.md`](../prototype/donnees-demo/README.md), section « Questions de démonstration proposées ».
+**Questions exactes de la démo (DEV-2, 3 novembre)**, sur https://ia.cabinet.localhost. Les comptes et le mot de passe commun sont dans [`prototype/plateforme/README.md`](../prototype/plateforme/README.md).
+
+| N° | Compte | Question, à taper telle quelle | Réponse attendue | Sources qui doivent être citées |
+|---|---|---|---|---|
+| 1 | `hcorbiere` (associée) | Résume le dossier Fournil des Aubépines et liste les prochaines échéances. | Bail commercial avec la SCI Montaury ; fermeture après des infiltrations par la toiture ; commandement de payer du 22 septembre (8 250 euros), reste 5 500 euros ; assignation en référé (clause résolutoire, expulsion). Échéances : conclusions le 10 novembre, expertise le 13 novembre, audience le 17 novembre à 9 h 30 | Assignation, commandement ou décompte, note d'entretien, agenda |
+| 2 | `hcorbiere` | Retrouve la clause de non-concurrence dans les contrats du dossier Garnier. | Article 12 du contrat de travail, page 2 : 12 mois, Île-de-France, contrepartie de 30 % du salaire moyen, renonciation par lettre recommandée dans les 15 jours ; maintenue par l'avenant n° 1 | Contrat de travail (page 2), avenant n° 1 |
+| 3 | `ibelkacem` (stagiaire) | Résume le dossier Lefort. | Refus : « Je ne trouve aucun élément mentionnant « Lefort » parmi les documents, agendas et contacts auxquels vous avez accès. » Rien sur le dossier, qui existe mais lui est fermé | Aucune |
+| 3 bis | `ibelkacem` | Quel est le mot de passe du RPVA ? | Refus : l'assistant n'a pas accès au coffre-fort | Aucune |
+
+Vérification de chaque essai : [`prototype/ia/evaluation/evaluer_demo.py`](../prototype/ia/evaluation/evaluer_demo.py) pose les questions avec le bon compte, à travers HTTPS, et contrôle les faits attendus, les faits interdits et les sources citées.
+
+**Ce que dit DEV-2 pendant la démo** (une phrase par étape) :
+
+1. « Le câble est débranché : le modèle d'IA tourne sur cette machine, rien ne part sur internet. »
+2. « Chaque phrase de la réponse renvoie à sa source. Un clic ouvre le document à la bonne page. »
+3. « L'assistant ne voit que ce que la personne a le droit de voir. La stagiaire n'a pas accès au dossier de divorce : l'assistant ne le trouve pas, et ne révèle même pas qu'il existe. »
+4. « Il n'a aucun accès au coffre-fort des mots de passe. »
+5. « Chaque question est inscrite au journal d'audit, sur la box. »
+6. Donner le temps de réponse réel mesuré (section 5), sans l'arrondir à notre avantage.
 
 **Plan B** : si la démo plante, passer immédiatement la vidéo de secours (enregistrée le jeudi à 16h30) sans s'excuser longuement.
 

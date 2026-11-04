@@ -25,3 +25,5 @@ Règles d'usage :
 - Police du nom : Adwaita Sans (licence SIL Open Font License 1.1, dérivée d'Inter), convertie en tracés : le SVG s'affiche pareil partout, sans police installée.
 
 Les propositions faites sur Canva le même jour (non retenues) restent dans le compte Canva de l'équipe.
+
+Usage dans les pages et les documents : [`docs/direction-artistique.md`](../../docs/direction-artistique.md).

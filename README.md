@@ -228,6 +228,7 @@ docs/
   business-model.md          Offres, prix, modèle financier, financement
   rse.md                     Méthode de mesure de l'impact
   securite.md                Modèle de menace, chiffrement, journal d'audit, licences
+  direction-artistique.md    Couleurs, typographie, logo et ton de toutes les pages
   roadmap-5-ans.md           Planning global à 5 ans
   sources.md                 Toutes les sources citées
 entretiens/

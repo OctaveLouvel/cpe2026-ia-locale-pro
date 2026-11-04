@@ -232,7 +232,10 @@ entretiens/
   modele-compte-rendu.md     Modèle de fiche d'entretien
   suivi.md                   Tableau de suivi des entretiens (données réelles uniquement)
 livrables/
-  executive-summary.md       Brouillon de l'executive summary (2 pages)
+  executive-summary.md       Mode d'emploi et vérifications avant dépôt
+  executive-summary.html     Texte de l'executive summary (source du PDF)
+  executive-summary.pdf      PDF de 2 pages déposé sur Moodle
+  generer-pdf.sh             Génère le PDF depuis le HTML
   plan-pitch.md              Déroulé des 15 minutes, qui parle quand
   questions-jury.md          Questions probables et éléments de réponse
 prototype/                   Code de la démo (une partie par développeur, voir prototype/README.md)

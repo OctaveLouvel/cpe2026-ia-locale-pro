@@ -224,6 +224,7 @@ docs/
   prototype.md               Spécification de la démo et architecture technique
   business-model.md          Offres, prix, modèle financier, financement
   rse.md                     Méthode de mesure de l'impact
+  securite.md                Modèle de menace, chiffrement, journal d'audit, licences
   roadmap-5-ans.md           Planning global à 5 ans
   sources.md                 Toutes les sources citées
 entretiens/
@@ -237,6 +238,7 @@ livrables/
 prototype/                   Code de la démo (une partie par développeur, voir prototype/README.md)
   plateforme/                DEV-1 : box.sh, services Docker, installeur, sauvegarde, vérification hors ligne
   ia/                        DEV-2 : assistant IA (droits Nextcloud, citations, refus), mesures des modèles
+  securite/                  DEV-4 : mesure de la consommation électrique
   donnees-demo/              Cabinet FICTIF de la démo : documents, agendas, contacts, droits
 reference/                   PDF officiel du challenge
 ```

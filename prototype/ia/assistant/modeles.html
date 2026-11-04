@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Modèles d'IA</title>
+<!-- Choix, installation et activation des modèles d'IA de la box (administrateurs du cabinet).
+     Aucune ressource externe. -->
+<style>
+:root{--fond:#f3f5f8;--carte:#fff;--texte:#17202c;--doux:#5b6675;--bord:#dde2e9;--accent:#1d3557;--accent-doux:#e8eef6;
+  --ok:#1e7a46;--ok-fond:#e5f4ec;--ko:#b23a48;--ko-fond:#fbe9ec;--att:#9a6700;--att-fond:#fff4d6;--ombre:0 1px 2px rgba(16,24,40,.06),0 4px 16px rgba(16,24,40,.06)}
+@media (prefers-color-scheme:dark){:root{--fond:#0f141b;--carte:#18202a;--texte:#e7ebf0;--doux:#9aa5b4;--bord:#2a3441;--accent:#8fb3e8;--accent-doux:#1f2b3a;
+  --ok:#5cc28a;--ok-fond:#163126;--ko:#ef8a96;--ko-fond:#3a1c22;--att:#e3b341;--att-fond:#3a3120;--ombre:none}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--fond);color:var(--texte);line-height:1.5}
+header{background:var(--carte);border-bottom:1px solid var(--bord)}
+.barre{max-width:1000px;margin:0 auto;padding:14px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.barre h1{margin:0;font-size:1.2rem;margin-right:auto}
+.barre a{color:var(--accent);font-size:.92rem}
+main{max-width:1000px;margin:0 auto;padding:22px 16px 48px}
+.resume{background:var(--carte);border:1px solid var(--bord);border-radius:14px;box-shadow:var(--ombre);padding:16px 20px;display:flex;flex-wrap:wrap;gap:8px 28px;margin-bottom:8px}
+.resume div{font-size:.9rem;color:var(--doux)}
+.resume strong{display:block;color:var(--texte);font-size:1.02rem}
+h2{font-size:1.05rem;margin:26px 0 4px}
+.aide{color:var(--doux);font-size:.9rem;margin:0 0 12px}
+.grille{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
+.modele{background:var(--carte);border:1px solid var(--bord);border-radius:14px;box-shadow:var(--ombre);padding:18px;display:flex;flex-direction:column;gap:8px}
+.modele.actif{border:2px solid var(--ok)}
+.modele h3{margin:0;font-size:1.05rem}
+.editeur{color:var(--doux);font-size:.82rem;margin-top:-6px}
+.modele p{margin:0;color:var(--doux);font-size:.9rem;flex:1}
+.chiffres{font-size:.85rem;color:var(--doux)}
+.badges{display:flex;gap:6px;flex-wrap:wrap}
+.badge{font-size:.78rem;padding:2px 9px;border-radius:999px;background:var(--accent-doux);color:var(--accent)}
+.badge.oui{background:var(--ok-fond);color:var(--ok)}.badge.juste{background:var(--att-fond);color:var(--att)}.badge.non{background:var(--ko-fond);color:var(--ko)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit;font-weight:600;font-size:.88rem;padding:7px 13px;border-radius:9px;border:0;cursor:pointer;background:var(--accent);color:var(--carte)}
+@media (prefers-color-scheme:dark){button{color:#0f141b}}
+button.second{background:var(--accent-doux);color:var(--accent)}
+button.danger{background:transparent;color:var(--ko);border:1px solid var(--ko)}
+button:disabled{opacity:.5;cursor:default}
+.progression{height:8px;border-radius:99px;background:var(--accent-doux);overflow:hidden}
+.progression div{height:100%;width:0;background:var(--accent);transition:width .3s}
+.statut{font-size:.82rem;color:var(--doux)}
+.message{padding:12px 16px;border-radius:10px;margin:12px 0;background:var(--att-fond);color:var(--att)}
+.message.ko{background:var(--ko-fond);color:var(--ko)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header><div class="barre">
+  <h1>Modèles d'IA de la box</h1>
+  <a href="/">Assistant</a>
+  <a id="portail" href="#">Portail de la box</a>
+</div></header>
+<main>
+  <div class="message" id="message" hidden></div>
+  <section id="contenu" hidden>
+    <div class="resume">
+      <div>Mémoire de la machine<strong id="memoire">–</strong></div>
+      <div>Modèle de rédaction actif<strong id="actif">–</strong></div>
+      <div>Recherche<strong id="recherche">–</strong></div>
+      <div>État de l'assistant<strong id="etat">–</strong></div>
+    </div>
+    <h2>Rédaction des réponses</h2>
+    <p class="aide">Le modèle qui lit les extraits des documents et rédige la réponse. Plus il est gros, meilleures sont les réponses, mais plus il faut de mémoire et plus il est lent sans carte graphique.</p>
+    <div class="grille" id="redaction"></div>
+    <h2>Recherche par le sens</h2>
+    <p class="aide">En option : retrouve un passage même formulé autrement que la question. Sans lui, l'assistant cherche par mots, ce qui suffit souvent. <button class="second" id="par-mots" hidden>Recherche par mots seulement</button></p>
+    <div class="grille" id="recherche-liste"></div>
+    <p class="aide" style="margin-top:22px">Les modèles tournent dans le conteneur de la box, sans accès à internet. Un téléchargement passe par un conteneur dédié et est inscrit au journal d'audit. Mémoire nécessaire : estimation (taille × 1,3 + 0,5 Go), à confirmer par une mesure.</p>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+$("portail").href = "https://" + location.host.replace(/^ia\./, "") + "/";
+let enCours = false;
+
+function echapper(t) { return String(t).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function message(texte, ko) { const m = $("message"); m.hidden = !texte; m.textContent = texte || ""; m.className = "message" + (ko ? " ko" : ""); }
+
+async function poster(action, id) {
+  const r = await fetch(`/api/modeles/${action}`, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({id})});
+  if (!r.ok) { message((await r.json()).erreur || "Erreur", true); return false; }
+  return true;
+}
+
+function carte(m) {
+  const tient = {oui: "Tient en mémoire", juste: "Mémoire juste", non: "Trop gros pour cette machine"}[m.tient];
+  const etat = m.actif ? `<span class="badge oui">Actif</span>` : m.installe ? `<span class="badge">Installé</span>` : "";
+  let actions = "";
+  if (m.moteur === "colibri" && !m.installe) actions = `<span class="statut">Hors conteneur : démarrer Colibri sur la box (./box.sh moteur-ia demarrer)</span>`;
+  else if (!m.installe) actions = `<button data-action="installer">Installer (${String(m.taille_go).replace(".", ",")} Go)</button>`;
+  else if (!m.actif) actions = `<button data-action="activer">Activer</button>` + (m.moteur === "ollama" ? `<button class="danger" data-action="supprimer">Supprimer</button>` : "");
+  const div = document.createElement("div");
+  div.className = "modele" + (m.actif ? " actif" : "");
+  div.innerHTML = `<h3>${echapper(m.nom)}</h3><div class="editeur">${echapper(m.editeur)} · ${echapper(m.id)}</div>
+    <p>${echapper(m.description)}</p>
+    <div class="chiffres">${String(m.taille_go).replace(".", ",")} Go ${m.moteur === "colibri" ? "sur le disque" : "à télécharger"} · environ ${String(m.memoire_estimee_go).replace(".", ",")} Go de mémoire</div>
+    <div class="badges"><span class="badge ${m.tient}">${tient}</span>${etat}</div>
+    <div class="progression" hidden><div></div></div><div class="statut suivi"></div>
+    <div class="actions">${actions}</div>`;
+  for (const b of div.querySelectorAll("button")) b.addEventListener("click", () => agir(b.dataset.action, m, div));
+  return div;
+}
+
+async function agir(action, m, div) {
+  if (enCours) return;
+  if (action === "supprimer" && !confirm(`Supprimer ${m.nom} de la box ?`)) return;
+  if (action === "installer" && m.tient === "non" && !confirm("Ce modèle risque de ne pas tenir en mémoire. Continuer ?")) return;
+  if (action === "installer" && !confirm(`Télécharger ${m.nom} (${m.taille_go} Go) ? C'est une connexion sortante, inscrite au journal d'audit.`)) return;
+  message("");
+  enCours = true;
+  for (const b of document.querySelectorAll("button")) b.disabled = true;
+  try {
+    if (action === "installer") await installer(m, div);
+    else if (await poster(action, m.id) && action === "activer") message(`${m.nom} activé : l'assistant charge le modèle.`);
+  } finally { enCours = false; await charger(); }
+}
+
+async function installer(m, div) {
+  const barre = div.querySelector(".progression"), suivi = div.querySelector(".suivi");
+  barre.hidden = false;
+  const r = await fetch("/api/modeles/installer", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({id: m.id})});
+  if (!r.ok) { message((await r.json()).erreur || "Erreur", true); return; }
+  const lecteur = r.body.getReader(), decodeur = new TextDecoder();
+  let tampon = "";
+  while (true) {
+    const {value, done} = await lecteur.read();
+    if (done) break;
+    tampon += decodeur.decode(value, {stream: true});
+    let fin;
+    while ((fin = tampon.indexOf("\n\n")) >= 0) {
+      const ev = JSON.parse(tampon.slice(6, fin)); tampon = tampon.slice(fin + 2);
+      if (ev.type === "progression") {
+        if (ev.pourcent !== null) barre.firstElementChild.style.width = ev.pourcent + "%";
+        suivi.textContent = ev.statut + (ev.pourcent !== null ? ` · ${ev.pourcent} %` : "");
+      } else if (ev.type === "erreur") message("Téléchargement échoué : " + ev.texte, true);
+      else if (ev.type === "fin") message(`${m.nom} est installé. Cliquez sur « Activer » pour l'utiliser.`);
+    }
+  }
+}
+
+async function charger() {
+  const s = await (await fetch("/api/session")).json();
+  if (!s.connecte) { message("Connectez-vous d'abord sur la page de l'assistant."); $("contenu").hidden = true; return; }
+  const r = await fetch("/api/modeles");
+  if (!r.ok) { message((await r.json()).erreur, true); $("contenu").hidden = true; return; }
+  const e = await r.json();
+  $("contenu").hidden = false;
+  $("memoire").textContent = String(e.memoire_machine_go).replace(".", ",") + " Go";
+  const actif = e.modeles.find((m) => m.actif && m.type === "redaction");
+  const recherche = e.modeles.find((m) => m.actif && m.type === "recherche");
+  $("actif").textContent = actif ? actif.nom : "aucun";
+  $("recherche").textContent = recherche ? "par le sens (" + recherche.nom + ")" : "par mots";
+  $("par-mots").hidden = !recherche;
+  $("etat").textContent = e.pret ? "prêt" : e.message;
+  if (!e.moteur_ollama) message("Le moteur ia-moteur ne répond pas : vérifier qu'il est démarré.", true);
+  $("redaction").replaceChildren(...e.modeles.filter((m) => m.type === "redaction").map(carte));
+  $("recherche-liste").replaceChildren(...e.modeles.filter((m) => m.type === "recherche").map(carte));
+  if (enCours) for (const b of document.querySelectorAll("button")) b.disabled = true;
+}
+
+$("par-mots").addEventListener("click", async () => { if (await poster("recherche-par-mots", "")) { message("Recherche par mots seulement."); charger(); } });
+charger();
+setInterval(() => { if (!enCours) charger(); }, 15000);
+</script>
+</body>
+</html>

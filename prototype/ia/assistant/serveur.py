@@ -15,13 +15,14 @@ from http import cookies
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from . import config, journal
+from . import config, journal, modeles
 from .index import Index
 from .moteur import Moteur, MoteurIndisponible
 from .nextcloud import AccesRefuse, Client, Indisponible
 from .reponse import Session, repondre
 
 INTERFACE = (Path(__file__).parent / "interface.html").read_bytes()
+PAGE_MODELES = (Path(__file__).parent / "modeles.html").read_bytes()
 DUREE_SESSION = 8 * 3600
 TAILLE_MAX = 64 * 1024
 POLITIQUE = ("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; "
@@ -35,18 +36,34 @@ sessions_basic: dict[str, tuple[Session, float]] = {}
 verrou_sessions = threading.Lock()
 
 
+_generation = 0
+
+
 def preparer():
-    """En tâche de fond : attend le moteur, charge les modèles, complète l'index si besoin."""
+    """En tâche de fond : attend le moteur, charge les modèles, complète l'index si besoin. Relancée à chaque
+    changement de modèle ; une préparation plus ancienne s'arrête d'elle-même."""
+    global _generation
+    _generation += 1
+    moi = _generation
+    etat.update(pret=False, message="Démarrage")
     while not moteur.pret():
-        etat["message"] = f"Moteur d'IA injoignable ou modèle {moteur.modele} absent (./box.sh modeles-ia)"
+        if moi != _generation:
+            return
+        etat["message"] = (f"Modèle {moteur.modele} indisponible : à installer ou à démarrer (page Modèles d'IA)"
+                           if moteur.modele else "Aucun modèle choisi : ouvrir la page Modèles d'IA")
         time.sleep(5)
     try:
-        etat["message"] = "Chargement des modèles en mémoire"
+        etat["message"] = f"Chargement de {moteur.modele} en mémoire"
         moteur.prechauffer()
         index.revectoriser()
-        etat.update(pret=True, message="Prêt")
+        if moi == _generation:
+            etat.update(pret=True, message="Prêt")
     except MoteurIndisponible as erreur:
         etat["message"] = f"Moteur indisponible : {erreur}"
+
+
+def relancer_preparation():
+    threading.Thread(target=preparer, daemon=True).start()
 
 
 class Gestionnaire(BaseHTTPRequestHandler):
@@ -104,7 +121,7 @@ class Gestionnaire(BaseHTTPRequestHandler):
                 profil = client.profil()
             except (AccesRefuse, Indisponible):
                 return None
-            session = Session(profil["login"], profil["nom"], client)
+            session = Session(profil["login"], profil["nom"], client, _admin(client))
             with verrou_sessions:
                 sessions_basic[cle] = (session, maintenant + 600)
             return session
@@ -114,8 +131,9 @@ class Gestionnaire(BaseHTTPRequestHandler):
 
     def do_GET(self):
         chemin = urllib.parse.urlsplit(self.path).path
-        if chemin in ("/", "/index.html"):
-            return self._repondre(INTERFACE, type_contenu="text/html; charset=utf-8",
+        if chemin in ("/", "/index.html", "/modeles"):
+            return self._repondre(PAGE_MODELES if chemin == "/modeles" else INTERFACE,
+                                  type_contenu="text/html; charset=utf-8",
                                   entetes={"Content-Security-Policy": POLITIQUE, "Referrer-Policy": "no-referrer"})
         if chemin == "/api/etat":
             return self._repondre({**etat, "modele": moteur.modele, "modele_embeddings": moteur.modele_embeddings,
@@ -124,11 +142,16 @@ class Gestionnaire(BaseHTTPRequestHandler):
         session = self._session()
         if chemin == "/api/session":
             return self._repondre({"connecte": session is not None,
-                                   **({"login": session.login, "nom": session.nom} if session else {})})
+                                   **({"login": session.login, "nom": session.nom, "admin": session.admin}
+                                      if session else {})})
         if session is None:
             return self._repondre({"erreur": "Connexion nécessaire."}, 401)
         if chemin == "/api/journal":
             return self._repondre(journal.lire(session.login))
+        if chemin == "/api/modeles":
+            if not session.admin:
+                return self._repondre({"erreur": "Réservé aux administrateurs du cabinet."}, 403)
+            return self._repondre({**modeles.etat(moteur), "pret": etat["pret"], "message": etat["message"]})
         if chemin.startswith("/api/document/"):
             return self._document(session, urllib.parse.unquote(chemin.rsplit("/", 1)[1]))
         self._repondre({"erreur": "Introuvable."}, 404)
@@ -162,6 +185,10 @@ class Gestionnaire(BaseHTTPRequestHandler):
             return self._deconnexion(session)
         if chemin == "/api/question":
             return self._question(session, str(corps.get("question", "")))
+        if chemin.startswith("/api/modeles/"):
+            if not session.admin:
+                return self._repondre({"erreur": "Réservé aux administrateurs du cabinet."}, 403)
+            return self._modeles(session, chemin.rsplit("/", 1)[1], str(corps.get("id", "")))
         if chemin == "/api/indexer":
             nombre = index.mettre_a_jour(session.client, session.client.fichiers())
             journal.ecrire("indexation", session.login, {"documents_indexes": nombre})
@@ -181,7 +208,8 @@ class Gestionnaire(BaseHTTPRequestHandler):
         except (Indisponible, KeyError, ValueError):
             return self._repondre({"erreur": "Nextcloud ne répond pas."}, 502)
         jeton = secrets.token_urlsafe(32)
-        session = Session(profil["login"], profil["nom"], Client(profil["login"], secret, self._ip()))
+        client_session = Client(profil["login"], secret, self._ip())
+        session = Session(profil["login"], profil["nom"], client_session, _admin(client_session))
         with verrou_sessions:
             sessions[jeton] = (session, time.time() + DUREE_SESSION)
         journal.ecrire("connexion", session.login, {"ip": self._ip()})
@@ -199,6 +227,45 @@ class Gestionnaire(BaseHTTPRequestHandler):
                 del sessions[jeton]
         journal.ecrire("deconnexion", session.login, {})
         self._repondre({"ok": True}, entetes={"Set-Cookie": "session=; Max-Age=0; Path=/; HttpOnly; SameSite=Strict"})
+
+    def _modeles(self, session, action, identifiant):
+        try:
+            if action == "installer":
+                return self._flux(modeles.installer(identifiant, session.login))
+            if action == "activer":
+                modeles.activer(identifiant, moteur, index, session.login)
+            elif action == "recherche-par-mots":
+                modeles.desactiver_recherche(moteur, index, session.login)
+            elif action == "supprimer":
+                modeles.supprimer(identifiant, moteur, session.login)
+            else:
+                return self._repondre({"erreur": "Action inconnue."}, 404)
+        except KeyError:
+            return self._repondre({"erreur": "Modèle inconnu."}, 404)
+        except (ValueError, MoteurIndisponible) as erreur:
+            return self._repondre({"erreur": str(erreur)}, 400)
+        if action != "supprimer":
+            relancer_preparation()
+        self._repondre({"ok": True})
+
+    def _flux(self, evenements):
+        """Envoie des événements au fil de l'eau (text/event-stream), terminés par « fin » ou « erreur »."""
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Connection", "close")
+        self.end_headers()
+        self.close_connection = True
+        try:
+            for evenement in evenements:
+                self.wfile.write(f"data: {json.dumps(evenement, ensure_ascii=False)}\n\n".encode())
+                self.wfile.flush()
+            fin = {"type": "fin"}
+        except (BrokenPipeError, ConnectionResetError):
+            return
+        except (ValueError, MoteurIndisponible) as erreur:
+            fin = {"type": "erreur", "texte": str(erreur)}
+        self.wfile.write(f"data: {json.dumps(fin, ensure_ascii=False)}\n\n".encode())
 
     def _question(self, session, question):
         self.send_response(200)
@@ -228,8 +295,15 @@ class Gestionnaire(BaseHTTPRequestHandler):
             envoyer({"type": "erreur", "texte": f"Le moteur d'IA local ne répond pas ({erreur})."})
 
 
+def _admin(client):
+    try:
+        return bool(set(client.groupes()) & config.GROUPES_ADMIN)
+    except (AccesRefuse, Indisponible, KeyError, ValueError):
+        return False
+
+
 def lancer():
-    threading.Thread(target=preparer, daemon=True).start()
+    relancer_preparation()
     serveur = ThreadingHTTPServer(("0.0.0.0", config.PORT), Gestionnaire)
     serveur.daemon_threads = True
     print(f"Assistant prêt à recevoir des connexions sur le port {config.PORT} "

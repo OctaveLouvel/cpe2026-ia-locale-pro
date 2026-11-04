@@ -22,7 +22,7 @@ main{max-width:900px;margin:0 auto;padding:20px 16px 140px}
 label{display:block;font-weight:600;margin:12px 0 4px}
 input,textarea{width:100%;padding:10px;border:1px solid var(--bord);border-radius:8px;background:var(--fond);color:var(--texte);font:inherit}
 button{padding:9px 16px;border:0;border-radius:8px;background:var(--accent);color:var(--carte);font:inherit;font-weight:600;cursor:pointer}
-button.lien{background:none;color:var(--accent);padding:4px 6px;font-weight:500}
+button.lien,a.lien{background:none;color:var(--accent);padding:4px 6px;font-weight:500;font-size:.95rem}
 button:disabled{opacity:.5;cursor:default}
 .erreur{color:var(--ko);margin-top:10px}
 .question{background:var(--bulle);border-radius:10px;padding:10px 14px;margin:18px 0 8px;margin-left:15%}
@@ -55,6 +55,7 @@ table.journal td{border-bottom:1px solid var(--bord);padding:6px 4px;vertical-al
   <span class="promesse">Fonctionne sur la box, sans internet. Ne voit que les documents auxquels vous avez accès.</span>
   <span class="pastille" id="etat">…</span>
   <span id="identite" hidden></span>
+  <a class="lien" id="lien-modeles" href="/modeles" hidden>Modèles d'IA</a>
   <button class="lien" id="voir-journal" hidden>Ce qui a été tracé</button>
   <button class="lien" id="deconnexion" hidden>Se déconnecter</button>
 </div></header>
@@ -150,6 +151,7 @@ async function verifierSession() {
   const connecte = s.connecte;
   $("connexion").hidden = connecte;
   for (const id of ["conversation", "saisie", "identite", "deconnexion", "voir-journal"]) $(id).hidden = !connecte;
+  $("lien-modeles").hidden = !(connecte && s.admin);
   if (connecte) { $("identite").textContent = s.nom; $("question").focus(); } else { $("login").focus(); }
 }
 

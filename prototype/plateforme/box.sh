@@ -100,6 +100,7 @@ afficher_adresses() {
   Fichiers et agenda    https://cloud.${BOX_DOMAIN}
   Coffre-fort           https://coffre.${BOX_DOMAIN}
   Assistant IA          https://ia.${BOX_DOMAIN}
+  Modèles d'IA          https://ia.${BOX_DOMAIN}/modeles
   Certificat racine     http://${BOX_DOMAIN}/autorite-locale.crt
 
   Mots de passe : fichier .env (NC_ADMIN_PASSWORD, DEMO_MOT_DE_PASSE). Adresse d'écoute : ${BIND_ADDRESS}.
@@ -107,6 +108,8 @@ EOF
 }
 
 cmd_installer() {
+    local demo=non
+    [ "${1:-}" = --demo ] && demo=oui
     verifier_prerequis
     creer_env
     charger_env
@@ -124,11 +127,19 @@ cmd_installer() {
     attendre nextcloud 900
     attendre coffre 120
     attendre proxy 60
+    attendre ia-moteur 300
+    attendre assistant 300
     exporter_certificat
-    journal installation "services de base installés et démarrés"
+    journal installation "box installée : services de base et assistant IA"
+    if [ "$demo" = oui ]; then
+        cmd_donnees_demo
+        "${COMPOSE[@]}" exec -T -e IA_MOT_DE_PASSE="$DEMO_MOT_DE_PASSE" assistant python -m assistant indexer hcorbiere \
+            || alerte "indexation à refaire quand un modèle sera actif : ./box.sh indexer-ia"
+    fi
     afficher_adresses
     echo
-    info "Étape suivante pour la démo : ./box.sh donnees-demo"
+    info "Choisir et installer le modèle d'IA : https://ia.${BOX_DOMAIN}/modeles (compte administrateur du cabinet)"
+    [ "$demo" = oui ] || info "Pour charger le cabinet fictif de démonstration : ./box.sh donnees-demo"
 }
 
 cmd_demarrer() {
@@ -433,7 +444,7 @@ cmd_verifier_hors_ligne() {
 
     info "2. Services"
     local service etat
-    for service in proxy nextcloud nextcloud-cron db cache coffre assistant; do
+    for service in proxy nextcloud nextcloud-cron db cache coffre ia-moteur ia-telechargeur assistant; do
         etat=$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
                "$("${COMPOSE[@]}" ps -q "$service" 2>/dev/null)" 2>/dev/null || echo absent)
         case $etat in healthy|running) reussi "$service : $etat" ;; *) rate "$service : $etat" ;; esac
@@ -453,6 +464,17 @@ cmd_verifier_hors_ligne() {
     else
         rate "conteneurs reliés au réseau de l'hôte : $relies"
     fi
+    relies=$(docker network inspect -f '{{range .Containers}}{{.Name}} {{end}}' box_sortie 2>/dev/null)
+    if [ -z "$relies" ] || { [ "$(echo "$relies" | wc -w)" -eq 1 ] && [[ $relies == *ia-telechargeur* ]]; }; then
+        reussi "réseau « sortie » : seul le conteneur de téléchargement des modèles y est relié"
+    else
+        rate "conteneurs reliés au réseau de téléchargement : $relies"
+    fi
+    local reseaux_moteur
+    reseaux_moteur=$(docker inspect -f '{{range $nom, $_ := .NetworkSettings.Networks}}{{$nom}} {{end}}' \
+                     "$("${COMPOSE[@]}" ps -q ia-moteur)" 2>/dev/null | xargs)
+    [ "$reseaux_moteur" = box_interne ] && reussi "le moteur d'IA n'est relié qu'au réseau interne (pas d'internet)" \
+                                        || rate "réseaux du moteur d'IA : ${reseaux_moteur:-inconnu}"
     if "${COMPOSE[@]}" exec -T nextcloud curl -sS --max-time 5 -o /dev/null https://www.example.com 2>/dev/null; then
         rate "Nextcloud arrive à joindre internet"
     else
@@ -517,31 +539,6 @@ cmd_verifier_hors_ligne() {
 
 IA_IMAGE_MOTEUR=ollama/ollama:0.40.14
 
-# Seule connexion sortante prévue pour l'IA : le téléchargement des modèles, en atelier.
-# Un conteneur temporaire relié à internet remplit le volume des modèles, puis disparaît : le moteur de
-# la box, lui, reste sur le réseau interne.
-cmd_modeles_ia() {
-    charger_env
-    local modeles=("${IA_MODELE:-qwen3:4b}" "${IA_MODELE_EMBEDDINGS:-embeddinggemma-2:270m}" "$@")
-    "${COMPOSE[@]}" up --no-start ia-moteur 2>/dev/null
-    docker rm -f box-ia-telechargement >/dev/null 2>&1 || true
-    docker run -d --name box-ia-telechargement -v box_ia_modeles:/root/.ollama "$IA_IMAGE_MOTEUR" >/dev/null
-    trap 'docker rm -f box-ia-telechargement >/dev/null 2>&1 || true' EXIT
-    local essai
-    for essai in $(seq 1 30); do docker exec box-ia-telechargement ollama list >/dev/null 2>&1 && break; sleep 1; done
-    local modele
-    for modele in "${modeles[@]}"; do
-        info "Téléchargement de $modele (registry.ollama.ai, HTTPS)"
-        journal connexion_sortante "téléchargement du modèle $modele depuis registry.ollama.ai" en_cours
-        docker exec box-ia-telechargement ollama pull "$modele" | tail -1
-        journal connexion_sortante "modèle $modele téléchargé" ok
-    done
-    docker exec box-ia-telechargement ollama list
-    docker rm -f box-ia-telechargement >/dev/null
-    trap - EXIT
-    ok "modèles prêts dans le volume box_ia_modeles"
-}
-
 # Moteur de rédaction Colibri, lancé directement sur la machine (il lit le modèle sur le SSD) mais
 # n'écoutant QUE sur l'adresse de l'hôte dans le réseau interne des conteneurs : l'assistant le joint,
 # le wifi et internet ne le voient pas, et les conteneurs restent sans accès à internet.
@@ -566,8 +563,11 @@ cmd_moteur_ia() {
                 sleep 2
             done
             curl -fsS "${cle[@]}" "http://$ip:$port/v1/models" >/dev/null 2>&1 || echec "Colibri ne répond pas (voir sortie/ia/colibri.log)"
-            sed -i "s|^IA_MOTEUR_URL=.*|IA_MOTEUR_URL=http://$ip:$port|" .env
-            grep -q "^IA_MOTEUR_URL=" .env || echo "IA_MOTEUR_URL=http://$ip:$port" >> .env
+            sed -i "s|^IA_COLIBRI_URL=.*|IA_COLIBRI_URL=http://$ip:$port|" .env
+            grep -q "^IA_COLIBRI_URL=" .env || echo "IA_COLIBRI_URL=http://$ip:$port" >> .env
+            # L'assistant lit cette adresse à son démarrage.
+            charger_env
+            "${COMPOSE[@]}" up -d assistant >/dev/null 2>&1
             journal moteur_ia "Colibri démarré sur $ip:$port"
             ok "Colibri prêt : http://$ip:$port/v1"
             ;;
@@ -617,6 +617,8 @@ cmd_reinitialiser() {
     read -r -p "Taper « effacer » pour confirmer : " reponse
     [ "$reponse" = effacer ] || echec "annulé"
     "${COMPOSE[@]}" --profile outils down -v --remove-orphans
+    # Index de l'assistant : il désigne les fichiers de l'ancienne installation. Le choix du modèle est gardé.
+    rm -f "$SORTIE/ia/index.json" "$SORTIE/ia/vecteurs.npy"
     journal reinitialisation "conteneurs et volumes supprimés"
     ok "box réinitialisée (le fichier .env est conservé)"
 }
@@ -625,7 +627,7 @@ cmd_aide() {
     cat <<'EOF'
 Usage : ./box.sh <commande>
 
-  installer            Crée .env (secrets), construit, démarre et attend que tout soit prêt
+  installer [--demo]   Installe toute la box en une commande (--demo : avec le cabinet fictif)
   donnees-demo         Charge le cabinet FICTIF : comptes, dossiers, droits, agendas, contacts
   demarrer | arreter   Démarre ou arrête les services
   etat                 État des services et adresses
@@ -638,7 +640,6 @@ Usage : ./box.sh <commande>
   verifier-hors-ligne  Liste de vérification de la démo, à lancer câble débranché
   ia [commande]        Modèles d'IA : menu pour choisir, installer et activer (liste, installer, activer, supprimer)
   moteur-ia ACTION     demarrer | arreter | etat : moteur Colibri sur le réseau interne
-  modeles-ia [modèle]  Option Ollama : télécharge des modèles (connexion sortante journalisée)
   indexer-ia           Prépare l'index de recherche de l'assistant pour la démo
   assistant [adresse]  Assistant web de première configuration (défaut 127.0.0.1:8090)
   preparer-hors-ligne  Exporte toutes les images dans sortie/images-box.tar (installation sans internet)
@@ -649,7 +650,7 @@ EOF
 commande=${1:-aide}
 shift || true
 case $commande in
-    installer)            cmd_installer ;;
+    installer)            cmd_installer "$@" ;;
     donnees-demo)         cmd_donnees_demo ;;
     demarrer)             cmd_demarrer ;;
     arreter)              cmd_arreter ;;
@@ -661,7 +662,6 @@ case $commande in
     tester-restauration)  cmd_tester_restauration "$@" ;;
     restaurer)            cmd_restaurer "$@" ;;
     verifier-hors-ligne)  cmd_verifier_hors_ligne ;;
-    modeles-ia)           cmd_modeles_ia "$@" ;;
     moteur-ia)            cmd_moteur_ia "$@" ;;
     ia)                   charger_env; exec python3 "$ICI/../ia/gerer_modeles.py" "$@" ;;
     indexer-ia)           cmd_indexer_ia ;;

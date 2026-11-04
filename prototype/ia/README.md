@@ -8,33 +8,42 @@ Il fonctionne avec la plateforme de DEV-1 ([`../plateforme/`](../plateforme/)) :
 |---|---|
 | `assistant` | Service maison (ce dossier) : connexion, recherche avec les droits, citations, journal, interface web |
 | `ia-moteur` | Moteur d'inférence local Ollama : rédaction des réponses et recherche par le sens |
+| `ia-telechargeur` | Téléchargement des modèles, seul conteneur IA relié à internet |
 
 ## Lancer
 
 ```bash
 cd prototype/plateforme
-./box.sh modeles-ia      # en atelier, une fois : télécharge le modèle (connexion sortante inscrite au journal)
-./box.sh demarrer        # démarre la box, dont l'assistant
-./box.sh indexer-ia      # prépare l'index de recherche pour la démo (compte de l'associée)
+./box.sh installer --demo   # toute la box, assistant compris, avec le cabinet fictif
+# puis choisir et installer le modèle sur https://ia.cabinet.localhost/modeles
 ```
 
 Puis ouvrir https://ia.cabinet.localhost et se connecter avec un compte du cabinet fictif (mot de passe : `DEMO_MOT_DE_PASSE` dans `plateforme/.env`).
 
-Modèles par défaut (dans `.env`) : `IA_MODELE=qwen3:4b` pour la rédaction, `IA_MODELE_EMBEDDINGS=embeddinggemma-2:270m` pour la recherche par le sens. Le choix vient des mesures de la section « Mesures ».
+Aucun modèle n'est imposé : on le choisit sur la page « Modèles d'IA » (section suivante). Le choix pour la démo dépend des mesures de la section « Mesures ».
 
 ## Choisir et installer un modèle
 
+**Par l'interface** : https://ia.cabinet.localhost/modeles (lien « Modèles d'IA » dans l'assistant, bouton « Choisir le modèle » sur le portail), réservée aux administrateurs du cabinet (groupes Nextcloud `admin` et `associes`). Pour chaque modèle du catalogue : taille, mémoire estimée par rapport à celle de la machine, état (installé, actif) et boutons « Installer » (barre de progression), « Activer », « Supprimer ». Le changement de modèle se fait à chaud, sans redémarrer la box.
+
+**En ligne de commande**, même fonctionnement :
+
 ```bash
-./box.sh ia                       # menu : liste numérotée, taper le numéro du modèle voulu
-./box.sh ia liste                 # catalogue, mémoire estimée, installé ou actif
-./box.sh ia installer qwen3:4b    # téléchargement seul
-./box.sh ia activer qwen3:4b      # branche l'assistant sur ce modèle (une minute de rechargement)
-./box.sh ia supprimer qwen3:4b
+./box.sh ia                       # menu : taper le numéro du modèle voulu
+./box.sh ia liste | installer <id> | activer <id> | supprimer <id>
 ```
 
-Le catalogue est [`modeles.json`](modeles.json) : ajouter une ligne suffit pour proposer un autre modèle de la bibliothèque Ollama. Pour chaque modèle, le menu indique s'il tient dans la mémoire de la machine (estimation, à confirmer par une mesure).
+Le catalogue est [`modeles.json`](modeles.json) : ajouter une ligne suffit pour proposer un autre modèle de la bibliothèque Ollama.
 
-Tout reste conteneurisé : les modèles tournent dans `ia-moteur`, sur le réseau interne sans internet. Le téléchargement passe par un conteneur temporaire relié à internet, qui remplit le volume `box_ia_modeles` puis disparaît ; la connexion est inscrite au journal de la plateforme. Seul Colibri tourne hors conteneur (`./box.sh moteur-ia`), en écoute sur le réseau interne uniquement.
+**Conteneurisation** :
+
+| Conteneur | Rôle | Réseaux |
+|---|---|---|
+| `ia-moteur` (Ollama) | fait tourner le modèle actif | interne seulement : aucun accès à internet |
+| `ia-telechargeur` (Ollama) | télécharge et supprime les modèles dans le volume partagé, sur ordre d'un administrateur ; chaque téléchargement est inscrit au journal | interne et `sortie` (internet) |
+| `assistant` | recherche, droits, citations, interfaces | interne seulement |
+
+Seul Colibri tourne hors conteneur (`./box.sh moteur-ia demarrer`), en écoute sur le réseau interne uniquement ; une fois démarré, il apparaît comme installé sur la page et s'active comme les autres. Le choix courant est enregistré dans `plateforme/sortie/ia/moteur.json`.
 
 ## Comment l'assistant respecte les droits
 

@@ -1,9 +1,14 @@
 """Clients des moteurs d'inférence locaux, sur le réseau interne de la box.
 
-- Rédaction des réponses : un serveur compatible OpenAI (Colibri, par défaut) ou Ollama.
-- Recherche par le sens (embeddings) : Ollama, en option. Sans lui, la recherche se fait par mots (BM25).
+- Rédaction : Ollama (conteneur ia-moteur) ou un serveur compatible OpenAI (Colibri).
+- Recherche par le sens (embeddings) : Ollama, en option. Sans lui, la recherche se fait par mots.
+
+Le modèle actif se choisit à chaud (page « Modèles d'IA » ou ./box.sh ia) et est enregistré dans
+<IA_DONNEES>/moteur.json ; les variables d'environnement ne donnent que le choix de départ.
 """
 import json
+import os
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -15,61 +20,88 @@ class MoteurIndisponible(Exception):
     pass
 
 
-def _appeler(base, chemin, corps=None, delai=900, entetes=None):
+def appeler(base, chemin, corps=None, delai=900, entetes=None, methode=None):
     donnees = json.dumps(corps).encode() if corps is not None else None
-    requete = urllib.request.Request(base + chemin, data=donnees, method="POST" if donnees else "GET",
+    requete = urllib.request.Request(base + chemin, data=donnees, method=methode or ("POST" if donnees else "GET"),
                                      headers={"Content-Type": "application/json", **(entetes or {})})
     try:
         return urllib.request.urlopen(requete, timeout=delai)
     except urllib.error.HTTPError as erreur:
         raise MoteurIndisponible(f"HTTP {erreur.code} : {erreur.read()[:200]!r}") from None
-    except (urllib.error.URLError, TimeoutError, ConnectionError) as erreur:
+    except (urllib.error.URLError, TimeoutError, ConnectionError, ValueError) as erreur:
         raise MoteurIndisponible(str(erreur)) from None
 
 
 class Moteur:
     def __init__(self):
-        self.type = config.MOTEUR  # "openai" (Colibri) ou "ollama"
-        self.url = config.MOTEUR_URL
-        self.modele = config.MODELE
-        self.modele_embeddings = config.MODELE_EMBEDDINGS if config.EMBEDDINGS_URL else None
-        self._entetes = {"Authorization": f"Bearer {config.MOTEUR_CLE}"} if config.MOTEUR_CLE else {}
-        self._reflexion = None
+        self._verrou = threading.Lock()
+        self._reflexion = {}
+        choix = {}
+        if config.ACTIF.exists():
+            try:
+                choix = json.loads(config.ACTIF.read_text(encoding="utf-8"))
+            except ValueError:
+                choix = {}
+        self.type = choix.get("moteur", config.MOTEUR)  # « ollama » ou « openai » (Colibri)
+        self.modele = choix.get("modele", config.MODELE)
+        self.modele_embeddings = choix.get("embeddings",
+                                           config.MODELE_EMBEDDINGS if config.EMBEDDINGS_URL else None)
+
+    # ------------------------------------------------------------ choix du modèle
+
+    @property
+    def url(self):
+        return config.OLLAMA_URL if self.type == "ollama" else config.COLIBRI_URL
+
+    @property
+    def _entetes(self):
+        return {"Authorization": f"Bearer {config.COLIBRI_CLE}"} if self.type == "openai" and config.COLIBRI_CLE else {}
+
+    def choisir(self, moteur=None, modele=None, embeddings="inchangé"):
+        with self._verrou:
+            if modele is not None:
+                self.type, self.modele = moteur, modele
+            if embeddings != "inchangé":
+                self.modele_embeddings = embeddings
+            config.DONNEES.mkdir(parents=True, exist_ok=True)
+            temporaire = config.ACTIF.with_suffix(".tmp")
+            temporaire.write_text(json.dumps({"moteur": self.type, "modele": self.modele,
+                                              "embeddings": self.modele_embeddings}, ensure_ascii=False))
+            os.replace(temporaire, config.ACTIF)
 
     def pret(self):
+        if not self.modele or (self.type == "openai" and not config.COLIBRI_URL):
+            return False
         try:
             if self.type == "openai":
-                with _appeler(self.url, "/v1/models", delai=5, entetes=self._entetes) as r:
+                with appeler(self.url, "/v1/models", delai=5, entetes=self._entetes) as r:
                     return any(m.get("id") == self.modele for m in json.load(r).get("data", []))
-            with _appeler(self.url, "/api/tags", delai=5) as r:
-                noms = {m["name"] for m in json.load(r).get("models", [])}
-            return self.modele in noms or f"{self.modele}:latest" in noms
+            return self.modele in modeles_ollama()
         except (MoteurIndisponible, ValueError):
             return False
 
     def prechauffer(self):
-        """Première génération et premier embedding : la première question de la démo ne paie pas le chargement."""
+        """Première génération et premier embedding : la première question ne paie pas le chargement."""
         for _ in self.repondre("Réponds en un mot.", "Bonjour"):
             pass
         if self.modele_embeddings:
             try:
                 self.vecteurs(["préchauffage"], requete=True)
             except MoteurIndisponible:
-                self.modele_embeddings = None  # recherche par mots seulement
+                pass
 
     # ------------------------------------------------------------ recherche sémantique (Ollama, en option)
 
     def vecteurs(self, textes, requete=False, lot=16):
         if not self.modele_embeddings:
-            raise MoteurIndisponible("pas de modèle d'embeddings configuré")
+            raise MoteurIndisponible("pas de modèle d'embeddings choisi")
         if "embeddinggemma" in self.modele_embeddings:  # ce modèle attend une consigne de tâche
             prefixe = "task: search result | query: " if requete else "title: none | text: "
             textes = [prefixe + t for t in textes]
         resultat = []
         for debut in range(0, len(textes), lot):
-            with _appeler(config.EMBEDDINGS_URL, "/api/embed", {"model": self.modele_embeddings,
-                                                                "input": textes[debut:debut + lot],
-                                                                "keep_alive": "24h"}) as r:
+            with appeler(config.OLLAMA_URL, "/api/embed", {"model": self.modele_embeddings,
+                                                           "input": textes[debut:debut + lot], "keep_alive": "24h"}) as r:
                 resultat += json.load(r)["embeddings"]
         return resultat
 
@@ -95,7 +127,7 @@ class Moteur:
     def _openai(self, messages):
         corps = {"model": self.modele, "messages": messages, "stream": True, "stream_options": {"include_usage": True},
                  "enable_thinking": False, "temperature": 0.1, "max_tokens": config.GENERATION_MAX}
-        with _appeler(self.url, "/v1/chat/completions", corps, entetes=self._entetes) as reponse:
+        with appeler(self.url, "/v1/chat/completions", corps, entetes=self._entetes) as reponse:
             for ligne in reponse:
                 ligne = ligne.decode("utf-8").strip()
                 if not ligne.startswith("data: ") or ligne == "data: [DONE]":
@@ -113,12 +145,12 @@ class Moteur:
         corps = {"model": self.modele, "messages": messages, "stream": True, "keep_alive": "24h",
                  "options": {"temperature": 0.1, "seed": 42, "num_ctx": config.CONTEXTE,
                              "num_predict": config.GENERATION_MAX}}
-        if self._reflexion is None:
-            with _appeler(self.url, "/api/show", {"model": self.modele}) as r:
-                self._reflexion = "thinking" in json.load(r).get("capabilities", [])
-        if self._reflexion:
+        if self.modele not in self._reflexion:
+            with appeler(config.OLLAMA_URL, "/api/show", {"model": self.modele}) as r:
+                self._reflexion[self.modele] = "thinking" in json.load(r).get("capabilities", [])
+        if self._reflexion[self.modele]:
             corps["think"] = False
-        with _appeler(self.url, "/api/chat", corps) as reponse:
+        with appeler(config.OLLAMA_URL, "/api/chat", corps) as reponse:
             for ligne in reponse:
                 if not ligne.strip():
                     continue
@@ -128,3 +160,20 @@ class Moteur:
                 yield donnee.get("message", {}).get("content", ""), (
                     {"contexte": donnee.get("prompt_eval_count", 0), "generes": donnee.get("eval_count", 0)}
                     if donnee.get("done") else None)
+
+
+def modeles_ollama():
+    """Modèles présents dans le volume, vus par le moteur."""
+    with appeler(config.OLLAMA_URL, "/api/tags", delai=5) as r:
+        return {m["name"] for m in json.load(r).get("models", [])}
+
+
+def colibri_disponible():
+    if not config.COLIBRI_URL:
+        return False
+    try:
+        entetes = {"Authorization": f"Bearer {config.COLIBRI_CLE}"} if config.COLIBRI_CLE else {}
+        with appeler(config.COLIBRI_URL, "/v1/models", delai=3, entetes=entetes) as r:
+            return bool(json.load(r).get("data"))
+    except (MoteurIndisponible, ValueError):
+        return False

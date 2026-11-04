@@ -4,20 +4,27 @@ from pathlib import Path
 
 NC_URL = os.environ.get("NC_URL", "http://nextcloud").rstrip("/")
 
-# Moteur de rédaction : « ollama » (choix de la démo, conteneur ia-moteur) ou « openai » pour un serveur
-# compatible OpenAI (Colibri...). Il n'est joignable que depuis le réseau interne de la box.
+# Moteur de rédaction de départ : « ollama » (conteneur ia-moteur) ou « openai » (Colibri). Ensuite le choix
+# se fait à chaud (page Modèles d'IA) et est enregistré dans <IA_DONNEES>/moteur.json.
 MOTEUR = os.environ.get("IA_MOTEUR", "ollama")
-MOTEUR_URL = os.environ.get("IA_MOTEUR_URL", "http://ia-moteur:11434").rstrip("/")
-MOTEUR_CLE = os.environ.get("IA_MOTEUR_CLE", "")
-MODELE = os.environ.get("IA_MODELE", "qwen3:4b")
+MODELE = os.environ.get("IA_MODELE", "")
+OLLAMA_URL = os.environ.get("IA_OLLAMA_URL", "http://ia-moteur:11434").rstrip("/")
+# Seul conteneur relié à internet : il télécharge les modèles dans le volume partagé, sur ordre d'un administrateur.
+TELECHARGEUR_URL = os.environ.get("IA_TELECHARGEUR_URL", "http://ia-telechargeur:11434").rstrip("/")
+COLIBRI_URL = os.environ.get("IA_COLIBRI_URL", "").rstrip("/")
+COLIBRI_CLE = os.environ.get("IA_MOTEUR_CLE", "")
 
-# Recherche par le sens, en option : un serveur Ollama avec un modèle d'embeddings. Vide = recherche par mots.
-EMBEDDINGS_URL = os.environ.get("IA_EMBEDDINGS_URL", "http://ia-moteur:11434").rstrip("/")
+# Recherche par le sens de départ (modèle d'embeddings d'Ollama). Vide = recherche par mots.
+EMBEDDINGS_URL = os.environ.get("IA_EMBEDDINGS_URL", "")
 MODELE_EMBEDDINGS = os.environ.get("IA_MODELE_EMBEDDINGS", "embeddinggemma-2:270m")
 
 BOX_DOMAIN = os.environ.get("BOX_DOMAIN", "cabinet.localhost")
 DONNEES = Path(os.environ.get("IA_DONNEES", "/donnees"))
 JOURNAL = Path(os.environ.get("IA_JOURNAL", "/journal/assistant.jsonl"))
+ACTIF = DONNEES / "moteur.json"
+CATALOGUE = Path(os.environ.get("IA_CATALOGUE", "/app/modeles.json"))
+# Groupes Nextcloud autorisés à choisir et installer les modèles.
+GROUPES_ADMIN = set(os.environ.get("IA_GROUPES_ADMIN", "admin associes").split())
 PORT = int(os.environ.get("IA_PORT", "8000"))
 FUSEAU = "Europe/Paris"
 

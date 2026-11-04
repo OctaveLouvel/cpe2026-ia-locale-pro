@@ -7,9 +7,9 @@
     ./box.sh ia activer qwen3:4b     branche l'assistant sur ce modèle
     ./box.sh ia supprimer qwen3:4b
 
-Les modèles « ollama » tournent dans le conteneur ia-moteur, sur le réseau interne sans internet. Le
-téléchargement passe par un conteneur temporaire relié à internet, qui remplit le volume des modèles puis
-disparaît. Le modèle « colibri » tourne hors conteneur (./box.sh moteur-ia). Bibliothèque standard seulement.
+Même fonctionnement que la page graphique https://ia.<domaine>/modeles : les modèles « ollama » tournent dans
+ia-moteur (réseau interne, sans internet), le téléchargement passe par ia-telechargeur, le choix est enregistré
+dans sortie/ia/moteur.json. Colibri tourne hors conteneur (./box.sh moteur-ia). Bibliothèque standard seulement.
 """
 import json
 import os
@@ -23,9 +23,7 @@ PLATEFORME = Path(__file__).resolve().parent.parent / "plateforme"
 CATALOGUE = Path(__file__).resolve().parent / "modeles.json"
 ENV = PLATEFORME / ".env"
 JOURNAL = PLATEFORME / "sortie" / "journal" / "evenements.jsonl"
-IMAGE_OLLAMA = "ollama/ollama:0.40.14"
-VOLUME = "box_ia_modeles"
-URL_OLLAMA = "http://ia-moteur:11434"
+ACTIF = PLATEFORME / "sortie" / "ia" / "moteur.json"
 
 GRAS, VERT, JAUNE, ROUGE, GRIS, FIN = "\033[1m", "\033[32m", "\033[33m", "\033[31m", "\033[90m", "\033[0m"
 
@@ -95,31 +93,27 @@ def memoire_machine_go():
     return 0
 
 
-def preparer_volume():
-    if lancer("docker", "volume", "inspect", VOLUME, capturer=True, verifier=False).returncode != 0:
-        lancer("docker", "compose", "--profile", "ollama", "up", "--no-start", "ia-moteur", capturer=True)
-
-
 def installes():
-    """Modèles présents dans le volume (lecture des manifestes, sans démarrer de serveur)."""
-    preparer_volume()
-    sortie = lancer("docker", "run", "--rm", "--entrypoint", "sh", "-v", f"{VOLUME}:/root/.ollama", IMAGE_OLLAMA, "-c",
-                    "cd /root/.ollama/models/manifests/registry.ollama.ai/library 2>/dev/null && find . -type f",
-                    capturer=True, verifier=False).stdout
-    presents = {ligne[2:].replace("/", ":", 1) for ligne in sortie.split() if ligne.startswith("./")}
-    env = lire_env()
-    colibri = Path(env.get("COLIBRI_DIR", "/nulle-part"), "c", "coli")
-    if colibri.exists() and Path(env.get("COLIBRI_MODELE", "/nulle-part")).is_dir():
+    """Modèles présents dans le volume, vus par le moteur, plus Colibri s'il est démarré."""
+    sortie = lancer("docker", "compose", "exec", "-T", "ia-moteur", "ollama", "list", capturer=True, verifier=False).stdout
+    presents = {ligne.split()[0] for ligne in sortie.splitlines()[1:] if ligne.strip()}
+    if lire_env().get("IA_COLIBRI_URL"):
         presents.add("qwen3.6-colibri")
     return presents
 
 
 def actifs():
+    """Choix courant de l'assistant : sortie/ia/moteur.json (écrit aussi par la page Modèles d'IA)."""
+    choix = json.loads(ACTIF.read_text(encoding="utf-8")) if ACTIF.exists() else {}
     env = lire_env()
-    resultat = {env.get("IA_MODELE", "")}
-    if env.get("IA_EMBEDDINGS_URL"):
-        resultat.add(env.get("IA_MODELE_EMBEDDINGS", ""))
-    return resultat
+    return {choix.get("modele", env.get("IA_MODELE", "")), choix.get("embeddings") or ""}
+
+
+def choisir(**valeurs):
+    choix = json.loads(ACTIF.read_text(encoding="utf-8")) if ACTIF.exists() else {}
+    choix.update(valeurs)
+    ACTIF.parent.mkdir(parents=True, exist_ok=True)
+    ACTIF.write_text(json.dumps(choix, ensure_ascii=False), encoding="utf-8")
 
 
 # ---------------------------------------------------------------- commandes
@@ -169,24 +163,15 @@ def installer(identifiant, demander=True):
         if reponse.strip().lower() not in ("o", "oui", "y"):
             print("annulé")
             return False
-    nom = "box-ia-telechargement"
-    lancer("docker", "rm", "-f", nom, capturer=True, verifier=False)
-    # Conteneur temporaire, sur le réseau par défaut (internet) : il ne sert qu'au téléchargement.
-    lancer("docker", "run", "-d", "--name", nom, "-v", f"{VOLUME}:/root/.ollama", IMAGE_OLLAMA, capturer=True)
-    try:
-        for _ in range(30):
-            if lancer("docker", "exec", nom, "ollama", "list", capturer=True, verifier=False).returncode == 0:
-                break
-            time.sleep(1)
-        journal("connexion_sortante", f"téléchargement du modèle {identifiant} depuis registry.ollama.ai", "en_cours")
-        debut = time.monotonic()
-        code = subprocess.run(["docker", "exec", "-t", nom, "ollama", "pull", identifiant]).returncode
-        journal("connexion_sortante", f"modèle {identifiant} : téléchargement en {time.monotonic() - debut:.0f} s",
-                "ok" if code == 0 else "echec")
-        if code != 0:
-            sys.exit(f"{ROUGE}Téléchargement échoué{FIN}")
-    finally:
-        lancer("docker", "rm", "-f", nom, capturer=True, verifier=False)
+    # Le conteneur ia-telechargeur, seul relié à internet, remplit le volume partagé avec ia-moteur.
+    journal("connexion_sortante", f"téléchargement du modèle {identifiant} depuis registry.ollama.ai", "en_cours")
+    debut = time.monotonic()
+    code = subprocess.run(["docker", "compose", "exec", "ia-telechargeur", "ollama", "pull", identifiant],
+                          cwd=PLATEFORME, env=environnement()).returncode
+    journal("connexion_sortante", f"modèle {identifiant} : téléchargement en {time.monotonic() - debut:.0f} s",
+            "ok" if code == 0 else "echec")
+    if code != 0:
+        sys.exit(f"{ROUGE}Téléchargement échoué{FIN}")
     print(f"{VERT}installé{FIN} : {m['nom']}")
     return True
 
@@ -197,22 +182,14 @@ def activer(identifiant):
         sys.exit(f"{ROUGE}{m['nom']} n'est pas installé{FIN} : ./box.sh ia installer {identifiant}")
     env = lire_env()
     if m["type"] == "recherche":
-        ecrire_env(IA_MODELE_EMBEDDINGS=identifiant, IA_EMBEDDINGS_URL=URL_OLLAMA, COMPOSE_PROFILES="ollama")
-        lancer("docker", "compose", "--profile", "ollama", "up", "-d", "ia-moteur", "assistant")
+        choisir(embeddings=identifiant)
     elif m["moteur"] == "colibri":
-        recherche = env.get("IA_EMBEDDINGS_URL", "")
-        ecrire_env(IA_MOTEUR="openai", IA_MODELE=identifiant,
-                   COMPOSE_PROFILES="ollama" if recherche else "")
-        lancer("./box.sh", "moteur-ia", "arreter", capturer=True, verifier=False)
-        lancer("./box.sh", "moteur-ia", "demarrer")
-        if not recherche:
-            lancer("docker", "compose", "--profile", "ollama", "stop", "ia-moteur", capturer=True, verifier=False)
-        lancer("docker", "compose", "up", "-d", "assistant")
+        if not env.get("IA_COLIBRI_URL"):
+            lancer("./box.sh", "moteur-ia", "demarrer")
+        choisir(moteur="openai", modele=identifiant)
     else:
-        if env.get("IA_MOTEUR") == "openai":
-            lancer("./box.sh", "moteur-ia", "arreter", verifier=False)
-        ecrire_env(IA_MOTEUR="ollama", IA_MOTEUR_URL=URL_OLLAMA, IA_MODELE=identifiant, COMPOSE_PROFILES="ollama")
-        lancer("docker", "compose", "--profile", "ollama", "up", "-d", "ia-moteur", "assistant")
+        choisir(moteur="ollama", modele=identifiant)
+    lancer("docker", "compose", "restart", "assistant", capturer=True)
     journal("modele_ia", f"modèle activé : {identifiant}")
     print(f"{VERT}actif{FIN} : {m['nom']}. L'assistant redémarre et charge le modèle (environ une minute) : "
           "suivre l'état sur https://" + env.get("BOX_DOMAIN", "cabinet.localhost"))
@@ -224,8 +201,7 @@ def supprimer(identifiant):
         sys.exit("Colibri se désinstalle hors de la box (supprimer COLIBRI_MODELE).")
     if identifiant in actifs():
         sys.exit(f"{ROUGE}{m['nom']} est actif{FIN} : en activer un autre d'abord.")
-    lancer("docker", "run", "--rm", "--entrypoint", "sh", "-v", f"{VOLUME}:/root/.ollama", IMAGE_OLLAMA, "-c",
-           "ollama serve >/dev/null 2>&1 & sleep 2; ollama rm " + identifiant, capturer=True)
+    lancer("docker", "compose", "exec", "-T", "ia-telechargeur", "ollama", "rm", identifiant, capturer=True)
     journal("modele_ia", f"modèle supprimé : {identifiant}")
     print(f"supprimé : {m['nom']}")
 

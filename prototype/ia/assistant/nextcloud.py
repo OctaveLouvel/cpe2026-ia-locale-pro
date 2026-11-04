@@ -106,6 +106,10 @@ class Client:
         donnees = json.loads(self._requete("GET", "/ocs/v1.php/cloud/user?format=json"))["ocs"]["data"]
         return {"login": donnees["id"], "nom": donnees.get("display-name") or donnees.get("displayname") or donnees["id"]}
 
+    def groupes(self):
+        donnees = json.loads(self._requete("GET", f"/ocs/v1.php/cloud/users/{urllib.parse.quote(self.login)}?format=json"))
+        return donnees["ocs"]["data"].get("groups") or []
+
     def creer_mot_de_passe_application(self):
         """Échange le mot de passe de connexion contre un mot de passe d'application, révocable, visible
         par la personne dans ses réglages Nextcloud (« Appareils et sessions »)."""

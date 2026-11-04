@@ -29,6 +29,7 @@ class Session:
     login: str
     nom: str
     client: Client
+    admin: bool = False  # peut choisir et installer les modèles d'IA
 
 
 def _etiquette_document(morceau, fichier):

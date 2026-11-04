@@ -56,6 +56,7 @@ table.journal td{border-bottom:1px solid var(--bord);padding:6px 4px;vertical-al
   <span class="pastille" id="etat">…</span>
   <span id="identite" hidden></span>
   <a class="lien" id="lien-modeles" href="/modeles" hidden>Modèles d'IA</a>
+  <a class="lien" id="lien-journal" href="/journal" hidden>Journal d'audit</a>
   <button class="lien" id="voir-journal" hidden>Ce qui a été tracé</button>
   <button class="lien" id="deconnexion" hidden>Se déconnecter</button>
 </div></header>
@@ -151,7 +152,7 @@ async function verifierSession() {
   const connecte = s.connecte;
   $("connexion").hidden = connecte;
   for (const id of ["conversation", "saisie", "identite", "deconnexion", "voir-journal"]) $(id).hidden = !connecte;
-  $("lien-modeles").hidden = !(connecte && s.admin);
+  $("lien-modeles").hidden = $("lien-journal").hidden = !(connecte && s.admin);
   if (connecte) { $("identite").textContent = s.nom; $("question").focus(); } else { $("login").focus(); }
 }
 

@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Journal d'audit</title>
+<!-- Journal d'audit de la box (DEV-4) : connexions sortantes, questions à l'assistant, refus, sauvegardes.
+     Réservé aux administrateurs du cabinet. Aucune ressource externe. -->
+<style>
+:root{--fond:#f3f5f8;--carte:#fff;--texte:#17202c;--doux:#5b6675;--bord:#dde2e9;--accent:#1d3557;--accent-doux:#e8eef6;
+  --ok:#1e7a46;--ok-fond:#e5f4ec;--ko:#b23a48;--ko-fond:#fbe9ec;--att:#9a6700;--att-fond:#fff4d6;--ombre:0 1px 2px rgba(16,24,40,.06),0 4px 16px rgba(16,24,40,.06)}
+@media (prefers-color-scheme:dark){:root{--fond:#0f141b;--carte:#18202a;--texte:#e7ebf0;--doux:#9aa5b4;--bord:#2a3441;--accent:#8fb3e8;--accent-doux:#1f2b3a;
+  --ok:#5cc28a;--ok-fond:#163126;--ko:#ef8a96;--ko-fond:#3a1c22;--att:#e3b341;--att-fond:#3a3120;--ombre:none}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--fond);color:var(--texte);line-height:1.5}
+header{background:var(--carte);border-bottom:1px solid var(--bord)}
+.barre{max-width:1100px;margin:0 auto;padding:14px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.barre h1{margin:0;font-size:1.2rem;margin-right:auto}
+.barre a{color:var(--accent);font-size:.92rem}
+main{max-width:1100px;margin:0 auto;padding:22px 16px 48px}
+.chiffres{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));margin-bottom:18px}
+.chiffre{background:var(--carte);border:1px solid var(--bord);border-radius:14px;box-shadow:var(--ombre);padding:14px 18px}
+.chiffre span{color:var(--doux);font-size:.85rem}
+.chiffre strong{display:block;font-size:1.5rem}
+.chiffre.sortie{border-left:4px solid var(--att)}
+.filtres{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.filtres button{font:inherit;font-size:.88rem;padding:6px 12px;border-radius:999px;border:1px solid var(--bord);background:var(--carte);color:var(--texte);cursor:pointer}
+.filtres button.choisi{background:var(--accent);border-color:var(--accent);color:var(--carte)}
+@media (prefers-color-scheme:dark){.filtres button.choisi{color:#0f141b}}
+.tableau{background:var(--carte);border:1px solid var(--bord);border-radius:14px;box-shadow:var(--ombre);overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th{text-align:left;color:var(--doux);font-weight:600;padding:10px 12px;border-bottom:1px solid var(--bord);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--bord);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td.date{white-space:nowrap;color:var(--doux)}
+.type{display:inline-block;font-size:.78rem;padding:2px 9px;border-radius:999px;background:var(--accent-doux);color:var(--accent);white-space:nowrap}
+.type.sortie{background:var(--att-fond);color:var(--att)}
+.type.refus{background:var(--ko-fond);color:var(--ko)}
+.res-ok{color:var(--ok)}.res-refus,.res-echec{color:var(--ko)}.res-en_cours{color:var(--att)}
+.message{padding:12px 16px;border-radius:10px;margin:12px 0;background:var(--att-fond);color:var(--att)}
+.aide{color:var(--doux);font-size:.88rem;margin-top:14px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header><div class="barre">
+  <h1>Journal d'audit de la box</h1>
+  <a href="/">Assistant</a>
+  <a id="portail" href="#">Portail de la box</a>
+</div></header>
+<main>
+  <div class="message" id="message" hidden></div>
+  <section id="contenu" hidden>
+    <div class="chiffres">
+      <div class="chiffre sortie"><span>Connexions sortantes</span><strong id="n-sortie">0</strong><span id="derniere-sortie">aucune</span></div>
+      <div class="chiffre"><span>Questions à l'assistant</span><strong id="n-questions">0</strong></div>
+      <div class="chiffre"><span>Refus de l'assistant</span><strong id="n-refus">0</strong><span>coffre-fort, dossier non autorisé, rien trouvé</span></div>
+      <div class="chiffre"><span>Sauvegardes</span><strong id="n-sauvegardes">0</strong><span id="derniere-sauvegarde">aucune</span></div>
+    </div>
+    <div class="filtres" id="filtres">
+      <button data-filtre="tout" class="choisi">Tout</button>
+      <button data-filtre="sortie">Connexions sortantes</button>
+      <button data-filtre="ia">Assistant IA</button>
+      <button data-filtre="refus">Refus</button>
+      <button data-filtre="systeme">Box et sauvegardes</button>
+    </div>
+    <div class="tableau"><table>
+      <thead><tr><th>Date</th><th>Événement</th><th>Personne</th><th>Détail</th><th>Résultat</th></tr></thead>
+      <tbody id="lignes"></tbody>
+    </table></div>
+    <p class="aide">Ce journal reste sur la box. Une connexion sortante n'a lieu que sur décision d'un administrateur (téléchargement d'un modèle d'IA, mise à jour) et y est toujours inscrite. Journal des accès aux fichiers : application « Audit » de Nextcloud (fichier audit.log de la box).</p>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+$("portail").href = "https://" + location.host.replace(/^ia\./, "") + "/";
+const LIBELLES = {connexion_sortante: "Connexion sortante", question: "Question", refus_coffre: "Refus : coffre-fort",
+  aucun_resultat: "Refus : rien d'accessible", connexion: "Connexion", deconnexion: "Déconnexion", indexation: "Indexation",
+  modele_ia: "Modèle d'IA", moteur_ia: "Moteur d'IA", sauvegarde: "Sauvegarde", test_restauration: "Test de restauration",
+  restauration: "Restauration", installation: "Installation", verification_hors_ligne: "Vérification hors ligne",
+  donnees_demo: "Données de démo", demarrage: "Démarrage", arret: "Arrêt", reinitialisation: "Réinitialisation",
+  indexation_ia: "Indexation"};
+let entrees = [], filtre = "tout";
+
+function echapper(t) { return String(t ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function categorie(e) {
+  if (e.type === "connexion_sortante") return "sortie";
+  if (e.type.startsWith("refus") || e.type === "aucun_resultat") return "refus";
+  if (e.source === "assistant") return "ia";
+  return "systeme";
+}
+function date(d) { const x = new Date(d); return isNaN(x) ? d : x.toLocaleString("fr-FR", {dateStyle: "short", timeStyle: "short"}); }
+
+function afficher() {
+  const visibles = entrees.filter((e) => filtre === "tout" || categorie(e) === filtre || (filtre === "ia" && categorie(e) === "refus"));
+  $("lignes").innerHTML = visibles.map((e) => {
+    const c = categorie(e);
+    return `<tr><td class="date">${date(e.date)}</td><td><span class="type ${c === "sortie" ? "sortie" : c === "refus" ? "refus" : ""}">${echapper(LIBELLES[e.type] || e.type)}</span></td>
+      <td>${echapper(e.utilisateur || e.source)}</td><td>${echapper(e.detail)}</td><td class="res-${echapper(e.resultat)}">${echapper(e.resultat)}</td></tr>`;
+  }).join("") || `<tr><td colspan="5">Aucun événement.</td></tr>`;
+}
+
+async function charger() {
+  const s = await (await fetch("/api/session")).json();
+  const m = $("message");
+  if (!s.connecte) { m.hidden = false; m.textContent = "Connectez-vous d'abord sur la page de l'assistant."; return; }
+  const r = await fetch("/api/journal/tout");
+  if (!r.ok) { m.hidden = false; m.textContent = (await r.json()).erreur; return; }
+  entrees = await r.json();
+  $("contenu").hidden = false;
+  const sorties = entrees.filter((e) => e.type === "connexion_sortante");
+  const sauvegardes = entrees.filter((e) => e.type === "sauvegarde");
+  $("n-sortie").textContent = sorties.length;
+  $("derniere-sortie").textContent = sorties.length ? "dernière : " + date(sorties[0].date) : "aucune";
+  $("n-questions").textContent = entrees.filter((e) => e.type === "question").length;
+  $("n-refus").textContent = entrees.filter((e) => categorie(e) === "refus").length;
+  $("n-sauvegardes").textContent = sauvegardes.length;
+  $("derniere-sauvegarde").textContent = sauvegardes.length ? "dernière : " + date(sauvegardes[0].date) : "aucune";
+  afficher();
+}
+
+for (const b of $("filtres").querySelectorAll("button")) b.addEventListener("click", () => {
+  filtre = b.dataset.filtre;
+  for (const x of $("filtres").querySelectorAll("button")) x.classList.toggle("choisi", x === b);
+  afficher();
+});
+charger();
+setInterval(charger, 30000);
+</script>
+</body>
+</html>

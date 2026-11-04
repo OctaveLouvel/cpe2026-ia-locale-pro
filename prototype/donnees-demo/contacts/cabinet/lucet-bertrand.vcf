@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+UID:lucet-bertrand@corbiere-avocats.example
+FN:Me Bertrand Lucet
+N:Lucet;Bertrand;;Me;
+ORG:Cabinet Lucet (fictif)
+TITLE:Avocat au barreau de l'Essonne\, conseil de la SCI Montaury
+TEL;TYPE=WORK,VOICE:+33 1 99 00 63 40
+EMAIL;TYPE=WORK:b.lucet@lucet-avocat.example
+NOTE:Confrère adverse\, dossier 2026-014. Contact FICTIF (données de dém
+ onstration).
+CATEGORIES:Confrère,Dossier 2026-014
+END:VCARD

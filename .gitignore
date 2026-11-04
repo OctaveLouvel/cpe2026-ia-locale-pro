@@ -19,8 +19,10 @@ data/
 *.db
 backups/
 
-# Contacts et entretiens nominatifs (à garder hors du dépôt)
-contacts*
+# Contacts et entretiens nominatifs (à garder hors du dépôt). Les contacts FICTIFS de
+# prototype/donnees-demo/ sont, eux, dans le dépôt.
+/contacts*
+entretiens/contacts*
 entretiens/*.xlsx
 entretiens/*.csv
 entretiens/*.pdf

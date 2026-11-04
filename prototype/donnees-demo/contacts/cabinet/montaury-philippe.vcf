@@ -1,0 +1,13 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+UID:montaury-philippe@corbiere-avocats.example
+FN:M. Philippe Montaury
+N:Montaury;Philippe;;M.;
+ORG:SCI Montaury
+TITLE:Gérant
+ADR;TYPE=WORK:;;3 rue des Lilas-Blancs;Corbeil-Essonnes;;91100;France
+NOTE:Partie adverse (bailleur)\, dossier 2026-014. Ne pas contacter directe
+ ment : passer par Me Lucet. Contact FICTIF (données de démonstration).
+CATEGORIES:Partie adverse,Dossier 2026-014
+END:VCARD

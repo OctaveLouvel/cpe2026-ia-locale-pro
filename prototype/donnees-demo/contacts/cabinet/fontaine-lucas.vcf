@@ -1,0 +1,12 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+UID:fontaine-lucas@corbiere-avocats.example
+FN:M. Lucas Fontaine
+N:Fontaine;Lucas;;M.;
+TITLE:Ancien collègue de Mme Garnier
+TEL;TYPE=CELL:+33 6 39 98 57 90
+NOTE:Témoin\, auteur d'une attestation\, dossier 2026-021. Contact FICTIF 
+ (données de démonstration).
+CATEGORIES:Témoin,Dossier 2026-021
+END:VCARD

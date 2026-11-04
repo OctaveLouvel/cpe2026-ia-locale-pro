@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+UID:granger-olivier@corbiere-avocats.example
+FN:Me Olivier Granger
+N:Granger;Olivier;;Me;
+ORG:Étude Granger (fictive)
+TITLE:Commissaire de justice
+TEL;TYPE=WORK,VOICE:+33 1 99 00 52 09
+EMAIL;TYPE=WORK:etude@granger-cj.example
+NOTE:Commissaire de justice habituel du cabinet. Contact FICTIF (données d
+ e démonstration).
+CATEGORIES:Commissaire de justice
+END:VCARD

@@ -1,0 +1,265 @@
+{
+  "avertissement": "Contacts FICTIFS. Téléphones pris dans les plages que l'ARCEP réserve aux œuvres de fiction (01 99 00 XX XX et 06 39 98 XX XX). Courriels en .example, domaine réservé qui n'existe pas.",
+  "contacts": [
+    {
+      "id": "bensaid-karim",
+      "carnet": "cabinet",
+      "civilite": "M.",
+      "prenom": "Karim",
+      "nom": "Bensaïd",
+      "organisation": "SARL Fournil des Aubépines",
+      "fonction": "Gérant",
+      "telephones": {
+        "mobile": "+33 6 39 98 12 47",
+        "travail": "+33 1 99 00 27 15"
+      },
+      "courriel": "k.bensaid@fournil-aubepines.example",
+      "adresse": {
+        "rue": "12 place du Marché-Neuf",
+        "ville": "Évry-Courcouronnes",
+        "code_postal": "91000"
+      },
+      "note": "Client, dossier 2026-014 (bail commercial).",
+      "categories": [
+        "Client",
+        "Dossier 2026-014"
+      ]
+    },
+    {
+      "id": "garnier-elodie",
+      "carnet": "cabinet",
+      "civilite": "Mme",
+      "prenom": "Élodie",
+      "nom": "Garnier",
+      "telephones": {
+        "mobile": "+33 6 39 98 30 82"
+      },
+      "courriel": "elodie.garnier@courriel.example",
+      "adresse": {
+        "rue": "5 allée des Glycines-Bleues",
+        "ville": "Savigny-sur-Orge",
+        "code_postal": "91600"
+      },
+      "note": "Cliente, dossier 2026-021 (licenciement). Préfère être appelée après 17 h.",
+      "categories": [
+        "Client",
+        "Dossier 2026-021"
+      ]
+    },
+    {
+      "id": "lucet-bertrand",
+      "carnet": "cabinet",
+      "civilite": "Me",
+      "prenom": "Bertrand",
+      "nom": "Lucet",
+      "organisation": "Cabinet Lucet (fictif)",
+      "fonction": "Avocat au barreau de l'Essonne, conseil de la SCI Montaury",
+      "telephones": {
+        "travail": "+33 1 99 00 63 40"
+      },
+      "courriel": "b.lucet@lucet-avocat.example",
+      "note": "Confrère adverse, dossier 2026-014.",
+      "categories": [
+        "Confrère",
+        "Dossier 2026-014"
+      ]
+    },
+    {
+      "id": "ollier-sandrine",
+      "carnet": "cabinet",
+      "civilite": "Me",
+      "prenom": "Sandrine",
+      "nom": "Ollier",
+      "organisation": "Ollier Avocats (fictif)",
+      "fonction": "Avocate au barreau de Paris, conseil de la SAS Techniflux",
+      "telephones": {
+        "travail": "+33 1 99 00 75 18"
+      },
+      "courriel": "s.ollier@ollier-avocats.example",
+      "note": "Consœur adverse, dossier 2026-021.",
+      "categories": [
+        "Confrère",
+        "Dossier 2026-021"
+      ]
+    },
+    {
+      "id": "weber-caroline",
+      "carnet": "cabinet",
+      "civilite": "Mme",
+      "prenom": "Caroline",
+      "nom": "Weber",
+      "organisation": "SAS Techniflux",
+      "fonction": "Directrice des ressources humaines",
+      "telephones": {
+        "travail": "+33 1 99 00 19 66"
+      },
+      "courriel": "drh@techniflux.example",
+      "note": "Partie adverse, dossier 2026-021. Ne pas contacter directement : passer par Me Ollier.",
+      "categories": [
+        "Partie adverse",
+        "Dossier 2026-021"
+      ]
+    },
+    {
+      "id": "montaury-philippe",
+      "carnet": "cabinet",
+      "civilite": "M.",
+      "prenom": "Philippe",
+      "nom": "Montaury",
+      "organisation": "SCI Montaury",
+      "fonction": "Gérant",
+      "adresse": {
+        "rue": "3 rue des Lilas-Blancs",
+        "ville": "Corbeil-Essonnes",
+        "code_postal": "91100"
+      },
+      "note": "Partie adverse (bailleur), dossier 2026-014. Ne pas contacter directement : passer par Me Lucet.",
+      "categories": [
+        "Partie adverse",
+        "Dossier 2026-014"
+      ]
+    },
+    {
+      "id": "granger-olivier",
+      "carnet": "cabinet",
+      "civilite": "Me",
+      "prenom": "Olivier",
+      "nom": "Granger",
+      "organisation": "Étude Granger (fictive)",
+      "fonction": "Commissaire de justice",
+      "telephones": {
+        "travail": "+33 1 99 00 52 09"
+      },
+      "courriel": "etude@granger-cj.example",
+      "note": "Commissaire de justice habituel du cabinet.",
+      "categories": [
+        "Commissaire de justice"
+      ]
+    },
+    {
+      "id": "perrin-hugo",
+      "carnet": "cabinet",
+      "civilite": "M.",
+      "prenom": "Hugo",
+      "nom": "Perrin",
+      "organisation": "Perrin Expertises (fictif)",
+      "fonction": "Expert mandaté par l'assureur du Fournil des Aubépines",
+      "telephones": {
+        "mobile": "+33 6 39 98 44 61"
+      },
+      "courriel": "h.perrin@perrin-expertises.example",
+      "note": "Dossier 2026-014 : rapport du 9 juillet 2026, réunion d'expertise le 13 novembre 2026.",
+      "categories": [
+        "Expert",
+        "Dossier 2026-014"
+      ]
+    },
+    {
+      "id": "morin-agnes",
+      "carnet": "cabinet",
+      "civilite": "Mme",
+      "prenom": "Agnès",
+      "nom": "Morin",
+      "organisation": "Morin Expertise Comptable (fictif)",
+      "fonction": "Expert-comptable de la SARL Fournil des Aubépines",
+      "telephones": {
+        "travail": "+33 1 99 00 88 23"
+      },
+      "courriel": "a.morin@morin-compta.example",
+      "note": "Fournit les bilans et l'attestation de perte de chiffre d'affaires, dossier 2026-014.",
+      "categories": [
+        "Dossier 2026-014"
+      ]
+    },
+    {
+      "id": "fontaine-lucas",
+      "carnet": "cabinet",
+      "civilite": "M.",
+      "prenom": "Lucas",
+      "nom": "Fontaine",
+      "fonction": "Ancien collègue de Mme Garnier",
+      "telephones": {
+        "mobile": "+33 6 39 98 57 90"
+      },
+      "note": "Témoin, auteur d'une attestation, dossier 2026-021.",
+      "categories": [
+        "Témoin",
+        "Dossier 2026-021"
+      ]
+    },
+    {
+      "id": "lefort-antoine",
+      "carnet": "confidentiel",
+      "civilite": "M.",
+      "prenom": "Antoine",
+      "nom": "Lefort",
+      "telephones": {
+        "mobile": "+33 6 39 98 21 36"
+      },
+      "courriel": "antoine.lefort@courriel.example",
+      "adresse": {
+        "rue": "27 chemin des Orchidées-Sauvages",
+        "ville": "Lisses",
+        "code_postal": "91090"
+      },
+      "note": "Client, dossier 2026-009 (divorce). Confidentiel.",
+      "categories": [
+        "Client",
+        "Dossier 2026-009"
+      ]
+    },
+    {
+      "id": "desforges-camille",
+      "carnet": "confidentiel",
+      "civilite": "Me",
+      "prenom": "Camille",
+      "nom": "Desforges",
+      "organisation": "Cabinet Desforges (fictif)",
+      "fonction": "Avocate au barreau de l'Essonne, conseil de Mme Sarah Lefort",
+      "telephones": {
+        "travail": "+33 1 99 00 36 54"
+      },
+      "courriel": "c.desforges@desforges-avocat.example",
+      "note": "Consœur, dossier 2026-009.",
+      "categories": [
+        "Confrère",
+        "Dossier 2026-009"
+      ]
+    },
+    {
+      "id": "vasseur-laure",
+      "carnet": "confidentiel",
+      "civilite": "Me",
+      "prenom": "Laure",
+      "nom": "Vasseur",
+      "organisation": "Étude Vasseur (fictive)",
+      "fonction": "Notaire",
+      "telephones": {
+        "travail": "+33 1 99 00 47 72"
+      },
+      "courriel": "l.vasseur@notaire-vasseur.example",
+      "note": "État liquidatif et dépôt de la convention de divorce, dossier 2026-009.",
+      "categories": [
+        "Notaire",
+        "Dossier 2026-009"
+      ]
+    },
+    {
+      "id": "lefort-sarah",
+      "carnet": "confidentiel",
+      "civilite": "Mme",
+      "prenom": "Sarah",
+      "nom": "Lefort",
+      "adresse": {
+        "rue": "14 avenue des Coquelicots-Rouges",
+        "ville": "Ris-Orangis",
+        "code_postal": "91130"
+      },
+      "note": "Épouse de M. Lefort, représentée par Me Desforges. Ne pas contacter directement.",
+      "categories": [
+        "Partie adverse",
+        "Dossier 2026-009"
+      ]
+    }
+  ]
+}

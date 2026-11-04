@@ -1,0 +1,11 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+UID:lefort-sarah@corbiere-avocats.example
+FN:Mme Sarah Lefort
+N:Lefort;Sarah;;Mme;
+ADR;TYPE=WORK:;;14 avenue des Coquelicots-Rouges;Ris-Orangis;;91130;France
+NOTE:Épouse de M. Lefort\, représentée par Me Desforges. Ne pas contacte
+ r directement. Contact FICTIF (données de démonstration).
+CATEGORIES:Partie adverse,Dossier 2026-009
+END:VCARD

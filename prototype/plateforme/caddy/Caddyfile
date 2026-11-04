@@ -41,7 +41,14 @@ http://{$BOX_DOMAIN} {
 # Tableau de bord de la box (DEV-3) : page d'accueil des postes du cabinet.
 {$BOX_DOMAIN} {
 	import entetes
-	reverse_proxy tableau-de-bord:8000
+	# Le coffre-fort est sur un réseau que seul le proxy joint : sa route de santé passe donc par ici.
+	handle /etat/coffre {
+		rewrite * /alive
+		reverse_proxy coffre:80
+	}
+	handle {
+		reverse_proxy tableau-de-bord:8000
+	}
 }
 
 # Fichiers, agenda, contacts.

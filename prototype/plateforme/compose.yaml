@@ -200,7 +200,7 @@ services:
       TZ: Europe/Paris
     volumes:
       - ./sortie/ia:/donnees
-      - ./sortie/journal:/journal
+      - ./sortie/journal:/journal:ro
     networks: [interne]
     depends_on:
       nextcloud:
@@ -227,7 +227,7 @@ services:
       TZ: Europe/Paris
     volumes:
       - ../interface/tableau-de-bord:/app:ro
-      - ./sortie/journal:/journal
+      - ./sortie/journal:/journal:ro
       - ./compose.yaml:/box/compose.yaml:ro
     networks: [interne]
     healthcheck:

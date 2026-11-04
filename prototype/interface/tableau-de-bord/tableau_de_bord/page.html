@@ -33,6 +33,7 @@ a{color:inherit}
 main{max-width:1080px;margin:-40px auto 0;padding:0 16px 48px}
 .bandeau{background:var(--carte);border:1px solid var(--bord);border-radius:14px;box-shadow:var(--ombre);padding:14px 18px;display:flex;gap:10px 24px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
 .bandeau .titre{font-weight:600;margin-right:auto}
+#pastilles{display:flex;flex-wrap:wrap;gap:8px}
 .pastille{display:inline-flex;align-items:center;gap:7px;font-size:.88rem;padding:4px 11px;border-radius:999px;background:var(--attente-fond);color:var(--attente)}
 .pastille::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
 .pastille.ok{background:var(--ok-fond);color:var(--ok)}
@@ -62,7 +63,7 @@ h2{font-size:1.05rem;margin:28px 0 12px;color:var(--doux);font-weight:600}
 .liste li{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-top:1px solid var(--bord)}
 .liste li:first-child{border-top:0}
 .liste .v{color:var(--doux);font-variant-numeric:tabular-nums;text-align:right}
-@media (prefers-color-scheme:dark){.garanties{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.garanties{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
 .garantie{background:var(--carte);border:1px solid var(--bord);border-radius:12px;padding:14px 16px;font-size:.9rem;color:var(--doux)}
 .garantie strong{display:block;color:var(--texte);margin-bottom:2px}
 footer{max-width:1080px;margin:0 auto;padding:0 16px 32px;color:var(--doux);font-size:.85rem}
@@ -173,6 +174,12 @@ function el(balise, attributs = {}, ...enfants) {
 const jour = (iso) => new Date(iso).toLocaleDateString("fr-FR", {weekday: "long", day: "numeric", month: "long"});
 const heure = (iso) => new Date(iso).toLocaleTimeString("fr-FR", {hour: "2-digit", minute: "2-digit"});
 const complet = (iso) => new Date(iso).toLocaleString("fr-FR", {day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit"});
+function duree(iso) {
+  const minutes = Math.max(1, Math.round((Date.now() - new Date(iso)) / 60000));
+  if (minutes < 60) return `${minutes} min`;
+  const heures = Math.round(minutes / 60);
+  return heures < 48 ? `${heures} h` : `${Math.round(heures / 24)} jours`;
+}
 function ilya(iso) {
   const minutes = Math.round((Date.now() - new Date(iso)) / 60000);
   if (minutes < 1) return "à l'instant";
@@ -202,7 +209,6 @@ function afficher(r) {
   pastilles.replaceChildren(...r.services.map((s) => {
     const p = el("span", {class: "pastille " + (s.etat === "attente" ? "" : s.etat), title: s.detail},
                  s.etat === "ok" ? s.nom : `${s.nom} : ${s.etat === "ko" ? "hors service" : s.detail}`);
-    p.style.marginLeft = "8px";
     return p;
   }));
   for (const s of r.services) {
@@ -210,13 +216,17 @@ function afficher(r) {
     if (detail && s.etat === "ok") detail.textContent = s.detail;
   }
 
+  // Le message principal : depuis quand rien n'est sorti de la box. Le décompte sur 30 jours reste affiché.
   const sorties = r.sorties;
-  if (sorties.trente_jours === 0) {
-    const depuis = sorties.derniere ? sorties.derniere.date : (r.installation && r.installation.date);
-    chiffre("c-sorties", "ok", "Aucune", depuis ? `aucune connexion vers internet depuis le ${jour(depuis)}` : "aucune connexion vers internet inscrite au journal");
+  if (!sorties.derniere) {
+    chiffre("c-sorties", "ok", "Aucune", r.installation ? `aucune connexion vers internet depuis l'installation, le ${jour(r.installation.date)}`
+                                                         : "aucune connexion vers internet inscrite au journal");
   } else {
-    chiffre("c-sorties", "attente", `${sorties.trente_jours} en 30 jours`,
-            `la dernière : ${sorties.derniere.detail || sorties.derniere.libelle}, le ${jour(sorties.derniere.date)}`);
+    const age = Date.now() - new Date(sorties.derniere.date);
+    const enCours = sorties.derniere.resultat === "en_cours" && age < 3 * 3600 * 1000;
+    chiffre("c-sorties", age < 24 * 3600 * 1000 ? "attente" : "ok", enCours ? "Une en cours" : `Aucune depuis ${duree(sorties.derniere.date)}`,
+            `la dernière, le ${jour(sorties.derniere.date)} : ${sorties.derniere.detail || sorties.derniere.libelle}`
+            + ` · ${sorties.trente_jours} en 30 jours, toutes inscrites au journal`);
   }
 
   const sv = r.sauvegarde;

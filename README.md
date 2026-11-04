@@ -208,6 +208,7 @@ Chaque piège ci-dessous a été identifié pendant l'analyse du projet. **Un ag
 | Numéro d'équipe et salle de coaching | Toute l'équipe | Immédiat | À reporter dans [`docs/attendus-challenge.md`](docs/attendus-challenge.md) |
 | Matériel de la démo | DEV-1 | Mardi 3 nov, 14h00 | Ce qui est disponible tout de suite et fait tourner un modèle local correct. **Proposition du 3 nov** : portable de DEV-1 (16 Go, sans GPU dédié), à remplacer par un mini-PC ou un portable avec GPU s'il y en a un d'ici mercredi midi. Détail dans [`docs/prototype.md`](docs/prototype.md), section 2. À confirmer au point de 17h30 |
 | Prix des offres | BIZ + DEV-4 | Mercredi 4 nov, 17h30 | Coût matériel réel + réponses des entretiens |
+| Publication de la landing page | BIZ + DEV-3 | Mercredi 4 nov, 17h30 | Texte validé par BIZ, nom du projet, adresse de contact, durée de conservation des inscriptions, hébergeur (le serveur doit garder les inscriptions). Page prête en local : [`prototype/interface/README.md`](prototype/interface/README.md) |
 
 ---
 
@@ -237,6 +238,7 @@ livrables/
 prototype/                   Code de la démo (une partie par développeur, voir prototype/README.md)
   plateforme/                DEV-1 : box.sh, services Docker, installeur, sauvegarde, vérification hors ligne
   ia/                        DEV-2 : assistant IA (droits Nextcloud, citations, refus), mesures des modèles
+  interface/                 DEV-3 : tableau de bord de la box, landing page et liste d'attente
   donnees-demo/              Cabinet FICTIF de la démo : documents, agendas, contacts, droits
 reference/                   PDF officiel du challenge
 ```

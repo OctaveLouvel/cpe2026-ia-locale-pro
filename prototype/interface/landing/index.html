@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[Nom du projet] : l'IA pour les cabinets d'avocats, sans que vos dossiers quittent le cabinet</title>
+<meta name="description" content="Une box installée et maintenue dans votre cabinet : cloud privé et assistant IA qui travaille sur vos dossiers sans internet. Projet étudiant, liste d'attente ouverte.">
+<!-- Landing page et liste d'attente (DEV-3). Texte provisoire à valider par BIZ : voir ../README.md.
+     Aucune ressource externe, aucun cookie, aucune mesure d'audience. Le formulaire fonctionne sans JavaScript. -->
+<style>
+:root{
+  --fond:#f6f7f9;--carte:#ffffff;--texte:#17202c;--doux:#56606e;--bord:#dde2e9;
+  --accent:#1d3557;--accent-doux:#e8eef6;--ok:#1e7a46;--ok-fond:#e5f4ec;--ko:#b23a48;--ko-fond:#fbe9ec;
+}
+@media (prefers-color-scheme:dark){:root{
+  --fond:#0f141b;--carte:#18202a;--texte:#e7ebf0;--doux:#9aa5b4;--bord:#2a3441;
+  --accent:#8fb3e8;--accent-doux:#1f2b3a;--ok:#5cc28a;--ok-fond:#163126;--ko:#ef8a96;--ko-fond:#3a1c22;
+}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--fond);color:var(--texte);line-height:1.55}
+a{color:var(--accent)}
+.cadre{max-width:1040px;margin:0 auto;padding:0 16px}
+.haut{background:#1d3557;color:#fff}
+@media (prefers-color-scheme:dark){.haut{background:#16243a}}
+nav{display:flex;justify-content:space-between;align-items:center;padding:18px 0;gap:12px}
+.marque{display:flex;align-items:center;gap:10px;font-weight:650;font-size:1.05rem}
+.logo{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.14);display:grid;place-items:center}
+nav a.lien{color:#fff;opacity:.9;font-size:.92rem}
+.accroche{padding:40px 0 72px;display:grid;gap:32px}
+.accroche h1{font-size:clamp(1.8rem,4.5vw,2.8rem);line-height:1.15;margin:0;letter-spacing:-.02em;max-width:22ch}
+.accroche p{font-size:1.12rem;max-width:60ch;margin:0;opacity:.92}
+.bouton{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-weight:650;padding:12px 20px;border-radius:10px;border:0;cursor:pointer;text-decoration:none;background:#fff;color:#1d3557}
+.bouton.plein{background:var(--accent);color:var(--carte)}
+@media (prefers-color-scheme:dark){.bouton.plein{color:#0f141b}}
+.statut{justify-self:start;display:inline-block;font-size:.85rem;padding:4px 12px;border-radius:999px;background:rgba(255,255,255,.14)}
+section{padding:48px 0}
+h2{font-size:1.5rem;margin:0 0 8px;letter-spacing:-.01em}
+.intro{color:var(--doux);margin:0 0 24px;max-width:65ch}
+.grille{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
+.carte{background:var(--carte);border:1px solid var(--bord);border-radius:14px;padding:20px}
+.carte h3{margin:0 0 6px;font-size:1.05rem}
+.carte p{margin:0;color:var(--doux);font-size:.95rem}
+.icone{width:40px;height:40px;border-radius:10px;background:var(--accent-doux);color:var(--accent);display:grid;place-items:center;margin-bottom:12px}
+.liste{background:var(--carte);border:1px solid var(--bord);border-radius:16px;padding:28px;display:grid;gap:28px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+form{display:grid;gap:14px}
+label{display:grid;gap:5px;font-size:.92rem;font-weight:600}
+label .aide{font-weight:400;color:var(--doux);font-size:.85rem}
+input,select{font:inherit;padding:10px 12px;border-radius:9px;border:1px solid var(--bord);background:var(--fond);color:var(--texte);width:100%}
+input:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
+.consentement{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:.9rem}
+.consentement input{width:auto;margin-top:4px;flex:none}
+.piege{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+.message{padding:12px 14px;border-radius:10px;font-size:.95rem}
+.message.ok{background:var(--ok-fond);color:var(--ok)}
+.message.ko{background:var(--ko-fond);color:var(--ko)}
+.petit{font-size:.85rem;color:var(--doux)}
+footer{border-top:1px solid var(--bord);padding:24px 0 40px;color:var(--doux);font-size:.88rem}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header class="haut"><div class="cadre">
+  <nav>
+    <div class="marque"><div class="logo" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 4l9 5.5v9L12 20l-9-5.5z"/><path d="M12 20v-9.5M3 9.5l9 5 9-5"/></svg></div>[Nom du projet]</div>
+    <a class="lien" href="#liste">Liste d'attente</a>
+  </nav>
+  <div class="accroche">
+    <span class="statut">Projet en cours de conception · pas encore commercialisé</span>
+    <h1>L'IA pour vos dossiers, sans que vos dossiers quittent le cabinet.</h1>
+    <p>Une box installée et maintenue par nous dans votre cabinet : vos fichiers, votre agenda, vos mots de passe et un assistant IA qui travaille sur vos dossiers. Tout fonctionne sans internet.</p>
+    <div><a class="bouton" href="#liste">Rejoindre la liste d'attente</a></div>
+  </div>
+</div></header>
+
+<main class="cadre">
+  <section>
+    <h2>Le problème</h2>
+    <p class="intro">Les outils d'IA générative font gagner du temps : résumer un dossier, retrouver une pièce, préparer un premier jet. Mais pour un avocat, ils posent une vraie question.</p>
+    <div class="grille">
+      <div class="carte"><h3>Le secret professionnel</h3><p>Les dossiers clients sont couverts par le secret. Les envoyer à un service d'IA en ligne, c'est les confier à un tiers, hors du cabinet.</p></div>
+      <div class="carte"><h3>Pas de service informatique</h3><p>Un petit cabinet n'a personne pour installer, sécuriser et maintenir une solution locale. Il faut que ça marche, sans y passer ses soirées.</p></div>
+      <div class="carte"><h3>Des outils éparpillés</h3><p>Fichiers, agenda, contacts, mots de passe : souvent répartis entre plusieurs services en ligne, chacun avec ses comptes et ses conditions.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Ce que nous construisons</h2>
+    <p class="intro">Une box posée dans le cabinet, livrée configurée. Le prototype fonctionne déjà, sur un cabinet fictif. Nous voulons construire la suite avec des avocats : c'est le but de cette liste d'attente.</p>
+    <div class="grille">
+      <div class="carte"><div class="icone" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.7L18.5 9l-4.7 1.8L12 15.5l-1.8-4.7L5.5 9l4.7-1.3z"/></svg></div>
+        <h3>Un assistant IA qui cite ses sources</h3><p>Il répond à partir de vos documents et de votre agenda, et indique pour chaque réponse le document et la page. S'il ne trouve rien, il le dit.</p></div>
+      <div class="carte"><div class="icone" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+        <h3>Les droits de chacun respectés</h3><p>L'assistant ne voit que ce que la personne qui pose la question a le droit de voir. Il n'a jamais accès au coffre-fort des mots de passe.</p></div>
+      <div class="carte"><div class="icone" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+        <h3>Un cloud privé complet</h3><p>Fichiers, agenda, contacts et coffre-fort de mots de passe, accessibles depuis les postes du cabinet, avec des sauvegardes chiffrées.</p></div>
+      <div class="carte"><div class="icone" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/><path d="M4 4l16 16"/></svg></div>
+        <h3>Hors ligne par défaut</h3><p>Rien ne sort du cabinet. Une connexion de maintenance n'a lieu qu'avec votre accord, et elle est inscrite dans un journal que vous pouvez consulter.</p></div>
+      <div class="carte"><div class="icone" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg></div>
+        <h3>Installée et maintenue par nous</h3><p>Installation sur place, mises à jour de sécurité, support en français. Vous n'avez rien à administrer.</p></div>
+    </div>
+  </section>
+
+  <section id="liste">
+    <div class="liste">
+      <div>
+        <h2>Rejoindre la liste d'attente</h2>
+        <p class="intro" style="margin-bottom:12px">Vous êtes avocat, ou vous travaillez dans un cabinet ? Laissez votre adresse : nous vous préviendrons de l'avancement du projet et nous pourrons vous proposer un court échange pour connaître vos besoins.</p>
+        <p class="petit">Pas de démarchage, pas de revente de votre adresse. Désinscription à tout moment, sur simple demande. Détails dans la <a href="confidentialite.html">mention de confidentialité</a>.</p>
+      </div>
+      <div>
+        <div class="message ok" id="merci" hidden role="status">Merci, votre inscription est bien enregistrée. Nous vous écrirons seulement pour vous tenir au courant du projet.</div>
+        <div class="message ko" id="erreur" hidden role="alert"></div>
+        <form method="post" action="inscription" id="formulaire">
+          <label>Adresse électronique<input type="email" name="courriel" required maxlength="200" autocomplete="email"></label>
+          <label>Taille du cabinet <span class="aide">facultatif</span>
+            <select name="taille">
+              <option value="">Je préfère ne pas répondre</option>
+              <option>1 avocat</option><option>2 à 4 avocats</option><option>5 à 10 avocats</option><option>Plus de 10 avocats</option>
+            </select></label>
+          <label>Votre fonction <span class="aide">facultatif</span>
+            <select name="fonction">
+              <option value="">Je préfère ne pas répondre</option>
+              <option>Avocat associé ou fondateur</option><option>Avocat collaborateur</option><option>Assistant ou secrétaire juridique</option><option>Autre</option>
+            </select></label>
+          <div class="piege" aria-hidden="true"><label>Ne pas remplir<input name="site" tabindex="-1" autocomplete="off"></label></div>
+          <label class="consentement"><input type="checkbox" name="consentement" value="oui" required>
+            <span>J'accepte que l'équipe [Nom du projet] conserve mon adresse pour me tenir informé de l'avancement du projet et me proposer un échange. Je peux retirer mon accord à tout moment (<a href="confidentialite.html">mention de confidentialité</a>).</span></label>
+          <button class="bouton plein" type="submit">Rejoindre la liste d'attente</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="cadre">
+  [Nom du projet] est un projet étudiant présenté au Challenge Projets d'Entreprendre 2026. Le produit n'est pas encore commercialisé.
+  · <a href="confidentialite.html">Confidentialité</a> · Contact : [adresse de contact]
+</div></footer>
+
+<script>
+// Message après l'envoi du formulaire (le serveur redirige vers ?inscription=ok ou ?erreur=...).
+const parametres = new URLSearchParams(location.search);
+const erreurs = {
+  courriel: "Cette adresse électronique ne semble pas valide.",
+  consentement: "Merci de cocher la case d'accord pour être inscrit.",
+  trop: "Trop d'essais depuis ce poste. Réessayez dans une heure.",
+  serveur: "L'inscription n'a pas pu être enregistrée. Réessayez plus tard.",
+};
+if (parametres.get("inscription") === "ok") {
+  document.getElementById("merci").hidden = false;
+  document.getElementById("formulaire").hidden = true;
+} else if (erreurs[parametres.get("erreur")]) {
+  const zone = document.getElementById("erreur");
+  zone.textContent = erreurs[parametres.get("erreur")];
+  zone.hidden = false;
+}
+if (parametres.has("inscription") || parametres.has("erreur")) document.getElementById("liste").scrollIntoView();
+</script>
+</body>
+</html>

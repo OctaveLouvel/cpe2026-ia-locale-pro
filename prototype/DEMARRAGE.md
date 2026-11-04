@@ -32,7 +32,8 @@ Ce qui tourne ensuite (`./box.sh etat` pour le voir) :
 
 | Conteneur | Rôle | Accès à internet |
 |---|---|---|
-| `proxy` (Caddy) | Porte d'entrée HTTPS, portail de la box | Non (il écoute seulement) |
+| `proxy` (Caddy) | Porte d'entrée HTTPS | Non (il écoute seulement) |
+| `tableau-de-bord` | Page d'accueil : état des services, sauvegardes, liens | Non |
 | `nextcloud`, `nextcloud-cron`, `db`, `cache` | Fichiers, agenda, contacts, tâches de fond | Non |
 | `coffre` (Vaultwarden) | Coffre-fort de mots de passe, sur un réseau à part | Non |
 | `assistant` | Assistant IA, avec les droits de chaque personne | Non |
@@ -41,7 +42,7 @@ Ce qui tourne ensuite (`./box.sh etat` pour le voir) :
 
 ## 3. Ouvrir la box
 
-1. Ouvrir **https://cabinet.localhost** : c'est le portail, avec un lien vers chaque service et leur état en direct.
+1. Ouvrir **https://cabinet.localhost** : c'est le tableau de bord, avec un lien vers chaque service et leur état en direct.
 2. Le navigateur prévient que le certificat est inconnu : c'est normal, la box a sa propre autorité de certification. Pour ne plus avoir l'alerte, importer `plateforme/sortie/autorite-locale.crt` dans le navigateur ([marche à suivre](plateforme/README.md#faire-confiance-au-certificat-de-la-box)).
 3. Se connecter avec un compte fictif. Le mot de passe commun est la valeur `DEMO_MOT_DE_PASSE` du fichier `plateforme/.env`.
 
@@ -54,7 +55,7 @@ Ce qui tourne ensuite (`./box.sh etat` pour le voir) :
 
 ## 4. Choisir le modèle d'IA, à la souris
 
-1. Ouvrir **https://ia.cabinet.localhost/modeles** (ou le bouton « Choisir le modèle » du portail), connecté avec `hcorbiere`.
+1. Ouvrir **https://ia.cabinet.localhost/modeles** (ou le bouton « Choisir le modèle » du tableau de bord), connecté avec `hcorbiere`.
 2. Chaque carte indique la taille à télécharger, la mémoire nécessaire (estimation) et si le modèle tient dans la mémoire de la machine. Préférer un modèle marqué « Tient en mémoire ».
 3. Cliquer sur **Installer** : une barre montre le téléchargement. C'est une connexion sortante : elle est inscrite au journal d'audit.
 4. Cliquer sur **Activer**. L'assistant charge le modèle et prépare l'index des documents.

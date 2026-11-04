@@ -70,7 +70,7 @@ Relevées le 3 et le 4 novembre 2026 sur les dépôts officiels ([S22], [S25] de
 | python-docx | MIT | Idem |
 | Modèles Qwen3 4B, Qwen3.6 35B-A3B | Apache-2.0 | Licence de chaque autre modèle du catalogue à vérifier avant de le proposer à un client |
 
-Conséquence pour le jury (cadre juridique) : la revente est permise. Les briques sous AGPL et GPL imposent de fournir leur code source aux clients : nous les utilisons sans modification et fournirons les liens et les versions. Notre propre code (assistant, installeur, portail) est séparé.
+Conséquence pour le jury (cadre juridique) : la revente est permise. Les briques sous AGPL et GPL imposent de fournir leur code source aux clients : nous les utilisons sans modification et fournirons les liens et les versions. Notre propre code (assistant, installeur, tableau de bord) est séparé.
 
 ## 6. Reste à faire, par priorité
 

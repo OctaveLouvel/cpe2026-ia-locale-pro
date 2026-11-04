@@ -4,7 +4,7 @@ Les services de base de la box, installés et vérifiés par un seul script : `.
 
 | Service | Brique | Adresse (domaine par défaut) |
 |---|---|---|
-| Page d'accueil provisoire, remplacée par le tableau de bord de DEV-3 | Caddy (fichiers statiques de [`accueil/`](accueil/)) | https://cabinet.localhost |
+| Tableau de bord (DEV-3) : état des services, sauvegardes, connexions sortantes, versions | Python, [`../interface/tableau-de-bord/`](../interface/tableau-de-bord/) | https://cabinet.localhost |
 | Fichiers, agenda, contacts | Nextcloud 34 + applications Agenda et Contacts | https://cloud.cabinet.localhost |
 | Coffre-fort de mots de passe | Vaultwarden (compatible Bitwarden) | https://coffre.cabinet.localhost |
 | Reverse proxy TLS avec autorité de certification locale | Caddy 2.11 | ports 80 et 443 |
@@ -117,7 +117,7 @@ Le chiffrement du coffre se fait dans le navigateur : la box ne connaît jamais 
 
 - **Ajouter un service** (assistant IA, tableau de bord) : le déclarer dans `compose.yaml` sur le réseau `interne`, et ajouter sa route dans [`caddy/sites/`](caddy/sites/) (exemple dans le README de ce dossier). Aucun service ne doit être relié au réseau `frontal`.
 - **DEV-2, droits de l'assistant** : l'assistant interroge Nextcloud avec les droits de la personne qui pose la question. Depuis le réseau interne : `http://nextcloud/remote.php/dav/files/<compte>/` (fichiers, WebDAV), `http://nextcloud/remote.php/dav/calendars/<compte>/` (agendas, CalDAV), `http://nextcloud/remote.php/dav/addressbooks/users/<compte>/` (contacts, CardDAV). Ce que Nextcloud ne renvoie pas à un compte, l'assistant ne doit pas le voir. Pour un premier prototype sans Nextcloud, [`../donnees-demo/index.json`](../donnees-demo/index.json) donne les lecteurs autorisés de chaque document. Le coffre-fort n'est relié à rien de tout cela.
-- **DEV-3, tableau de bord** : remplacer le contenu de [`accueil/`](accueil/), ou ajouter un service et changer la route du domaine principal dans le Caddyfile.
+- **DEV-3, tableau de bord** : fait, service `tableau-de-bord` sur le domaine principal ; voir [`../interface/README.md`](../interface/README.md).
 - **DEV-4, journal d'audit** : deux sources déjà disponibles. Le journal d'audit de Nextcloud (`data/audit.log` dans le volume `box_nextcloud_donnees` : connexions, accès et partages de fichiers, au format JSON) et le journal de la plateforme `sortie/journal/evenements.jsonl` (installation, sauvegardes, restaurations, vérifications), au format `{"date", "source", "type", "detail", "resultat"}`.
 
 ## Système de la box
@@ -145,4 +145,4 @@ Les briques sous AGPL sont utilisées sans modification de leur code : nous ne l
 - Le jeton d'administration du coffre-fort est en clair dans `.env` (Vaultwarden recommande un hachage Argon2).
 - Les courriels sont désactivés : pas de notification, pas de réinitialisation de mot de passe par courriel.
 - Le choix « coffre-fort désactivé » de l'assistant arrête le service, mais `./box.sh demarrer` le relance.
-- Accès distant (WireGuard), tableau de bord et assistant IA : à brancher par DEV-4, DEV-3 et DEV-2.
+- Accès distant (WireGuard) : à brancher par DEV-4.

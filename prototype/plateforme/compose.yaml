@@ -44,7 +44,6 @@ services:
     volumes:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - ./caddy/sites:/etc/caddy/sites:ro
-      - ./accueil:/srv/accueil:ro
       - caddy_donnees:/data
       - caddy_config:/config
     networks: [frontal, interne, coffre]
@@ -52,6 +51,8 @@ services:
       nextcloud:
         condition: service_started
       coffre:
+        condition: service_started
+      tableau-de-bord:
         condition: service_started
 
   # Fichiers, agenda, contacts. Image dérivée : Agenda et Contacts intégrés, durcissement hors ligne.
@@ -210,6 +211,31 @@ services:
       timeout: 10s
       retries: 5
       start_period: 1m
+
+  # Tableau de bord de la box (DEV-3), page d'accueil https://<domaine> : état des services, sauvegardes,
+  # connexions sortantes, versions, lien vers le journal d'audit de DEV-4. Bibliothèque standard de Python :
+  # aucune image à construire. Il ne lit aucune donnée du cabinet, seulement les routes de santé et les journaux.
+  tableau-de-bord:
+    image: python:3.12-slim
+    restart: unless-stopped
+    user: "${BOX_UID:-1000}:${BOX_GID:-1000}"
+    working_dir: /app
+    command: ["python", "-u", "-m", "tableau_de_bord"]
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+      NC_URL: http://nextcloud
+      TZ: Europe/Paris
+    volumes:
+      - ../interface/tableau-de-bord:/app:ro
+      - ./sortie/journal:/journal:ro
+      - ./compose.yaml:/box/compose.yaml:ro
+    networks: [interne]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/sante', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   # Outil ponctuel : chargement du jeu de données fictif (./box.sh donnees-demo).
   outils:

@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>asoterIA · Executive summary</title>
+<!-- Source du PDF déposé sur Moodle. Générer avec : ./livrables/generer-pdf.sh
+     Les éléments en class="todo" (surlignés en jaune) sont à remplacer par un humain de l'équipe avant le dépôt.
+     Structure inspirée de propulsebyca.fr/business-plan/executive-summary : identité, proposition de valeur,
+     avancement, équipe, plan de financement en deux colonnes, prévisions, objectif de la démarche en conclusion. -->
+<style>
+  @page { size: A4; margin: 12mm 14mm 11mm 14mm; }
+  :root {
+    --encre: #1b2430;
+    --doux: #55606e;
+    --accent: #1f4e79;
+    --accent-clair: #e8eff6;
+    --trait: #d5dce4;
+    --fait: #2e7d4f;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    margin: 0;
+    font-family: "Noto Sans", sans-serif;
+    font-size: 8.7pt;
+    line-height: 1.36;
+    color: var(--encre);
+    background: #fff;
+  }
+  p { margin: 0 0 3.5pt; }
+  ul { margin: 0 0 3.5pt; padding-left: 11pt; }
+  li { margin-bottom: 1.2pt; }
+  strong { font-weight: 600; }
+
+  header {
+    border-bottom: 2pt solid var(--accent);
+    padding-bottom: 5pt;
+    margin-bottom: 7pt;
+  }
+  .surtitre {
+    font-size: 7.3pt;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--doux);
+    display: flex;
+    justify-content: space-between;
+  }
+  h1 .logo { height: 21pt; width: auto; display: block; }
+  h1 {
+    font-family: "Noto Serif", serif;
+    font-size: 21pt;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 2pt 0 1pt;
+    line-height: 1.1;
+  }
+  .mission { font-family: "Noto Serif", serif; font-style: italic; font-size: 9.6pt; color: var(--doux); }
+
+  .bref {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3pt 14pt;
+    background: var(--accent-clair);
+    border-left: 3pt solid var(--accent);
+    padding: 6pt 9pt;
+    margin: 0 0 6pt;
+  }
+  .bref div { font-size: 8.4pt; }
+  .bref b { color: var(--accent); font-weight: 600; display: inline-block; min-width: 46pt; }
+  .pvu {
+    grid-column: 1 / -1;
+    border-top: 0.6pt solid #c4d3e2;
+    padding-top: 4pt;
+    font-size: 9.4pt !important;
+  }
+
+  h2 {
+    font-family: "Noto Serif", serif;
+    font-size: 10.6pt;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 7pt 0 3pt;
+    padding-bottom: 1.5pt;
+    border-bottom: 0.6pt solid var(--trait);
+    break-after: avoid;
+  }
+  section { break-inside: avoid; }
+
+  .chiffres {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6pt;
+    margin: 5pt 0 2pt;
+  }
+  .chiffre {
+    border: 0.6pt solid var(--trait);
+    border-radius: 3pt;
+    padding: 4pt 6pt;
+  }
+  .chiffre b {
+    display: block;
+    font-family: "Noto Serif", serif;
+    font-size: 13.5pt;
+    font-weight: 600;
+    color: var(--accent);
+    line-height: 1.15;
+  }
+  .chiffre span { font-size: 7.2pt; color: var(--doux); line-height: 1.25; display: block; }
+
+  .deux-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12pt; }
+
+  .etapes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8pt; }
+  .etape { border-top: 2pt solid var(--trait); padding-top: 3pt; }
+  .etape.fait { border-top-color: var(--fait); }
+  .etape.encours { border-top-color: var(--accent); }
+  .etape h3 { font-size: 8pt; font-weight: 600; margin: 0 0 2pt; text-transform: uppercase; letter-spacing: 0.04em; }
+  .etape.fait h3 { color: var(--fait); }
+  .etape.encours h3 { color: var(--accent); }
+  .etape h3 + p, .etape ul { font-size: 8pt; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8pt; margin: 2pt 0 3pt; }
+  th, td { text-align: left; padding: 2.6pt 5pt; border-bottom: 0.5pt solid var(--trait); vertical-align: top; }
+  th { background: var(--accent-clair); font-weight: 600; color: var(--accent); }
+  td.n, th.n { text-align: right; white-space: nowrap; }
+  tr.nous td { background: #f4f7fa; font-weight: 600; }
+
+  .note { font-size: 7.2pt; color: var(--doux); }
+  sup { font-size: 6pt; color: var(--accent); }
+  .todo { background: #fff3a6; padding: 0 2pt; border-radius: 2pt; }
+
+  .demande {
+    margin-top: 6pt;
+    background: var(--accent);
+    color: #fff;
+    padding: 7pt 10pt;
+    border-radius: 3pt;
+    font-size: 9pt;
+  }
+  .demande strong { color: #fff; }
+  .demande .todo { color: var(--encre); }
+
+  footer.sources {
+    margin-top: 6pt;
+    font-size: 6.5pt;
+    color: var(--doux);
+    line-height: 1.3;
+  }
+  .saut { break-before: page; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="surtitre"><span>Challenge Projets d'Entreprendre 2026 · Executive summary</span><span>Équipe n°<span class="todo">[numéro]</span></span></div>
+  <h1><img class="logo" src="logo/asoteria-logo.png" alt="asoterIA"></h1>
+  <div class="mission">Donner aux petits cabinets d'avocats l'IA sans renoncer au secret professionnel.</div>
+</header>
+
+<div class="bref">
+  <div><b>Activité</b> Box d'IA locale et de cloud privé, vendue en B2B avec un abonnement de service</div>
+  <div><b>Cible</b> Cabinets d'avocats de 1 à 10 personnes, sans service informatique, d'abord en Île-de-France</div>
+  <div><b>Stade</b> Prototype fonctionnel hors ligne, premiers échanges avec la profession</div>
+  <div><b>Équipe</b> 4 développeurs et 1 profil business, <span class="todo">[écoles]</span></div>
+  <div class="pvu"><strong>Notre proposition</strong> : un assistant IA qui travaille sur les dossiers du cabinet et cite toujours ses sources, sur une box installée et maintenue par nous, <strong>sans qu'aucune donnée ne quitte le cabinet</strong>.</div>
+</div>
+
+<section>
+<h2>Le problème</h2>
+<p>Les avocats veulent utiliser l'IA générative pour lire, résumer et rédiger. Mais ils sont tenus au <strong>secret professionnel</strong> : envoyer les pièces d'un client à un service d'IA en ligne pose un problème de confidentialité. Les petits cabinets n'ont pas de service informatique pour installer une solution locale. Et une IA générale cite mal ses sources, ce qui est dangereux pour un avocat.</p>
+<p><strong>Premiers échanges.</strong> Un étudiant en droit passé par des stages au tribunal confirme que le milieu cherche à utiliser des LLM tout en gardant les données privées, et que même les meilleurs modèles restent vagues dans leurs citations sans lien avec de vrais textes. Dans un cabinet de 8 avocats, le secrétariat indique que les documents sont dans un logiciel de gestion qui intègre déjà un assistant IA, et que l'achat informatique passe par le comptable.</p>
+<p><strong>Preuves</strong> : <span class="todo">[nombre]</span> entretiens avec des avocats du 2 au 4 novembre 2026, <span class="todo">[nombre]</span> avec des spécialistes, <span class="todo">[nombre]</span> marques d'intérêt écrites, <span class="todo">[nombre]</span> inscrits sur la liste d'attente.</p>
+</section>
+
+<section>
+<h2>La solution</h2>
+<div class="deux-col">
+  <div>
+    <p>Une box posée dans le cabinet réunit <strong>documents, agenda, contacts et coffre-fort de mots de passe</strong>, avec un assistant IA local qui :</p>
+    <ul>
+      <li>répond à partir des dossiers et <strong>cite toujours le document source</strong> ;</li>
+      <li>respecte les droits de la personne qui pose la question ;</li>
+      <li><strong>n'a jamais accès au coffre-fort</strong>.</li>
+    </ul>
+  </div>
+  <div>
+    <p>Tout fonctionne <strong>câble réseau débranché</strong>. Chaque connexion sortante (mise à jour, support, sauvegarde hors site) est optionnelle, chiffrée, autorisée par le cabinet et inscrite dans un journal d'audit.</p>
+    <p class="note">Nous assemblons des briques libres (Nextcloud, Vaultwarden, restic, Caddy). Notre travail : l'installeur, l'assistant qui croise les services et cite ses sources, le tableau de bord, le journal d'audit, le pack métier et le service sur place.</p>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>Avancement</h2>
+<div class="etapes">
+  <div class="etape fait">
+    <h3>Réalisé (2 au 4 nov.)</h3>
+    <ul>
+      <li>6 services sur un réseau isolé sans route vers internet, environ 375 Mo de mémoire hors IA</li>
+      <li>Installeur en 5 écrans</li>
+      <li>Sauvegarde chiffrée, restauration réelle testée en 40 s</li>
+      <li>Cabinet fictif complet pour la démo</li>
+    </ul>
+  </div>
+  <div class="etape encours">
+    <h3>D'ici le 6 novembre</h3>
+    <ul>
+      <li><span class="todo">[assistant IA : modèle retenu, temps de réponse mesuré]</span></li>
+      <li>Tableau de bord et journal d'audit visibles</li>
+      <li>Démo complète testée hors ligne</li>
+      <li>Consommation mesurée au wattmètre</li>
+    </ul>
+  </div>
+  <div class="etape">
+    <h3>Objectifs 2027</h3>
+    <ul>
+      <li>Premier cabinet pilote installé en mars</li>
+      <li>10 cabinets pilotes en juin</li>
+      <li>20 cabinets payants en fin d'année 1</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>Le marché</h2>
+<p><strong>Qui paie</strong> : l'associé, ou le comptable du cabinet. <strong>Qui utilise</strong> : les collaborateurs, les assistants et l'associé.</p>
+<div class="chiffres">
+  <div class="chiffre"><b>77 598</b><span>avocats inscrits en France<sup>1</sup></span></div>
+  <div class="chiffre"><b>63%</b><span>des cabinets comptent 1 à 4 avocats<sup>2</sup></span></div>
+  <div class="chiffre"><b><span class="todo">[SAM]</span></b><span>cabinets de 1 à 10 personnes × panier annuel</span></div>
+  <div class="chiffre"><b>530</b><span>cabinets clients visés à 5 ans (objectif)</span></div>
+</div>
+</section>
+
+<section class="saut">
+<h2>Concurrence et positionnement</h2>
+<table>
+  <tr><th>Acteur</th><th>Offre</th><th class="n">Prix</th><th>Limite pour un cabinet d'avocats</th></tr>
+  <tr><td><strong>Olares One</strong></td><td>Box cloud et IA locale sur les fichiers ; série A de 45 M$<sup>4</sup></td><td class="n">2 899 à 3 999 $<sup>3</sup></td><td>Vise passionnés et développeurs, pas de service sur place ni de spécialisation métier</td></tr>
+  <tr><td><strong>Start9</strong></td><td>Serveur personnel, support à vie inclus<sup>5</sup></td><td class="n">749 à 1 049 $<sup>5</sup></td><td>Orienté souveraineté et Bitcoin, demande des compétences techniques</td></tr>
+  <tr><td><strong>ZimaCube</strong></td><td>NAS « cloud personnel » avec applications<sup>6</sup></td><td class="n">649 à 1 099 $<sup>6</sup></td><td>Orienté stockage et créateurs de contenu</td></tr>
+  <tr><td><strong>IA intégrée aux logiciels de cabinet</strong></td><td>Assistant ajouté au logiciel de gestion déjà utilisé</td><td class="n"><span class="todo">[à sourcer]</span></td><td><span class="todo">[hébergement et confidentialité à documenter]</span></td></tr>
+  <tr class="nous"><td>Nous</td><td>Box, installation et support en France, pensée pour le secret professionnel</td><td class="n">voir offres</td><td>Réponses sourcées, rien ne sort du cabinet, aucune compétence technique demandée</td></tr>
+</table>
+</section>
+
+<div class="deux-col">
+<section>
+<h2>Business model</h2>
+<p>Le <strong>revenu récurrent</strong> est le cœur du modèle : la box ne se vend qu'une fois. L'abonnement comprend les mises à jour de sécurité suivies, les mises à jour des modèles et du pack métier, la sauvegarde hors site chiffrée côté client, l'intervention sur place et le remplacement en cas de panne.</p>
+<table>
+  <tr><th>Offre (HT)</th><th class="n">Box</th><th class="n">Installation</th><th class="n">Abonnement</th></tr>
+  <tr><td>Solo, 1 à 3 pers.</td><td class="n"><span class="todo">[ ]</span></td><td class="n"><span class="todo">[ ]</span></td><td class="n"><span class="todo">[ ]</span></td></tr>
+  <tr><td>Cabinet, 4 à 10 pers.</td><td class="n">3 500€</td><td class="n">500€</td><td class="n">79€ / mois</td></tr>
+</table>
+<p class="note">Prix en cours de validation à partir du coût matériel réel et des entretiens.</p>
+</section>
+
+<section>
+<h2>Go to market</h2>
+<ul>
+  <li><strong>5 à 10 cabinets pilotes</strong> en Île-de-France à prix réduit, contre un vrai retour d'usage.</li>
+  <li><strong>Vente directe</strong> : prospection téléphonique, démonstration sur place.</li>
+  <li><strong>Profession</strong> : barreaux, salons d'avocats, formations continues.</li>
+  <li><strong>Revendeurs</strong> : prestataires informatiques locaux pour couvrir les régions.</li>
+  <li><strong>Contenus</strong> sur l'IA et le secret professionnel, liste d'attente ouverte.</li>
+</ul>
+<p>Coût d'acquisition d'un cabinet : <span class="todo">[ ]</span></p>
+</section>
+</div>
+
+<div class="deux-col">
+<section>
+<h2>Équipe</h2>
+<table>
+  <tr><th>Rôle</th><th>Membre</th></tr>
+  <tr><td>Business : marché, ventes, finance</td><td><span class="todo">[Nom, école]</span></td></tr>
+  <tr><td>Plateforme : box, installeur, sauvegardes</td><td><span class="todo">[Nom, école]</span></td></tr>
+  <tr><td>IA : modèle local, recherche, citations</td><td><span class="todo">[Nom, école]</span></td></tr>
+  <tr><td>Interface : tableau de bord, site</td><td><span class="todo">[Nom, école]</span></td></tr>
+  <tr><td>Sécurité : chiffrement, audit, mesures</td><td><span class="todo">[Nom, école]</span></td></tr>
+</table>
+</section>
+
+<section>
+<h2>Prévisions (objectifs)</h2>
+<table>
+  <tr><th></th><th class="n">Année 1</th><th class="n">Année 3</th><th class="n">Année 5</th></tr>
+  <tr><td>Cabinets actifs</td><td class="n">20</td><td class="n">200</td><td class="n">530</td></tr>
+  <tr><td>Chiffre d'affaires</td><td class="n">89 k€</td><td class="n">613 k€</td><td class="n">1 137 k€</td></tr>
+  <tr><td>Marge brute</td><td class="n"><span class="todo">[ ]</span></td><td class="n"><span class="todo">[ ]</span></td><td class="n"><span class="todo">[ ]</span></td></tr>
+  <tr><td>Effectif</td><td class="n">4 à 6</td><td class="n">12 à 15</td><td class="n">15 à 25</td></tr>
+</table>
+<p class="note">Seuil de rentabilité : <span class="todo">[année]</span>. Sans résiliation à ce stade. Extensions : experts-comptables en année 2, santé en année 3 via un partenaire certifié HDS.</p>
+</section>
+</div>
+
+<div class="deux-col">
+<section>
+<h2>Plan de financement (démarrage)</h2>
+<table>
+  <tr><th>Besoins</th><th class="n">Montant</th><th>Ressources</th><th class="n">Montant</th></tr>
+  <tr><td>Premier lot de box</td><td class="n"><span class="todo">[ ]</span></td><td>Préventes des pilotes</td><td class="n"><span class="todo">[ ]</span></td></tr>
+  <tr><td>Développement V1</td><td class="n"><span class="todo">[ ]</span></td><td>Aides et prêts d'honneur</td><td class="n"><span class="todo">[ ]</span></td></tr>
+  <tr><td>Prospection</td><td class="n"><span class="todo">[ ]</span></td><td>Apports des fondateurs</td><td class="n"><span class="todo">[ ]</span></td></tr>
+</table>
+<p class="note">Accompagnement visé : Next Step de l'ENSIIE et incubateur IMT Starter. Levée d'amorçage seulement après les pilotes, pour recruter et financer le stock.</p>
+</section>
+
+<section>
+<h2>Impact RSE</h2>
+<ul>
+  <li><strong>Mesuré</strong> : <span class="todo">[X] W au repos, [Y] W en charge, soit [Z] kWh par an</span>.</li>
+  <li><strong>Négatif</strong> : fabrication du matériel, machine allumée en permanence, moins mutualisée qu'un centre de données.</li>
+  <li><strong>Positif</strong> : les données des clients ne quittent jamais le cabinet.</li>
+  <li><strong>Actions</strong> : modèle dimensionné au besoin, veille hors usage, réparation plutôt que remplacement, reconditionné en option.</li>
+</ul>
+</section>
+</div>
+
+<div class="demande">
+<strong>Ce que nous cherchons</strong> : 5 à 10 cabinets d'avocats d'Île-de-France prêts à tester la box en pilote début 2027, et des contacts dans les barreaux et chez les prestataires informatiques de la profession.
+</div>
+
+<footer class="sources">
+<strong>Sources</strong> (consultées le 3 novembre 2026).
+1. Conseil national des barreaux, via motherbase.ai.
+2. Enquête emploi avocats 2026, Viavoice pour le CNB : 32% des cabinets à 1 avocat, 31% de 2 à 4.
+3. Yanko Design et TechRadar.
+4. Olares, annonce de l'Olares One.
+5. Novasapien, distributeur Start9.
+6. Boutique ZimaSpace.
+Prix, prévisions et jalons 2027 : objectifs de l'équipe, en cours de validation.
+</footer>
+
+</body>
+</html>

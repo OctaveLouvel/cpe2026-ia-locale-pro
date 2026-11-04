@@ -47,7 +47,7 @@ Règles valables tous les jours :
 - [x] Premier prototype de recherche dans les documents (RAG) sur une dizaine de PDF fictifs, avec citation du document source. *(Fait sur les 30 documents du cabinet fictif : `prototype/ia/`.)*
 
 **DEV-3**
-- [ ] **Landing page + formulaire de liste d'attente en ligne ce soir.** Formulaire conforme au RGPD : consentement explicite, finalité indiquée, lien vers une courte mention de confidentialité.
+- [ ] **Landing page + formulaire de liste d'attente en ligne ce soir.** Formulaire conforme au RGPD : consentement explicite, finalité indiquée, lien vers une courte mention de confidentialité. *(4 nov : page, formulaire et mention prêts et testés en local, `prototype/interface/landing/`. Pas encore en ligne : texte à valider par BIZ, nom, contact et hébergeur à choisir.)*
 - [ ] Maquette du tableau de bord unifié (papier ou outil de maquette), validée par l'équipe au point de 17h30.
 
 **DEV-4**
@@ -102,7 +102,7 @@ Règles valables tous les jours :
 - [ ] Préparer les 3 questions exactes de la démo et vérifier que les réponses sont bonnes à chaque essai.
 
 **DEV-3**
-- [ ] Tableau de bord v1 : état des services, sauvegardes, mises à jour, journal des accès, entrée vers l'assistant.
+- [x] Tableau de bord v1 : état des services, sauvegardes, mises à jour, journal des accès, entrée vers l'assistant. *(4 nov : https://cabinet.localhost, `prototype/interface/`. Le journal détaillé est la page de DEV-4, liée depuis le tableau de bord.)*
 - [ ] Modèle de slides commun à l'équipe, captures d'écran de la démo.
 
 **DEV-4**

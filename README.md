@@ -210,6 +210,7 @@ Chaque piège ci-dessous a été identifié pendant l'analyse du projet. **Un ag
 | Numéro d'équipe et salle de coaching | Toute l'équipe | Immédiat | À reporter dans [`docs/attendus-challenge.md`](docs/attendus-challenge.md) |
 | Matériel de la démo | DEV-1 | Mardi 3 nov, 14h00 | Ce qui est disponible tout de suite et fait tourner un modèle local correct. **Proposition du 3 nov** : portable de DEV-1 (16 Go, sans GPU dédié), à remplacer par un mini-PC ou un portable avec GPU s'il y en a un d'ici mercredi midi. Détail dans [`docs/prototype.md`](docs/prototype.md), section 2. À confirmer au point de 17h30 |
 | Prix des offres | BIZ + DEV-4 | Mercredi 4 nov, 17h30 | Coût matériel réel + réponses des entretiens |
+| Publication de la landing page | BIZ + DEV-3 | Mercredi 4 nov, 17h30 | Texte validé par BIZ, nom du projet, adresse de contact, durée de conservation des inscriptions, hébergeur (le serveur doit garder les inscriptions). Page prête en local : [`prototype/interface/README.md`](prototype/interface/README.md) |
 
 ---
 
@@ -230,18 +231,23 @@ docs/
   roadmap-5-ans.md           Planning global à 5 ans
   sources.md                 Toutes les sources citées
 entretiens/
-  guide-entretien.md         Script et questions
+  guide-entretien.md         Script et questions (version détaillée 15 min)
+  guide-entretien-v2.md      Script rapide (accroche courte, 5 min et prix)
   modele-compte-rendu.md     Modèle de fiche d'entretien
   suivi.md                   Tableau de suivi des entretiens (données réelles uniquement)
 livrables/
   logo/                      Logo asoterIA (PNG clair, sombre, icône), liens Canva
-  executive-summary.md       Brouillon de l'executive summary (2 pages)
+  executive-summary.md       Mode d'emploi et vérifications avant dépôt
+  executive-summary.html     Texte de l'executive summary (source du PDF)
+  executive-summary.pdf      PDF de 2 pages déposé sur Moodle
+  generer-pdf.sh             Génère le PDF depuis le HTML
   plan-pitch.md              Déroulé des 15 minutes, qui parle quand
   questions-jury.md          Questions probables et éléments de réponse
 prototype/                   Code de la démo (une partie par développeur, voir prototype/README.md)
   DEMARRAGE.md               Guide : lancer toute la box en une commande, choisir le modèle d'IA
   plateforme/                DEV-1 : box.sh, services Docker, installeur, sauvegarde, vérification hors ligne
   ia/                        DEV-2 : assistant IA (droits Nextcloud, citations, refus), mesures des modèles
+  interface/                 DEV-3 : tableau de bord de la box, landing page et liste d'attente
   securite/                  DEV-4 : mesure de la consommation électrique
   donnees-demo/              Cabinet FICTIF de la démo : documents, agendas, contacts, droits
 reference/                   PDF officiel du challenge

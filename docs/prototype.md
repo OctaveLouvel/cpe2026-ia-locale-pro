@@ -129,7 +129,7 @@ Mesures de DEV-2 sur le portable de démo (section 2), applications fermées, av
 
 | Modèle testé | Mémoire utilisée | Temps jusqu'au premier mot | Tokens par seconde | Qualité en français (note sur 5, 5 questions types) | Retenu |
 |---|---|---|---|---|---|
-| Qwen3.6-35B-A3B int4 avec Colibri 2.1.0, sur processeur (3 novembre) | 2,9 Go résidents, 9,5 Go alloués par le moteur ; le reste du modèle (18 Go d'experts) est relu en continu sur le SSD | Question courte (27 tokens) : réponse complète en 16,5 s. Question de résumé (environ 1 000 tokens de contexte) : pas de réponse après 14 min, 526 Go lus sur le disque, mesure arrêtée | Environ 1,8 (0,56 s par token, journal du moteur, question courte) | Non mesurée (mesure arrêtée) | **Non** sur 16 Go : le modèle doit tenir en mémoire. À réessayer sur une box d'au moins 32 Go |
+| Qwen3.6-35B-A3B int4 avec Colibri 2.1.0, sur processeur (3 novembre) | 2,9 Go résidents, 9,5 Go alloués par le moteur ; le reste du modèle (18 Go d'experts) est relu en continu sur le SSD | Question courte (27 tokens) : réponse complète en 16,5 s. Question de résumé (environ 1 000 tokens de contexte) : pas de réponse après 14 min, 526 Go lus sur le disque, mesure arrêtée | Environ 1,8 (0,56 s par token, journal du moteur, question courte) | Non mesurée (mesure arrêtée) | **Non** sur 16 Go : le modèle doit tenir en mémoire. À réessayer sur une box d'au moins 32 Go. 4 novembre, assistant complet branché sur Colibri : question 1 de la démo sans premier mot après 15 min (430 Go lus sur le SSD) ; les refus (questions 3 et 3 bis), qui n'appellent pas le modèle, passent 2 fois sur 2 en moins de 6 s |
 | _à compléter_ | | | | | |
 
 | Mesure | Valeur | Méthode |

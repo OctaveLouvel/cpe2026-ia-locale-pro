@@ -556,7 +556,8 @@ cmd_moteur_ia() {
             [ -x "${COLIBRI_DIR:-}/c/coli" ] || echec "Colibri introuvable : renseigner COLIBRI_DIR dans .env"
             [ -d "${COLIBRI_MODELE:-}" ] || echec "modèle introuvable : renseigner COLIBRI_MODELE dans .env"
             info "Démarrage de Colibri sur $ip:$port (réseau interne seulement)"
-            nohup "$COLIBRI_DIR/c/coli" serve --model "$COLIBRI_MODELE" --host "$ip" --port "$port" --no-think \
+            # setsid : le lanceur et le moteur qu'il démarre forment un groupe, arrêté d'un coup.
+            setsid nohup "$COLIBRI_DIR/c/coli" serve --model "$COLIBRI_MODELE" --host "$ip" --port "$port" --no-think \
                 ${IA_MOTEUR_CLE:+--api-key "$IA_MOTEUR_CLE"} > "$SORTIE/ia/colibri.log" 2>&1 &
             echo $! > "$SORTIE/ia/colibri.pid"
             local essai
@@ -571,7 +572,7 @@ cmd_moteur_ia() {
             ok "Colibri prêt : http://$ip:$port/v1"
             ;;
         arreter)
-            [ -f "$SORTIE/ia/colibri.pid" ] && kill "$(cat "$SORTIE/ia/colibri.pid")" 2>/dev/null || true
+            [ -f "$SORTIE/ia/colibri.pid" ] && kill -TERM -- "-$(cat "$SORTIE/ia/colibri.pid")" 2>/dev/null || true
             rm -f "$SORTIE/ia/colibri.pid"
             journal moteur_ia "Colibri arrêté"
             ok "Colibri arrêté"

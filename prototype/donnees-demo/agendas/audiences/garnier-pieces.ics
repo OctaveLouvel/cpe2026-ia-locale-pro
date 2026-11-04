@@ -1,6 +1,6 @@
 BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+PRODID:-//asoterIA//Donnees de demonstration FICTIVES//FR
 CALSCALE:GREGORIAN
 BEGIN:VEVENT
 UID:garnier-pieces@corbiere-avocats.example

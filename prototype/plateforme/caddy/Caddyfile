@@ -10,9 +10,9 @@
 	}
 	pki {
 		ca local {
-			name "Box du cabinet"
-			root_cn "Box du cabinet - autorite racine locale"
-			intermediate_cn "Box du cabinet - autorite intermediaire"
+			name "asoterIA"
+			root_cn "asoterIA - autorite racine locale"
+			intermediate_cn "asoterIA - autorite intermediaire"
 		}
 	}
 }

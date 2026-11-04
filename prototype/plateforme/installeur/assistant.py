@@ -195,11 +195,11 @@ def page(numero, contenu, erreur=None):
     etapes = "".join(f'<li class="{"active" if i == numero else ""}">{i}. {html.escape(nom)}</li>'
                      for i, nom in enumerate(ETAPES, start=1))
     alerte = f'<div class="erreur">{html.escape(erreur)}</div>' if erreur else ""
-    nom = html.escape(lire_env().get("BOX_NOM", "Box du cabinet"))
+    nom = html.escape(lire_env().get("BOX_NOM", "asoterIA"))
     return f"""<!doctype html><html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>Installation - {nom}</title>
 <style>{STYLE}</style>{SUIVI}</head><body><main>
-<h1>Installation de la box</h1><p class="sous-titre">Quelques étapes, sans connexion à internet. Aucune donnée ne quitte cette machine.</p>
+<h1>Installation d'asoterIA</h1><p class="sous-titre">Quelques étapes, sans connexion à internet. Aucune donnée ne quitte cette machine.</p>
 <ol class="etapes">{etapes}</ol>{alerte}{contenu}</main></body></html>"""
 
 

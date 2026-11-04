@@ -8,11 +8,11 @@ Les parties entre crochets sont à remplacer. **Aucun chiffre sans source, aucun
 
 ---
 
-## [Nom du projet]
+## asoterIA
 
 **Équipe n°[numéro]** : [Prénom Nom, école], [Prénom Nom, école], [Prénom Nom, école], [Prénom Nom, école], [Prénom Nom, école]
 
-**En une phrase** : [Nom] installe dans les cabinets d'avocats une box clé en main qui leur donne un cloud privé et un assistant IA travaillant sur leurs dossiers, sans qu'aucune donnée ne quitte le cabinet.
+**En une phrase** : asoterIA installe dans les cabinets d'avocats une box clé en main qui leur donne un cloud privé et un assistant IA travaillant sur leurs dossiers, sans qu'aucune donnée ne quitte le cabinet.
 
 ### Le problème
 

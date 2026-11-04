@@ -1,4 +1,6 @@
-# IA locale et cloud privé pour cabinets d'avocats
+# asoterIA : IA locale et cloud privé pour cabinets d'avocats
+
+![Logo asoterIA](livrables/logo/asoteria-logo.png)
 
 Projet d'équipe pour le **Challenge Projets d'Entreprendre 2026 (27e édition, IMT Starter / IMT-BS / Télécom SudParis / ENSIIE)**, du lundi 2 au vendredi 6 novembre 2026, finale le lundi 9 novembre 2026.
 
@@ -6,7 +8,7 @@ Projet d'équipe pour le **Challenge Projets d'Entreprendre 2026 (27e édition, 
 
 Ce dépôt est la source de vérité du projet. Il est écrit pour être lu par les 5 membres de l'équipe **et par les agents IA** qu'ils utilisent. Un agent qui arrive sans contexte doit lire, dans l'ordre : ce README, puis [`AGENTS.md`](AGENTS.md), puis le document de `docs/` qui correspond à sa tâche.
 
-Nom commercial du projet : **à choisir** (voir [Décisions ouvertes](#8-décisions-ouvertes)). En attendant, on dit « le produit ».
+Nom commercial du projet : **asoterIA** (choisi le 4 novembre, voir [Décisions ouvertes](#8-décisions-ouvertes)). Logo et usage : [`livrables/logo/`](livrables/logo/).
 
 ---
 
@@ -204,7 +206,7 @@ Chaque piège ci-dessous a été identifié pendant l'analyse du projet. **Un ag
 
 | Décision | Responsable | Échéance | Critère |
 |---|---|---|---|
-| Nom du projet | BIZ | Mardi 3 nov, 18h00 | Court, disponible en nom de domaine, pas déjà pris par un concurrent |
+| Nom du projet | BIZ | Mardi 3 nov, 18h00 | Court, disponible en nom de domaine, pas déjà pris par un concurrent. **4 nov : « asoterIA » choisi**, logo fait sur Canva. À confirmer au point de 17h30. **Reste à vérifier** : nom de domaine libre, pas de marque déposée identique (base de l'INPI), pas de concurrent du même nom |
 | Numéro d'équipe et salle de coaching | Toute l'équipe | Immédiat | À reporter dans [`docs/attendus-challenge.md`](docs/attendus-challenge.md) |
 | Matériel de la démo | DEV-1 | Mardi 3 nov, 14h00 | Ce qui est disponible tout de suite et fait tourner un modèle local correct. **Proposition du 3 nov** : portable de DEV-1 (16 Go, sans GPU dédié), à remplacer par un mini-PC ou un portable avec GPU s'il y en a un d'ici mercredi midi. Détail dans [`docs/prototype.md`](docs/prototype.md), section 2. À confirmer au point de 17h30 |
 | Prix des offres | BIZ + DEV-4 | Mercredi 4 nov, 17h30 | Coût matériel réel + réponses des entretiens |
@@ -232,6 +234,7 @@ entretiens/
   modele-compte-rendu.md     Modèle de fiche d'entretien
   suivi.md                   Tableau de suivi des entretiens (données réelles uniquement)
 livrables/
+  logo/                      Logo asoterIA (PNG clair, sombre, icône), liens Canva
   executive-summary.md       Brouillon de l'executive summary (2 pages)
   plan-pitch.md              Déroulé des 15 minutes, qui parle quand
   questions-jury.md          Questions probables et éléments de réponse

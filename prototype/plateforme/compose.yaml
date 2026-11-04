@@ -200,7 +200,7 @@ services:
       TZ: Europe/Paris
     volumes:
       - ./sortie/ia:/donnees
-      - ./sortie/journal:/journal:ro
+      - ./sortie/journal:/journal
     networks: [interne]
     depends_on:
       nextcloud:
@@ -213,7 +213,7 @@ services:
       start_period: 1m
 
   # Tableau de bord de la box (DEV-3), page d'accueil https://<domaine> : état des services, sauvegardes,
-  # connexions sortantes, versions, journal d'audit (réservé aux associés). Bibliothèque standard de Python :
+  # connexions sortantes, versions, lien vers le journal d'audit de DEV-4. Bibliothèque standard de Python :
   # aucune image à construire. Il ne lit aucune donnée du cabinet, seulement les routes de santé et les journaux.
   tableau-de-bord:
     image: python:3.12-slim

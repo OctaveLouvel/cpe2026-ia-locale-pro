@@ -22,6 +22,20 @@ Puis ouvrir https://ia.cabinet.localhost et se connecter avec un compte du cabin
 
 Modèles par défaut (dans `.env`) : `IA_MODELE=qwen3:4b` pour la rédaction, `IA_MODELE_EMBEDDINGS=embeddinggemma-2:270m` pour la recherche par le sens. Le choix vient des mesures de la section « Mesures ».
 
+## Choisir et installer un modèle
+
+```bash
+./box.sh ia                       # menu : liste numérotée, taper le numéro du modèle voulu
+./box.sh ia liste                 # catalogue, mémoire estimée, installé ou actif
+./box.sh ia installer qwen3:4b    # téléchargement seul
+./box.sh ia activer qwen3:4b      # branche l'assistant sur ce modèle (une minute de rechargement)
+./box.sh ia supprimer qwen3:4b
+```
+
+Le catalogue est [`modeles.json`](modeles.json) : ajouter une ligne suffit pour proposer un autre modèle de la bibliothèque Ollama. Pour chaque modèle, le menu indique s'il tient dans la mémoire de la machine (estimation, à confirmer par une mesure).
+
+Tout reste conteneurisé : les modèles tournent dans `ia-moteur`, sur le réseau interne sans internet. Le téléchargement passe par un conteneur temporaire relié à internet, qui remplit le volume `box_ia_modeles` puis disparaît ; la connexion est inscrite au journal de la plateforme. Seul Colibri tourne hors conteneur (`./box.sh moteur-ia`), en écoute sur le réseau interne uniquement.
+
 ## Comment l'assistant respecte les droits
 
 L'assistant n'a **aucun compte privilégié**. Tout passe par les droits de la personne connectée :

@@ -636,6 +636,7 @@ Usage : ./box.sh <commande>
   tester-restauration  Restaure le dernier instantané dans un projet isolé et vérifie tout
   restaurer [id]       Reconstruit la box depuis un instantané (REMPLACE les données)
   verifier-hors-ligne  Liste de vérification de la démo, à lancer câble débranché
+  ia [commande]        Modèles d'IA : menu pour choisir, installer et activer (liste, installer, activer, supprimer)
   moteur-ia ACTION     demarrer | arreter | etat : moteur Colibri sur le réseau interne
   modeles-ia [modèle]  Option Ollama : télécharge des modèles (connexion sortante journalisée)
   indexer-ia           Prépare l'index de recherche de l'assistant pour la démo
@@ -662,6 +663,7 @@ case $commande in
     verifier-hors-ligne)  cmd_verifier_hors_ligne ;;
     modeles-ia)           cmd_modeles_ia "$@" ;;
     moteur-ia)            cmd_moteur_ia "$@" ;;
+    ia)                   charger_env; exec python3 "$ICI/../ia/gerer_modeles.py" "$@" ;;
     indexer-ia)           cmd_indexer_ia ;;
     assistant)            exec python3 "$ICI/installeur/assistant.py" "$@" ;;
     preparer-hors-ligne)  cmd_preparer_hors_ligne ;;

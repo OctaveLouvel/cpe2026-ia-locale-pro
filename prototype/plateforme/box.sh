@@ -9,7 +9,7 @@ cd "$ICI"
 SORTIE="$ICI/sortie"
 JOURNAL="$SORTIE/journal/evenements.jsonl"
 COMPOSE=(docker compose)
-CLES_SECRETES=(NC_ADMIN_PASSWORD NC_DB_PASSWORD CACHE_PASSWORD VW_ADMIN_TOKEN DEMO_MOT_DE_PASSE SAUVEGARDE_MOT_DE_PASSE)
+CLES_SECRETES=(NC_ADMIN_PASSWORD NC_DB_PASSWORD CACHE_PASSWORD VW_ADMIN_TOKEN DEMO_MOT_DE_PASSE SAUVEGARDE_MOT_DE_PASSE IA_MOTEUR_CLE)
 
 info()   { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
 ok()     { printf '\033[1;32m ok\033[0m %s\n' "$*"; }
@@ -433,7 +433,7 @@ cmd_verifier_hors_ligne() {
 
     info "2. Services"
     local service etat
-    for service in proxy nextcloud nextcloud-cron db cache coffre ia-moteur assistant; do
+    for service in proxy nextcloud nextcloud-cron db cache coffre assistant; do
         etat=$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
                "$("${COMPOSE[@]}" ps -q "$service" 2>/dev/null)" 2>/dev/null || echo absent)
         case $etat in healthy|running) reussi "$service : $etat" ;; *) rate "$service : $etat" ;; esac
@@ -542,6 +542,47 @@ cmd_modeles_ia() {
     ok "modèles prêts dans le volume box_ia_modeles"
 }
 
+# Moteur de rédaction Colibri, lancé directement sur la machine (il lit le modèle sur le SSD) mais
+# n'écoutant QUE sur l'adresse de l'hôte dans le réseau interne des conteneurs : l'assistant le joint,
+# le wifi et internet ne le voient pas, et les conteneurs restent sans accès à internet.
+cmd_moteur_ia() {
+    charger_env
+    local action=${1:-etat} ip port=5000
+    ip=$(docker network inspect box_interne -f '{{(index .IPAM.Config 0).Gateway}}' 2>/dev/null) \
+        || echec "réseau box_interne absent : lancer d'abord ./box.sh demarrer"
+    local cle=(); [ -n "${IA_MOTEUR_CLE:-}" ] && cle=(-H "Authorization: Bearer $IA_MOTEUR_CLE")
+    case $action in
+        demarrer)
+            [ -x "${COLIBRI_DIR:-}/c/coli" ] || echec "Colibri introuvable : renseigner COLIBRI_DIR dans .env"
+            [ -d "${COLIBRI_MODELE:-}" ] || echec "modèle introuvable : renseigner COLIBRI_MODELE dans .env"
+            info "Démarrage de Colibri sur $ip:$port (réseau interne seulement)"
+            nohup "$COLIBRI_DIR/c/coli" serve --model "$COLIBRI_MODELE" --host "$ip" --port "$port" --no-think \
+                ${IA_MOTEUR_CLE:+--api-key "$IA_MOTEUR_CLE"} > "$SORTIE/ia/colibri.log" 2>&1 &
+            echo $! > "$SORTIE/ia/colibri.pid"
+            local essai
+            for essai in $(seq 1 120); do
+                curl -fsS "${cle[@]}" "http://$ip:$port/v1/models" >/dev/null 2>&1 && break
+                sleep 2
+            done
+            curl -fsS "${cle[@]}" "http://$ip:$port/v1/models" >/dev/null 2>&1 || echec "Colibri ne répond pas (voir sortie/ia/colibri.log)"
+            sed -i "s|^IA_MOTEUR_URL=.*|IA_MOTEUR_URL=http://$ip:$port|" .env
+            grep -q "^IA_MOTEUR_URL=" .env || echo "IA_MOTEUR_URL=http://$ip:$port" >> .env
+            journal moteur_ia "Colibri démarré sur $ip:$port"
+            ok "Colibri prêt : http://$ip:$port/v1"
+            ;;
+        arreter)
+            [ -f "$SORTIE/ia/colibri.pid" ] && kill "$(cat "$SORTIE/ia/colibri.pid")" 2>/dev/null || true
+            rm -f "$SORTIE/ia/colibri.pid"
+            journal moteur_ia "Colibri arrêté"
+            ok "Colibri arrêté"
+            ;;
+        etat)
+            if curl -fsS "${cle[@]}" "http://$ip:$port/v1/models" 2>/dev/null; then echo; else echo "Colibri arrêté"; fi
+            ;;
+        *) echec "usage : ./box.sh moteur-ia demarrer|arreter|etat" ;;
+    esac
+}
+
 # Prépare l'index de recherche pour la démo, avec le compte de l'associée (qui voit tous les dossiers).
 cmd_indexer_ia() {
     charger_env
@@ -594,7 +635,8 @@ Usage : ./box.sh <commande>
   tester-restauration  Restaure le dernier instantané dans un projet isolé et vérifie tout
   restaurer [id]       Reconstruit la box depuis un instantané (REMPLACE les données)
   verifier-hors-ligne  Liste de vérification de la démo, à lancer câble débranché
-  modeles-ia [modèle]  Télécharge les modèles d'IA (atelier, connexion sortante journalisée)
+  moteur-ia ACTION     demarrer | arreter | etat : moteur Colibri sur le réseau interne
+  modeles-ia [modèle]  Option Ollama : télécharge des modèles (connexion sortante journalisée)
   indexer-ia           Prépare l'index de recherche de l'assistant pour la démo
   assistant [adresse]  Assistant web de première configuration (défaut 127.0.0.1:8090)
   preparer-hors-ligne  Exporte toutes les images dans sortie/images-box.tar (installation sans internet)
@@ -618,6 +660,7 @@ case $commande in
     restaurer)            cmd_restaurer "$@" ;;
     verifier-hors-ligne)  cmd_verifier_hors_ligne ;;
     modeles-ia)           cmd_modeles_ia "$@" ;;
+    moteur-ia)            cmd_moteur_ia "$@" ;;
     indexer-ia)           cmd_indexer_ia ;;
     assistant)            exec python3 "$ICI/installeur/assistant.py" "$@" ;;
     preparer-hors-ligne)  cmd_preparer_hors_ligne ;;

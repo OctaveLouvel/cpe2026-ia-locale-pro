@@ -141,8 +141,10 @@ services:
 
   # Moteur d'inférence local (DEV-2). Les modèles sont téléchargés une fois, en atelier,
   # par ./box.sh modeles-ia ; ensuite le moteur n'a plus aucun accès à internet.
+  # Optionnel (profil « ollama ») : la démo utilise Colibri, lancé par ./box.sh moteur-ia.
   ia-moteur:
     image: ollama/ollama:0.40.14
+    profiles: [ollama]
     restart: unless-stopped
     environment:
       OLLAMA_HOST: 0.0.0.0:11434
@@ -171,11 +173,11 @@ services:
       NC_URL: http://nextcloud
       # Moteur de rédaction : Ollama dans la box (choix de la démo), ou serveur compatible OpenAI (Colibri)
       # avec IA_MOTEUR=openai et IA_MOTEUR_URL. Voir prototype/ia/README.md.
-      IA_MOTEUR: ${IA_MOTEUR:-ollama}
-      IA_MOTEUR_URL: ${IA_MOTEUR_URL:-http://ia-moteur:11434}
+      IA_MOTEUR: ${IA_MOTEUR:-openai}
+      IA_MOTEUR_URL: ${IA_MOTEUR_URL:-http://172.23.0.1:5000}
       IA_MOTEUR_CLE: ${IA_MOTEUR_CLE:-}
-      IA_MODELE: ${IA_MODELE:-qwen3:4b}
-      IA_EMBEDDINGS_URL: ${IA_EMBEDDINGS_URL:-http://ia-moteur:11434}
+      IA_MODELE: ${IA_MODELE:-qwen3.6-colibri}
+      IA_EMBEDDINGS_URL: ${IA_EMBEDDINGS_URL:-}
       IA_MODELE_EMBEDDINGS: ${IA_MODELE_EMBEDDINGS:-embeddinggemma-2:270m}
       BOX_DOMAIN: ${BOX_DOMAIN:-cabinet.localhost}
       IA_DONNEES: /donnees
@@ -188,8 +190,6 @@ services:
     depends_on:
       nextcloud:
         condition: service_healthy
-      ia-moteur:
-        condition: service_started
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/etat', timeout=5)"]
       interval: 30s

@@ -129,6 +129,7 @@ cmd_installer() {
     attendre proxy 60
     attendre ia-moteur 300
     attendre assistant 300
+    attendre tableau-de-bord 120
     exporter_certificat
     journal installation "box installée : services de base et assistant IA"
     if [ "$demo" = oui ]; then
@@ -444,7 +445,7 @@ cmd_verifier_hors_ligne() {
 
     info "2. Services"
     local service etat
-    for service in proxy nextcloud nextcloud-cron db cache coffre ia-moteur ia-telechargeur assistant; do
+    for service in proxy nextcloud nextcloud-cron db cache coffre ia-moteur ia-telechargeur assistant tableau-de-bord; do
         etat=$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' \
                "$("${COMPOSE[@]}" ps -q "$service" 2>/dev/null)" 2>/dev/null || echo absent)
         case $etat in healthy|running) reussi "$service : $etat" ;; *) rate "$service : $etat" ;; esac
@@ -475,6 +476,12 @@ cmd_verifier_hors_ligne() {
                      "$("${COMPOSE[@]}" ps -q ia-moteur)" 2>/dev/null | xargs)
     [ "$reseaux_moteur" = box_interne ] && reussi "le moteur d'IA n'est relié qu'au réseau interne (pas d'internet)" \
                                         || rate "réseaux du moteur d'IA : ${reseaux_moteur:-inconnu}"
+    if "${COMPOSE[@]}" exec -T assistant python -c \
+         "import urllib.request; urllib.request.urlopen('http://coffre/alive', timeout=3)" >/dev/null 2>&1; then
+        rate "l'assistant IA arrive à joindre le coffre-fort"
+    else
+        reussi "l'assistant IA ne peut pas joindre le coffre-fort (réseau séparé)"
+    fi
     if "${COMPOSE[@]}" exec -T nextcloud curl -sS --max-time 5 -o /dev/null https://www.example.com 2>/dev/null; then
         rate "Nextcloud arrive à joindre internet"
     else
@@ -525,8 +532,8 @@ cmd_verifier_hors_ligne() {
     fi
 
     echo
-    echo "  Restent à vérifier à la main : les 3 questions de démo (DEV-2), le tableau de bord (DEV-3),"
-    echo "  le journal d'audit dans le tableau de bord (DEV-4), l'écran et l'adaptateur de la salle."
+    echo "  Restent à vérifier à la main : les 3 questions de démo (DEV-2), le journal d'audit dans le tableau"
+    echo "  de bord (connexion associée), l'écran et l'adaptateur de la salle."
     journal verification_hors_ligne "$echecs échec(s), $alertes alerte(s)" "$([ "$echecs" -eq 0 ] && echo ok || echo echec)"
     if [ "$echecs" -eq 0 ]; then
         ok "vérification terminée : 0 échec, $alertes alerte(s)"

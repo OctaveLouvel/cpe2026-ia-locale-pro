@@ -23,6 +23,7 @@ from .reponse import Session, repondre
 
 INTERFACE = (Path(__file__).parent / "interface.html").read_bytes()
 PAGE_MODELES = (Path(__file__).parent / "modeles.html").read_bytes()
+PAGE_JOURNAL = (Path(__file__).parent / "journal.html").read_bytes()
 DUREE_SESSION = 8 * 3600
 TAILLE_MAX = 64 * 1024
 POLITIQUE = ("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; "
@@ -131,8 +132,9 @@ class Gestionnaire(BaseHTTPRequestHandler):
 
     def do_GET(self):
         chemin = urllib.parse.urlsplit(self.path).path
-        if chemin in ("/", "/index.html", "/modeles"):
-            return self._repondre(PAGE_MODELES if chemin == "/modeles" else INTERFACE,
+        if chemin in ("/", "/index.html", "/modeles", "/journal"):
+            page = {"/modeles": PAGE_MODELES, "/journal": PAGE_JOURNAL}.get(chemin, INTERFACE)
+            return self._repondre(page,
                                   type_contenu="text/html; charset=utf-8",
                                   entetes={"Content-Security-Policy": POLITIQUE, "Referrer-Policy": "no-referrer"})
         if chemin == "/api/etat":
@@ -148,6 +150,10 @@ class Gestionnaire(BaseHTTPRequestHandler):
             return self._repondre({"erreur": "Connexion nécessaire."}, 401)
         if chemin == "/api/journal":
             return self._repondre(journal.lire(session.login))
+        if chemin == "/api/journal/tout":
+            if not session.admin:
+                return self._repondre({"erreur": "Réservé aux administrateurs du cabinet."}, 403)
+            return self._repondre(journal.lire_tout())
         if chemin == "/api/modeles":
             if not session.admin:
                 return self._repondre({"erreur": "Réservé aux administrateurs du cabinet."}, 403)

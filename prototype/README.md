@@ -1,5 +1,7 @@
 # Code de la démo
 
+**Pour lancer la box en une commande : [`DEMARRAGE.md`](DEMARRAGE.md).**
+
 La spécification complète est dans [`docs/prototype.md`](../docs/prototype.md). À lire avant d'écrire du code.
 
 ## Organisation proposée

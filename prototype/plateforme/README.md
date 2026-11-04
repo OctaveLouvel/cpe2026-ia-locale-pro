@@ -13,6 +13,8 @@ Les services de base de la box, installés et vérifiés par un seul script : `.
 
 ## Démarrage rapide
 
+Guide pas à pas pour toute l'équipe, avec le choix du modèle d'IA et les problèmes courants : [`../DEMARRAGE.md`](../DEMARRAGE.md).
+
 Prérequis : Linux, Docker Engine 25 ou plus avec le greffon `docker compose`, ports 80 et 443 libres, `openssl`, `python3` (pour l'assistant d'installation), environ 1 Go de mémoire libre pour ces services (sans l'IA). Connexion internet nécessaire **une seule fois**, pour télécharger les images.
 
 ```bash

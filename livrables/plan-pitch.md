@@ -30,7 +30,7 @@ Chaque personne parle environ 3 minutes. Ajuster si quelqu'un est plus à l'aise
 
 ## Slides à produire (une par ligne)
 
-1. Titre : nom du projet, phrase de promesse, équipe.
+1. Titre : logo asoterIA ([`logo/`](logo/)), phrase de promesse, équipe.
 2. Le problème (situation réelle + chiffre sourcé).
 3. Preuves : entretiens et marques d'intérêt.
 4. Marché : TAM / SAM / SOM, persona.

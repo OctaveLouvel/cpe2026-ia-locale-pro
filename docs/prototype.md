@@ -134,8 +134,8 @@ Mesures de DEV-2 sur le portable de démo (section 2), applications fermées, av
 
 | Mesure | Valeur | Méthode |
 |---|---|---|
-| Consommation au repos (W) | _à mesurer_ | Wattmètre, 5 minutes |
-| Consommation en charge (W) | _à mesurer_ | Wattmètre, pendant 5 questions à l'assistant |
+| Consommation au repos (W) | 7,0 W en moyenne (min. 5,8, max. 10,0), le 4 novembre, portable de démo entier écran compris. **À refaire au wattmètre sur la box réelle** | Batterie du portable (courant × tension), 120 s, [`prototype/securite/mesurer_consommation.sh`](../prototype/securite/mesurer_consommation.sh). Détails et limites : [`rse.md`](rse.md) |
+| Consommation en charge (W) | 14,5 W en moyenne (min. 11,5, max. 16,9), mêmes conditions, assistant sur Colibri (probablement sous-estimée : le moteur attend le SSD) | Idem |
 | Temps de réponse des 3 questions de démo | _à mesurer_ | Chronomètre, 3 essais chacune |
 | Durée d'une restauration de sauvegarde | 39 à 40 s (deux essais), mesurées le 3 novembre sur le portable de développement, jeu de démo, dossier local à la place du disque USB. **À refaire sur le matériel de démo avec le disque externe** | Restauration réelle et vérifiée : `./box.sh tester-restauration` |
 | Durée d'une sauvegarde | 5 à 8 s, mêmes conditions | `./box.sh sauvegarder` |
@@ -177,14 +177,29 @@ Vérification de chaque essai : [`prototype/ia/evaluation/evaluer_demo.py`](../p
 
 ## 7. Roadmap technique et RH (slide « Solution »)
 
-Ébauche à affiner par DEV-4 le mercredi. Les durées sont des **HYPOTHÈSES** à justifier.
+Affinée par DEV-4 le 4 novembre. Toutes les durées sont des **HYPOTHÈSES** : elles partent de ce que l'équipe a construit cette semaine (section « Point de départ ») et de la liste de ce qui manque ([`securite.md`](securite.md), section 6).
 
-| Phase | Contenu | Durée | Équipe |
-|---|---|---|---|
-| MVP pilote | Stabilisation de la démo, installeur complet, mises à jour à distance sûres, 5 à 10 cabinets pilotes | 3 à 4 mois | 2 développeurs + 1 personne pour les installations |
-| V1 commerciale | Supervision, sauvegarde hors site, documentation, procédures de support | 6 mois | 3 développeurs + 1 support |
-| Intégrations cabinet d'avocats | Connexion aux logiciels de gestion de cabinet les plus utilisés | 4 mois | 1 à 2 développeurs |
-| Industrialisation | Préparation des box en série, gestion du parc, mises à jour en masse | En continu | 1 développeur + 1 logistique |
+**Point de départ, mesuré** : en 3 jours, 4 développeurs ont produit une box qui s'installe en une commande (207 s sur le portable de démo, à partir de zéro), fonctionne câble débranché, sauvegarde et restaure (39 à 40 s), et un assistant qui respecte les droits et cite ses sources. Ce qui manque est surtout ce qui rend la box **sûre à laisser chez un client** : chiffrement du disque testé, sauvegarde hors site, pare-feu des sorties, mises à jour, accès de support.
+
+| Phase | Contenu | Durée (HYPOTHÈSE) | Équipe (HYPOTHÈSE) | Raisonnement |
+|---|---|---|---|---|
+| MVP pilote | Disque chiffré testé sur le mini-PC retenu, sauvegarde hors site chiffrée, pare-feu des sorties, mises à jour sûres et journalisées, double authentification, installation sur place en une demi-journée ; 5 à 10 cabinets pilotes | 3 à 4 mois | 2 développeurs + 1 personne pour les installations | Chaque brique existe (LUKS, restic, nftables, WireGuard) : le travail est l'intégration et surtout les tests sur matériel réel, puis le retour des pilotes |
+| V1 commerciale | Supervision du parc (sans voir les données), accès de support WireGuard activé par le client, procédures de support, documentation, contrat de sous-traitance RGPD | 6 mois | 3 développeurs + 1 support | La supervision et le support à distance touchent à la confiance : à faire relire par un tiers (audit de sécurité) avant de vendre largement |
+| Qualité de l'IA | Évaluation continue sur des questions juridiques réelles fournies par les pilotes (anonymisées), modèles plus gros sur box avec plus de mémoire, pack métier (LEGI, jurisprudence) | En parallèle de la V1 | 1 développeur IA | Les mesures de cette semaine montrent que la mémoire de la box décide du modèle possible (section 5) |
+| Intégrations cabinet d'avocats | Connexion aux logiciels de gestion de cabinet les plus utilisés | 4 mois | 1 à 2 développeurs | Dépend des interfaces ouvertes par les éditeurs : à vérifier éditeur par éditeur |
+| Industrialisation | Préparation des box en série (image disque), gestion du parc, mises à jour en masse | En continu | 1 développeur + 1 logistique | L'installeur actuel (une commande) est la base de l'image |
+
+**Coûts techniques à porter au modèle financier** (structure seulement : aucune valeur n'est sourcée pour l'instant, **ne pas inventer de prix**).
+
+| Poste | Unité | Comment l'obtenir |
+|---|---|---|
+| Mini-PC de la box (mémoire selon le modèle d'IA visé, voir section 5) | Par box | Devis de 2 fournisseurs, prix relevé avec la date dans [`sources.md`](sources.md) |
+| Disque externe de sauvegarde | Par box | Idem |
+| Stockage hors site des sauvegardes chiffrées | Par box et par mois, selon le volume | Grille tarifaire publique d'un hébergeur européen, relevée avec la date |
+| Électricité de la box (payée par le cabinet, à citer dans la RSE) | Par box et par an | kWh par an mesurés ([`rse.md`](rse.md)) × prix du kWh (à sourcer) |
+| Installation sur place | Heures par cabinet | Mesurer sur le premier pilote |
+| Support et mises à jour | Heures par box et par mois | HYPOTHÈSE à confronter aux pilotes |
+| Audit de sécurité externe | Par audit | Devis |
 
 Enjeux de R&D à citer : qualité des réponses en français sur des documents juridiques, limitation des réponses inventées, respect des droits d'accès dans la recherche, mises à jour sûres d'un parc de box hors ligne, performance sur du matériel abordable.
 
@@ -193,7 +208,7 @@ Enjeux de R&D à citer : qualité des réponses en français sur des documents j
 | Risque | Réponse |
 |---|---|
 | L'IA invente une réponse | Citations obligatoires, réponse « je ne trouve pas » quand rien n'est pertinent, avertissement dans l'interface |
-| Box volée | Disque chiffré, sauvegarde hors site chiffrée, remplacement et restauration |
+| Box volée | Disque chiffré, sauvegarde hors site chiffrée, remplacement et restauration (modèle de menace complet : [`securite.md`](securite.md)) |
 | Box en panne | Remplacement sous un délai contractuel et restauration depuis la sauvegarde (**délai à définir**) |
 | Faille de sécurité dans une brique | Veille sur les vulnérabilités, mises à jour poussées par nous avec l'accord du client, journalisées |
 | Matériel insuffisant pour l'IA | Offres dimensionnées par taille de cabinet, mesures publiées |

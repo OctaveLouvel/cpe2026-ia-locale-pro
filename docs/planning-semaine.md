@@ -51,10 +51,10 @@ Règles valables tous les jours :
 - [ ] Maquette du tableau de bord unifié (papier ou outil de maquette), validée par l'équipe au point de 17h30.
 
 **DEV-4**
-- [ ] Modèle de menace d'une page : qui attaque, quoi, comment on protège (vol de la box, ransomware, fuite par l'IA, accès distant abusé, erreur de manipulation).
-- [ ] Plan de chiffrement : disque, communications, sauvegardes. Plan de journal d'audit.
+- [x] Modèle de menace d'une page : qui attaque, quoi, comment on protège (vol de la box, ransomware, fuite par l'IA, accès distant abusé, erreur de manipulation).
+- [x] Plan de chiffrement : disque, communications, sauvegardes. Plan de journal d'audit.
 - [ ] Trouver un **wattmètre** (fablab, labo de l'école, prêt) pour mesurer la box mercredi.
-- [ ] Commencer la roadmap technique avec temps de développement et RH (pour la slide « Solution »).
+- [x] Commencer la roadmap technique avec temps de développement et RH (pour la slide « Solution »).
 
 ### 17h30 : point d'équipe
 
@@ -106,9 +106,9 @@ Règles valables tous les jours :
 - [ ] Modèle de slides commun à l'équipe, captures d'écran de la démo.
 
 **DEV-4**
-- [ ] Chiffrement en place, journal d'audit des connexions sortantes visible dans le tableau de bord.
-- [ ] **Mesure au wattmètre** : au repos, en charge (IA qui répond). Calcul en kWh par an dans [`rse.md`](rse.md).
-- [ ] Slide roadmap technique + RH. Liste des licences des briques utilisées.
+- [ ] Chiffrement en place (disque : non, voir [`securite.md`](securite.md)), journal d'audit des connexions sortantes visible dans le tableau de bord.
+- [ ] **Mesure au wattmètre** : au repos, en charge (IA qui répond). Calcul en kWh par an dans [`rse.md`](rse.md). Faite le 4 novembre par la batterie du portable, faute de wattmètre : à refaire au wattmètre.
+- [x] Slide roadmap technique + RH. Liste des licences des briques utilisées.
 - [ ] Coûts techno pour le modèle financier : matériel, hébergement des sauvegardes hors site, temps de support.
 
 ### 17h30 : point d'équipe

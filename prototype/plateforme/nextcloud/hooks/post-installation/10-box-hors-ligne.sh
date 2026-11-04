@@ -62,7 +62,7 @@ occ config:app:set core shareapi_allow_links --value=no
 essayer config:app:set core shareapi_allow_resharing --value=no
 
 echo "[box] Apparence"
-essayer theming:config name "${BOX_NOM:-Box du cabinet}"
+essayer theming:config name "${BOX_NOM:-asoterIA}"
 essayer theming:config slogan "Vos dossiers restent au cabinet"
 essayer theming:config url "https://${BOX_DOMAIN:-cabinet.localhost}"
 essayer theming:config color "#1d3557"

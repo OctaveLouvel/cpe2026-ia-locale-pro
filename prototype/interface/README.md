@@ -48,6 +48,6 @@ Testé le 4 novembre en local : adresse invalide refusée, case non cochée refu
 **Avant de publier** (le serveur affiche un avertissement tant que ce n'est pas fait) :
 
 1. **BIZ** relit et valide le texte de la page : c'est un texte provisoire de DEV-3, tiré du README (problème, solution). Il ne contient ni prix, ni client, ni avis, ni chiffre, et dit clairement que le produit n'est pas encore commercialisé.
-2. Remplacer `[Nom du projet]` et `[adresse de contact]` dans les deux pages, et `[hébergeur et pays d'hébergement]` dans `confidentialite.html`.
+2. Remplacer `[adresse de contact]` dans les deux pages (le nom asoterIA est déjà en place), et `[hébergeur et pays d'hébergement]` dans `confidentialite.html`.
 3. Valider en équipe la durée de conservation écrite dans la mention (fin du projet, au plus 12 mois après l'inscription).
 4. Choisir l'hébergement (décision d'équipe, voir README section 8) : par exemple une petite VM avec Caddy devant `serveur.py`. Le serveur doit garder les inscriptions sur disque : un hébergement de pages statiques seules ne suffit pas.

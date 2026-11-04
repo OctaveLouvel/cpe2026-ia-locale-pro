@@ -24,7 +24,7 @@ x-nextcloud-env: &nextcloud-env
   PHP_MEMORY_LIMIT: 1G
   PHP_UPLOAD_LIMIT: 4G
   BOX_DOMAIN: ${BOX_DOMAIN:-cabinet.localhost}
-  BOX_NOM: ${BOX_NOM:-Box du cabinet}
+  BOX_NOM: ${BOX_NOM:-asoterIA}
   TZ: Europe/Paris
 
 x-nextcloud-volumes: &nextcloud-volumes

@@ -2,7 +2,7 @@
 
 Chaque chiffre factuel utilisé dans le dépôt ou dans les livrables doit renvoyer à une ligne de ce fichier. Ajouter la source **en même temps** que le chiffre. Indiquer la date de consultation.
 
-Les références [S1] à [S24] ont été consultées le 3 novembre 2026. **Les sources secondaires** (sites d'entreprises privées, agrégateurs) sont signalées : pour les slides, remonter si possible à la source primaire.
+Les références [S1] à [S24] ont été consultées le 3 novembre 2026, [S25] le 4 novembre 2026. **Les sources secondaires** (sites d'entreprises privées, agrégateurs) sont signalées : pour les slides, remonter si possible à la source primaire.
 
 | Réf. | Ce qu'elle appuie | Source | Type |
 |---|---|---|---|
@@ -31,6 +31,7 @@ Les références [S1] à [S24] ont été consultées le 3 novembre 2026. **Les s
 | S22 | Licences des briques de la plateforme : Nextcloud, Agenda, Contacts et Vaultwarden en AGPL-3.0, coffre web Bitwarden (bw_web_builds) en GPL-3.0, Caddy en Apache-2.0, Valkey en BSD-3-Clause, restic en BSD-2-Clause, PostgreSQL sous licence PostgreSQL | Dépôts officiels, champ « license » de l'API GitHub (nextcloud/server, nextcloud/calendar, nextcloud/contacts, dani-garcia/vaultwarden, dani-garcia/bw_web_builds, caddyserver/caddy, valkey-io/valkey, restic/restic) ; [licence PostgreSQL](https://www.postgresql.org/about/licence/) | Primaire (consulté le 3 novembre 2026) |
 | S23 | Base LEGI de la DILA : codes, lois et règlements consolidés, licence ouverte Etalab, XML, archive complète de 1,17 Go (13 juillet 2025) et archives quotidiennes | [data.gouv.fr, LEGI](https://www.data.gouv.fr/fr/datasets/legi-codes-lois-et-reglements-consolides/) ; [répertoire de la DILA](https://echanges.dila.gouv.fr/OPENDATA/LEGI/) (taille lue dans l'en-tête HTTP de l'archive) | Primaire (consulté le 3 novembre 2026) |
 | S24 | Jurisprudence pseudonymisée de la Cour de cassation depuis septembre 2018, licence ouverte 2.0 | [data.gouv.fr](https://www.data.gouv.fr/datasets/jurisprudence-pseudonymisee-de-la-cour-de-cassation-debut-septembre-2018) | Primaire (consulté le 3 novembre 2026) |
+| S25 | Licences des briques de l'IA : Ollama en MIT, Colibri en Apache-2.0, pypdf en BSD-3-Clause, python-docx en MIT, numpy en BSD-3-Clause (avec des parties MIT, Zlib, 0BSD, CC0-1.0), modèles Qwen3-4B et Qwen3.6-35B-A3B en Apache-2.0 | Dépôts officiels des projets, métadonnées PyPI des bibliothèques Python, fiches des modèles sur Hugging Face | Primaire (consulté le 4 novembre 2026) |
 
 ## À sourcer (manquant)
 
@@ -42,5 +43,5 @@ Les références [S1] à [S24] ont été consultées le 3 novembre 2026. **Les s
 - Concurrents indirects : services d'IA en ligne pour avocats, notamment hébergés en Europe.
 - Facteur d'émission de l'électricité en France (Base Empreinte de l'ADEME).
 - Aides et prêts publics pour créateurs de start-up innovantes.
-- Licences exactes des briques de l'IA et du tableau de bord (celles de la plateforme sont en S22).
+- Licences des briques du tableau de bord et des autres modèles du catalogue de l'assistant (plateforme : S22, IA : S25).
 - Format et taille du jeu de jurisprudence de la Cour de cassation (licence vérifiée : S24).

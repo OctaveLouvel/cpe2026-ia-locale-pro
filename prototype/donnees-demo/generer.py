@@ -29,7 +29,7 @@ ICI = pathlib.Path(__file__).resolve().parent
 PARIS = ZoneInfo("Europe/Paris")
 CABINET = json.loads((ICI / "cabinet.json").read_text(encoding="utf-8"))
 DOMAINE_UID = "corbiere-avocats.example"
-PRODID = "-//Box du cabinet//Donnees de demonstration FICTIVES//FR"
+PRODID = "-//asoterIA//Donnees de demonstration FICTIVES//FR"
 DTSTAMP = "20261101T090000Z"  # fixe : la génération est reproductible
 
 AVERTISSEMENT_DOCX = (

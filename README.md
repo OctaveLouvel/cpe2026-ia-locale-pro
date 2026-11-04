@@ -1,6 +1,6 @@
 # asoterIA : IA locale et cloud privé pour cabinets d'avocats
 
-![Logo asoterIA](livrables/logo/asoteria-logo.png)
+<img src="livrables/logo/asoteria-logo.svg" alt="Logo asoterIA" width="360">
 
 Projet d'équipe pour le **Challenge Projets d'Entreprendre 2026 (27e édition, IMT Starter / IMT-BS / Télécom SudParis / ENSIIE)**, du lundi 2 au vendredi 6 novembre 2026, finale le lundi 9 novembre 2026.
 
@@ -206,7 +206,7 @@ Chaque piège ci-dessous a été identifié pendant l'analyse du projet. **Un ag
 
 | Décision | Responsable | Échéance | Critère |
 |---|---|---|---|
-| Nom du projet | BIZ | Mardi 3 nov, 18h00 | Court, disponible en nom de domaine, pas déjà pris par un concurrent. **4 nov : « asoterIA » choisi**, logo fait sur Canva. À confirmer au point de 17h30. **Reste à vérifier** : nom de domaine libre, pas de marque déposée identique (base de l'INPI), pas de concurrent du même nom |
+| Nom du projet | BIZ | Mardi 3 nov, 18h00 | Court, disponible en nom de domaine, pas déjà pris par un concurrent. **4 nov : « asoterIA » choisi**, logo dessiné par l'équipe (cube et réseau de neurones). À confirmer au point de 17h30. **Reste à vérifier** : nom de domaine libre, pas de marque déposée identique (base de l'INPI), pas de concurrent du même nom |
 | Numéro d'équipe et salle de coaching | Toute l'équipe | Immédiat | À reporter dans [`docs/attendus-challenge.md`](docs/attendus-challenge.md) |
 | Matériel de la démo | DEV-1 | Mardi 3 nov, 14h00 | Ce qui est disponible tout de suite et fait tourner un modèle local correct. **Proposition du 3 nov** : portable de DEV-1 (16 Go, sans GPU dédié), à remplacer par un mini-PC ou un portable avec GPU s'il y en a un d'ici mercredi midi. Détail dans [`docs/prototype.md`](docs/prototype.md), section 2. À confirmer au point de 17h30 |
 | Prix des offres | BIZ + DEV-4 | Mercredi 4 nov, 17h30 | Coût matériel réel + réponses des entretiens |
@@ -236,7 +236,7 @@ entretiens/
   modele-compte-rendu.md     Modèle de fiche d'entretien
   suivi.md                   Tableau de suivi des entretiens (données réelles uniquement)
 livrables/
-  logo/                      Logo asoterIA (PNG clair, sombre, icône), liens Canva
+  logo/                      Logo asoterIA (SVG et PNG, clair, sombre, icône) et son script
   executive-summary.md       Mode d'emploi et vérifications avant dépôt
   executive-summary.html     Texte de l'executive summary (source du PDF)
   executive-summary.pdf      PDF de 2 pages déposé sur Moodle

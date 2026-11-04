@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Box du cabinet</title>
+<!-- Tableau de bord de la box (DEV-3). Aucune ressource externe (polices, icônes et scripts sont dans ce
+     fichier) : il s'affiche câble débranché. Les textes venus des journaux sont insérés avec textContent.
+     Le journal d'audit détaillé est la page de DEV-4 : https://ia.<domaine>/journal. -->
+<style>
+:root{
+  --fond:#f3f5f8;--carte:#ffffff;--texte:#17202c;--doux:#5b6675;--bord:#dde2e9;
+  --accent:#1d3557;--accent-doux:#e8eef6;--ok:#1e7a46;--ok-fond:#e5f4ec;--ko:#b23a48;--ko-fond:#fbe9ec;--attente:#9a6700;--attente-fond:#fff4d6;
+  --ombre:0 1px 2px rgba(16,24,40,.06),0 4px 16px rgba(16,24,40,.06);
+}
+@media (prefers-color-scheme:dark){:root{
+  --fond:#0f141b;--carte:#18202a;--texte:#e7ebf0;--doux:#9aa5b4;--bord:#2a3441;
+  --accent:#8fb3e8;--accent-doux:#1f2b3a;--ok:#5cc28a;--ok-fond:#163126;--ko:#ef8a96;--ko-fond:#3a1c22;--attente:#e3b341;--attente-fond:#3a3120;
+  --ombre:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+}}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--fond);color:var(--texte);line-height:1.5}
+a{color:inherit}
+.haut{background:var(--accent);color:#fff}
+@media (prefers-color-scheme:dark){.haut{background:#16243a}}
+.haut .cadre{max-width:1080px;margin:0 auto;padding:28px 16px 64px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start}
+.marque{display:flex;gap:14px;align-items:center}
+.logo{width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.14);display:grid;place-items:center}
+.marque h1{margin:0;font-size:1.45rem;letter-spacing:-.01em}
+.marque p{margin:2px 0 0;opacity:.85;font-size:.95rem}
+.horloge{text-align:right;font-size:.9rem;opacity:.9}
+.horloge strong{display:block;font-size:1.6rem;font-weight:600;letter-spacing:.02em}
+main{max-width:1080px;margin:-40px auto 0;padding:0 16px 48px}
+.bandeau{background:var(--carte);border:1px solid var(--bord);border-radius:14px;box-shadow:var(--ombre);padding:14px 18px;display:flex;gap:10px 24px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.bandeau .titre{font-weight:600;margin-right:auto}
+.pastille{display:inline-flex;align-items:center;gap:7px;font-size:.88rem;padding:4px 11px;border-radius:999px;background:var(--attente-fond);color:var(--attente)}
+.pastille::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.pastille.ok{background:var(--ok-fond);color:var(--ok)}
+.pastille.ko{background:var(--ko-fond);color:var(--ko)}
+h2{font-size:1.05rem;margin:28px 0 12px;color:var(--doux);font-weight:600}
+.chiffres{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
+.chiffre{background:var(--carte);border:1px solid var(--bord);border-left:5px solid var(--attente);border-radius:14px;box-shadow:var(--ombre);padding:16px 18px}
+.chiffre.ok{border-left-color:var(--ok)} .chiffre.ko{border-left-color:var(--ko)}
+.chiffre .nom{font-size:.85rem;color:var(--doux);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.chiffre .valeur{font-size:1.5rem;font-weight:650;margin:2px 0;letter-spacing:-.01em}
+.chiffre .sous{font-size:.88rem;color:var(--doux)}
+.grille{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr))}
+.service,.carte{background:var(--carte);border:1px solid var(--bord);border-radius:14px;box-shadow:var(--ombre);padding:20px;display:flex;flex-direction:column;gap:12px}
+.service{transition:border-color .15s,transform .15s}
+.service:hover{border-color:var(--accent);transform:translateY(-2px)}
+.service .tete{display:flex;gap:14px;align-items:center}
+.icone{width:44px;height:44px;border-radius:11px;background:var(--accent-doux);color:var(--accent);display:grid;place-items:center;flex:none}
+.service h3,.carte h3{margin:0;font-size:1.08rem}
+.service .etat{font-size:.82rem;color:var(--doux)}
+.service p,.carte p{margin:0;color:var(--doux);font-size:.93rem}
+.service p{flex:1}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.bouton{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-weight:600;font-size:.9rem;padding:8px 14px;border-radius:9px;background:var(--accent);color:var(--carte)}
+@media (prefers-color-scheme:dark){.bouton{color:#0f141b}}
+.bouton.second{background:var(--accent-doux);color:var(--accent)}
+.liste{margin:0;padding:0;list-style:none;font-size:.92rem}
+.liste li{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-top:1px solid var(--bord)}
+.liste li:first-child{border-top:0}
+.liste .v{color:var(--doux);font-variant-numeric:tabular-nums;text-align:right}
+@media (prefers-color-scheme:dark){.garanties{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.garantie{background:var(--carte);border:1px solid var(--bord);border-radius:12px;padding:14px 16px;font-size:.9rem;color:var(--doux)}
+.garantie strong{display:block;color:var(--texte);margin-bottom:2px}
+footer{max-width:1080px;margin:0 auto;padding:0 16px 32px;color:var(--doux);font-size:.85rem}
+footer a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header class="haut"><div class="cadre">
+  <div class="marque">
+    <div class="logo" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 4l9 5.5v9L12 20l-9-5.5z"/><path d="M12 20v-9.5M3 9.5l9 5 9-5"/></svg></div>
+    <div><h1>Box du cabinet</h1><p>Vos dossiers restent au cabinet. Tout fonctionne sans internet.</p></div>
+  </div>
+  <div class="horloge"><strong id="heure">--:--</strong><span id="date"></span></div>
+</div></header>
+
+<main>
+  <div class="bandeau">
+    <span class="titre">État de la box</span>
+    <span id="pastilles"><span class="pastille">Lecture de l'état…</span></span>
+  </div>
+
+  <div class="chiffres">
+    <div class="chiffre" id="c-sorties"><div class="nom">Connexions sortantes</div><div class="valeur">…</div><div class="sous"></div></div>
+    <div class="chiffre" id="c-sauvegarde"><div class="nom">Dernière sauvegarde</div><div class="valeur">…</div><div class="sous"></div></div>
+    <div class="chiffre" id="c-verification"><div class="nom">Vérification hors ligne</div><div class="valeur">…</div><div class="sous"></div></div>
+  </div>
+
+  <h2>Services</h2>
+  <div class="grille">
+    <section class="service">
+      <div class="tete"><div class="icone" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+        <div><h3>Dossiers clients</h3><div class="etat" data-detail="cloud">Fichiers partagés du cabinet</div></div></div>
+      <p>Les documents de chaque dossier, accessibles selon les droits de chacun, avec l'historique des versions.</p>
+      <div class="actions"><a class="bouton" data-service="cloud" data-chemin="/apps/files/">Ouvrir les fichiers</a></div>
+    </section>
+
+    <section class="service">
+      <div class="tete"><div class="icone" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg></div>
+        <div><h3>Agenda et contacts</h3><div class="etat">Audiences, échéances, carnet du cabinet</div></div></div>
+      <p>L'agenda partagé des audiences et les agendas de chacun ; les contacts des clients, confrères et experts.</p>
+      <div class="actions"><a class="bouton" data-service="cloud" data-chemin="/apps/calendar/">Agenda</a><a class="bouton second" data-service="cloud" data-chemin="/apps/contacts/">Contacts</a></div>
+    </section>
+
+    <section class="service">
+      <div class="tete"><div class="icone" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.7L18.5 9l-4.7 1.8L12 15.5l-1.8-4.7L5.5 9l4.7-1.3z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg></div>
+        <div><h3>Assistant IA</h3><div class="etat" data-detail="assistant">Recherche dans vos dossiers</div></div></div>
+      <p>Posez une question sur un dossier : la réponse cite ses sources, à la page près. Il ne voit que ce que vous avez le droit de voir.</p>
+      <div class="actions"><a class="bouton" data-service="ia" data-chemin="/">Poser une question</a><a class="bouton second" data-service="ia" data-chemin="/modeles">Choisir le modèle</a></div>
+    </section>
+
+    <section class="service">
+      <div class="tete"><div class="icone" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.5" r="1.2"/></svg></div>
+        <div><h3>Coffre-fort</h3><div class="etat">Mots de passe du cabinet</div></div></div>
+      <p>RPVA, banque, CARPA, messagerie : chiffrés dans votre navigateur. L'assistant IA n'y a jamais accès.</p>
+      <div class="actions"><a class="bouton" data-service="coffre" data-chemin="/">Ouvrir le coffre-fort</a></div>
+    </section>
+  </div>
+
+  <h2>Sauvegardes et mises à jour</h2>
+  <div class="grille">
+    <section class="carte">
+      <h3>Sauvegardes chiffrées</h3>
+      <p>Copie chiffrée chaque nuit sur le disque externe, illisible sans la phrase de passe de la fiche de secours.</p>
+      <ul class="liste" id="sauvegardes"></ul>
+    </section>
+    <section class="carte">
+      <h3>Mises à jour</h3>
+      <p>La box ne cherche pas de mises à jour seule : elle n'a pas accès à internet. Nous les appliquons pendant une fenêtre de maintenance, avec votre accord, et chaque connexion est inscrite au journal.</p>
+      <ul class="liste" id="versions"></ul>
+    </section>
+  </div>
+
+  <h2>Contrôle</h2>
+  <div class="grille">
+    <section class="service">
+      <div class="tete"><div class="icone" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg></div>
+        <div><h3>Journal d'audit</h3><div class="etat">Réservé aux administrateurs</div></div></div>
+      <p>Toute connexion vers l'extérieur, chaque question posée à l'assistant, chaque refus et chaque sauvegarde, avec la date et la personne. Le journal reste sur la box.</p>
+      <div class="actions"><a class="bouton" data-service="ia" data-chemin="/journal">Ouvrir le journal</a></div>
+    </section>
+  </div>
+
+  <h2>Ce que garantit la box</h2>
+  <div class="garanties">
+    <div class="garantie"><strong>Aucune donnée ne sort</strong>Les services n'ont aucun accès à internet. Toute connexion de maintenance est inscrite au journal.</div>
+    <div class="garantie"><strong>Connexions chiffrées</strong>Certificats délivrés par l'autorité propre à la box, sans service extérieur.</div>
+    <div class="garantie"><strong>Sauvegardes chiffrées</strong>Copie chaque nuit sur le disque externe, illisible sans la phrase de la fiche de secours.</div>
+    <div class="garantie"><strong>Droits respectés</strong>Chaque dossier n'est visible que de l'équipe qui y travaille, y compris par l'assistant.</div>
+  </div>
+</main>
+
+<footer>Box du cabinet · réseau local · <a id="lien-ca" href="#">certificat de la box</a> à installer sur chaque poste (vérifier son empreinte)</footer>
+
+<script>
+const domaine = location.host;
+for (const lien of document.querySelectorAll("[data-service]")) {
+  lien.href = `https://${lien.dataset.service}.${domaine}${lien.dataset.chemin}`;
+}
+document.getElementById("lien-ca").href = `http://${location.hostname}/autorite-locale.crt`;
+
+const $ = (id) => document.getElementById(id);
+function el(balise, attributs = {}, ...enfants) {
+  const e = document.createElement(balise);
+  for (const [cle, valeur] of Object.entries(attributs)) e.setAttribute(cle, valeur);
+  for (const enfant of enfants) e.append(enfant);
+  return e;
+}
+const jour = (iso) => new Date(iso).toLocaleDateString("fr-FR", {weekday: "long", day: "numeric", month: "long"});
+const heure = (iso) => new Date(iso).toLocaleTimeString("fr-FR", {hour: "2-digit", minute: "2-digit"});
+const complet = (iso) => new Date(iso).toLocaleString("fr-FR", {day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit"});
+function ilya(iso) {
+  const minutes = Math.round((Date.now() - new Date(iso)) / 60000);
+  if (minutes < 1) return "à l'instant";
+  if (minutes < 60) return `il y a ${minutes} min`;
+  const heures = Math.round(minutes / 60);
+  if (heures < 48) return `il y a ${heures} h`;
+  return `il y a ${Math.round(heures / 24)} jours`;
+}
+
+function horloge() {
+  const maintenant = new Date();
+  $("heure").textContent = maintenant.toLocaleTimeString("fr-FR", {hour: "2-digit", minute: "2-digit"});
+  $("date").textContent = maintenant.toLocaleDateString("fr-FR", {weekday: "long", day: "numeric", month: "long", year: "numeric"});
+}
+
+function chiffre(id, etat, valeur, sous) {
+  const c = $(id);
+  c.className = "chiffre " + etat;
+  c.querySelector(".valeur").textContent = valeur;
+  c.querySelector(".sous").textContent = sous;
+}
+
+function ligne(liste, nom, valeur) { liste.append(el("li", {}, el("span", {}, nom), el("span", {class: "v"}, valeur))); }
+
+function afficher(r) {
+  const pastilles = $("pastilles");
+  pastilles.replaceChildren(...r.services.map((s) => {
+    const p = el("span", {class: "pastille " + (s.etat === "attente" ? "" : s.etat), title: s.detail},
+                 s.etat === "ok" ? s.nom : `${s.nom} : ${s.etat === "ko" ? "hors service" : s.detail}`);
+    p.style.marginLeft = "8px";
+    return p;
+  }));
+  for (const s of r.services) {
+    const detail = document.querySelector(`[data-detail="${s.id}"]`);
+    if (detail && s.etat === "ok") detail.textContent = s.detail;
+  }
+
+  const sorties = r.sorties;
+  if (sorties.trente_jours === 0) {
+    const depuis = sorties.derniere ? sorties.derniere.date : (r.installation && r.installation.date);
+    chiffre("c-sorties", "ok", "Aucune", depuis ? `aucune connexion vers internet depuis le ${jour(depuis)}` : "aucune connexion vers internet inscrite au journal");
+  } else {
+    chiffre("c-sorties", "attente", `${sorties.trente_jours} en 30 jours`,
+            `la dernière : ${sorties.derniere.detail || sorties.derniere.libelle}, le ${jour(sorties.derniere.date)}`);
+  }
+
+  const sv = r.sauvegarde;
+  if (!sv.derniere_reussie) chiffre("c-sauvegarde", "ko", "Aucune", "aucune sauvegarde réussie : lancer ./box.sh sauvegarder");
+  else chiffre("c-sauvegarde", sv.etat, ilya(sv.derniere_reussie.date),
+               `${jour(sv.derniere_reussie.date)} à ${heure(sv.derniere_reussie.date)} · ${sv.derniere_reussie.detail}`
+               + (sv.etat === "attente" && sv.derniere !== null && sv.derniere.resultat !== "ok" ? " · la dernière tentative a échoué" : ""));
+
+  const v = r.verification;
+  if (!v) chiffre("c-verification", "attente", "Jamais faite", "./box.sh verifier-hors-ligne, câble débranché");
+  else chiffre("c-verification", v.resultat === "ok" ? "ok" : "ko", v.detail, `${jour(v.date)} à ${heure(v.date)}`);
+
+  const liste = $("sauvegardes");
+  liste.replaceChildren();
+  ligne(liste, "Dernière sauvegarde réussie", sv.derniere_reussie ? complet(sv.derniere_reussie.date) : "aucune");
+  if (sv.derniere && sv.derniere !== sv.derniere_reussie && sv.derniere.resultat !== "ok") ligne(liste, "Dernière tentative", `${complet(sv.derniere.date)} : échec`);
+  const t = sv.test_restauration;
+  ligne(liste, "Dernier test de restauration", t ? `${complet(t.date)} · ${t.resultat === "ok" ? "réussi" : "échec"}` : "jamais fait");
+  if (t && t.detail) ligne(liste, "", t.detail);
+  ligne(liste, "Sauvegardes inscrites au journal", String(sv.nombre));
+
+  const versions = $("versions");
+  versions.replaceChildren();
+  if (r.installation) ligne(versions, r.installation.type === "restauration" ? "Box restaurée le" : "Box installée le", complet(r.installation.date));
+  for (const brique of r.versions) ligne(versions, brique.nom, brique.version);
+}
+
+// Le coffre-fort est sur un réseau à part : seul le reverse proxy le joint (route de santé /etat/coffre).
+async function etatCoffre() {
+  try { return (await fetch("/etat/coffre", {cache: "no-store"})).ok; } catch { return false; }
+}
+
+async function verifier() {
+  try {
+    const [reponse, coffre] = await Promise.all([fetch("/api/resume", {cache: "no-store"}), etatCoffre()]);
+    if (!reponse.ok) throw new Error();
+    const r = await reponse.json();
+    r.services.splice(1, 0, {id: "coffre", nom: "Coffre-fort", etat: coffre ? "ok" : "ko", detail: coffre ? "En service" : "Ne répond pas"});
+    afficher(r);
+  } catch { $("pastilles").replaceChildren(el("span", {class: "pastille ko"}, "Tableau de bord injoignable")); }
+}
+
+horloge(); verifier();
+setInterval(horloge, 15000);
+setInterval(verifier, 30000);
+</script>
+</body>
+</html>

@@ -1,9 +1,10 @@
-"""Ce que montre le tableau de bord : état des services, sauvegardes, connexions sortantes, versions installées
-et journal d'audit.
+"""Ce que montre le tableau de bord : état des services, sauvegardes, connexions sortantes, versions installées.
 
 Tout est lu sur la box : routes de santé des services (réseau interne), journaux JSON Lines de
 sortie/journal/ (plateforme, assistant, et tout autre fichier *.jsonl ajouté par DEV-4), fichier compose.yaml
-pour les versions. Aucune donnée du cabinet (fichiers, agenda, coffre-fort) n'est lue.
+pour les versions. Aucune donnée du cabinet (fichiers, agenda, coffre-fort) n'est lue. Le journal d'audit
+détaillé (questions posées, personnes) est la page de DEV-4, réservée aux administrateurs : https://ia.<domaine>/journal.
+Le coffre-fort est sur un réseau à part : son état est lu par la page, à travers le reverse proxy (/etat/coffre).
 """
 import json
 import re
@@ -18,7 +19,6 @@ from . import config
 SERVICES = [
     # (identifiant, nom affiché, adresse de santé sur le réseau interne, en-têtes)
     ("cloud", "Fichiers, agenda, contacts", config.NC_URL + "/status.php", {"Host": "nextcloud"}),
-    ("coffre", "Coffre-fort", config.COFFRE_URL + "/alive", {}),
     ("assistant", "Assistant IA", config.ASSISTANT_URL + "/api/etat", {}),
     ("moteur", "Moteur d'IA local", config.MOTEUR_URL + "/api/version", {}),
 ]
@@ -80,11 +80,6 @@ LIBELLES = {
     "moteur_ia": "Moteur d'IA",
     "modele_ia": "Modèle d'IA",
 }
-CATEGORIES = {
-    "acces": {"question", "aucun_resultat", "refus_coffre", "connexion", "deconnexion", "indexation"},
-    "sortie": {"connexion_sortante"},
-    "sauvegarde": {"sauvegarde", "test_restauration", "restauration"},
-}
 SOURCES = {"plateforme": "Box", "installeur": "Installation", "assistant": "Assistant IA",
            "tableau-de-bord": "Tableau de bord"}
 
@@ -118,13 +113,11 @@ def _detail(evenement):
         morceaux.append(f"erreur : {detail['erreur']}")
     if "documents_indexes" in detail:
         morceaux.append(f"{detail['documents_indexes']} documents")
+    if detail.get("motif"):
+        morceaux.append(detail["motif"])
     if detail.get("ip"):
         morceaux.append(f"poste {detail['ip']}")
     return " · ".join(morceaux)
-
-
-def _categorie(type_evenement):
-    return next((nom for nom, types in CATEGORIES.items() if type_evenement in types), "systeme")
 
 
 def evenements():
@@ -149,7 +142,6 @@ def evenements():
                 "source": SOURCES.get(brut.get("source"), brut.get("source", "")),
                 "type": type_evenement,
                 "libelle": LIBELLES.get(type_evenement, type_evenement.replace("_", " ").capitalize()),
-                "categorie": _categorie(type_evenement),
                 "utilisateur": brut.get("utilisateur") or "",
                 "detail": _detail(brut),
                 "resultat": str(brut.get("resultat", "")),
@@ -160,15 +152,6 @@ def evenements():
 
 def _public(evenement):
     return {**evenement, "date": evenement["date"].isoformat(timespec="seconds")}
-
-
-def journal(categorie="", nombre=200):
-    liste = evenements()
-    if categorie == "refus":
-        liste = [e for e in liste if e["resultat"] in ("refus", "echec")]
-    elif categorie:
-        liste = [e for e in liste if e["categorie"] == categorie]
-    return [_public(e) for e in reversed(liste[-nombre:])]
 
 
 # ------------------------------------------------------------ résumé

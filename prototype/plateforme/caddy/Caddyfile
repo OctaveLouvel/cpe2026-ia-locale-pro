@@ -38,29 +38,10 @@ http://{$BOX_DOMAIN} {
 	}
 }
 
-# Page d'accueil provisoire (remplacée par le tableau de bord de DEV-3).
+# Tableau de bord de la box (DEV-3) : page d'accueil des postes du cabinet.
 {$BOX_DOMAIN} {
 	import entetes
-	# État des services pour le portail : routes de santé seulement, aucune donnée du cabinet.
-	handle /etat/cloud {
-		rewrite * /status.php
-		reverse_proxy nextcloud:80 {
-			header_up Host nextcloud
-			header_up -X-Forwarded-Host
-		}
-	}
-	handle /etat/coffre {
-		rewrite * /alive
-		reverse_proxy coffre:80
-	}
-	handle /etat/assistant {
-		rewrite * /api/etat
-		reverse_proxy assistant:8000
-	}
-	handle {
-		root * /srv/accueil
-		file_server
-	}
+	reverse_proxy tableau-de-bord:8000
 }
 
 # Fichiers, agenda, contacts.

@@ -35,6 +35,10 @@ def appeler(base, chemin, corps=None, delai=900, entetes=None, methode=None):
 class Moteur:
     def __init__(self):
         self._verrou = threading.Lock()
+        # Questions en cours : la préparation des fiches en tâche de fond s'efface devant elles (un moteur
+        # comme Colibri ne traite qu'une génération à la fois).
+        self._questions = 0
+        self.derniere_question = 0.0
         self._reflexion = {}
         choix = {}
         if config.ACTIF.exists():
@@ -107,26 +111,44 @@ class Moteur:
 
     # ------------------------------------------------------------ rédaction
 
-    def repondre(self, systeme, message):
-        """Génère la réponse au fil de l'eau. Produit des morceaux de texte, puis un dictionnaire de mesures."""
+    def question_commencee(self):
+        with self._verrou:
+            self._questions += 1
+            self.derniere_question = time.monotonic()
+
+    def question_terminee(self):
+        with self._verrou:
+            self._questions = max(0, self._questions - 1)
+            self.derniere_question = time.monotonic()
+
+    @property
+    def question_en_cours(self):
+        return self._questions > 0
+
+    def repondre(self, systeme, message, longueur_max=None):
+        """Génère la réponse au fil de l'eau. Produit des morceaux de texte, puis un dictionnaire de mesures.
+        « coupee » vaut True quand le moteur s'est arrêté sur la limite de longueur, pas en fin de réponse."""
         messages = [{"role": "system", "content": systeme}, {"role": "user", "content": message}]
+        longueur_max = longueur_max or config.GENERATION_MAX
         debut, premier, usage = time.monotonic(), None, {}
-        for morceau, fin in (self._openai(messages) if self.type == "openai" else self._ollama(messages)):
+        flux = self._openai(messages, longueur_max) if self.type == "openai" else self._ollama(messages, longueur_max)
+        for morceau, fin in flux:
             if morceau:
                 if premier is None:
                     premier = time.monotonic() - debut
                 yield morceau
             if fin:
-                usage = fin
+                usage.update(fin)
         total = time.monotonic() - debut
         generation = max(total - (premier or total), 1e-3)
         yield {"premier_mot_s": round(premier or total, 1), "tokens_contexte": usage.get("contexte", 0),
                "tokens_generes": usage.get("generes", 0),
-               "generation_tokens_s": round(usage.get("generes", 0) / generation, 1)}
+               "generation_tokens_s": round(usage.get("generes", 0) / generation, 1),
+               "coupee": usage.get("raison") == "length", "longueur_max": longueur_max}
 
-    def _openai(self, messages):
+    def _openai(self, messages, longueur_max):
         corps = {"model": self.modele, "messages": messages, "stream": True, "stream_options": {"include_usage": True},
-                 "enable_thinking": False, "temperature": 0.1, "max_tokens": config.GENERATION_MAX}
+                 "enable_thinking": False, "temperature": 0.1, "max_tokens": longueur_max}
         with appeler(self.url, "/v1/chat/completions", corps, entetes=self._entetes) as reponse:
             for ligne in reponse:
                 ligne = ligne.decode("utf-8").strip()
@@ -136,15 +158,16 @@ class Moteur:
                 if "error" in donnee:
                     raise MoteurIndisponible(str(donnee["error"]))
                 for choix in donnee.get("choices") or []:
-                    yield (choix.get("delta") or {}).get("content") or "", None
+                    yield ((choix.get("delta") or {}).get("content") or "",
+                           {"raison": choix["finish_reason"]} if choix.get("finish_reason") else None)
                 if donnee.get("usage"):
                     yield "", {"contexte": donnee["usage"].get("prompt_tokens", 0),
                                "generes": donnee["usage"].get("completion_tokens", 0)}
 
-    def _ollama(self, messages):
+    def _ollama(self, messages, longueur_max):
         corps = {"model": self.modele, "messages": messages, "stream": True, "keep_alive": "24h",
                  "options": {"temperature": 0.1, "seed": 42, "num_ctx": config.CONTEXTE,
-                             "num_predict": config.GENERATION_MAX}}
+                             "num_predict": longueur_max}}
         if self.modele not in self._reflexion:
             with appeler(config.OLLAMA_URL, "/api/show", {"model": self.modele}) as r:
                 self._reflexion[self.modele] = "thinking" in json.load(r).get("capabilities", [])
@@ -158,7 +181,8 @@ class Moteur:
                 if "error" in donnee:
                     raise MoteurIndisponible(donnee["error"])
                 yield donnee.get("message", {}).get("content", ""), (
-                    {"contexte": donnee.get("prompt_eval_count", 0), "generes": donnee.get("eval_count", 0)}
+                    {"contexte": donnee.get("prompt_eval_count", 0), "generes": donnee.get("eval_count", 0),
+                     "raison": donnee.get("done_reason")}
                     if donnee.get("done") else None)
 
 

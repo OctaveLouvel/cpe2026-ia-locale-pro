@@ -71,9 +71,25 @@ Ensuite, le modèle reçoit une consigne stricte ([`assistant/consignes.py`](ass
 
 - Documents découpés en extraits d'environ 130 mots, **en suivant les articles** (« Article 12 - Clause de non-concurrence », sous-clauses 12.1 à 12.5) pour citer un article et sa page. Un article coupé en plusieurs extraits est donné en entier au modèle.
 - Recherche par mots (BM25, sans dépendance) et, si un modèle d'embeddings est disponible, par le sens ; fusion des deux classements.
-- Un dossier cité dans la question (« dossier Garnier », « 2026-014 ») limite la recherche à ce dossier.
-- Pour un résumé : une pièce par document, en priorité les pièces de synthèse (notes, conclusions, assignations, décomptes) et leurs sections de faits, plus les 5 prochaines échéances de l'agenda pour ce dossier.
+- Un dossier cité dans la question (« dossier Garnier », « 2026-014 »), ou choisi dans la liste de l'interface, limite la recherche à ce dossier. Sans dossier, la réponse le signale : « Recherche dans tous vos documents ».
+- Pour un résumé de dossier : la **fiche de chaque pièce** (section suivante), donc toutes les pièces, plus les 5 prochaines échéances de l'agenda pour ce dossier. Une pièce dont la fiche n'est pas encore prête est représentée par son meilleur extrait.
+- **Budget de contexte** : si la consigne, les extraits et la réponse attendue (`IA_GENERATION_MAX`) dépassent le contexte du modèle (`IA_CONTEXTE`), les extraits les moins pertinents sont retirés, et la réponse le dit (« 2 extraits écartés faute de place »).
+- **Réponse coupée** : si le modèle s'arrête sur la limite de longueur, la réponse l'indique au lieu de paraître complète.
+
+## Fiches préparées à l'avance
+
+Pour qu'un résumé ne laisse pas de pièce de côté, l'assistant prépare en tâche de fond ([`assistant/fiches.py`](assistant/fiches.py)), **seulement pour les dossiers dont on a besoin** :
+
+- la **fiche de chaque pièce** des dossiers clients (répertoire `Dossiers clients`, réglable avec `IA_FICHES_RACINES`) : 3 à 6 points (nature et date, auteur, objet, montants, délais), rédigés par le modèle local à partir du texte complet du document ;
+- la **fiche de chaque dossier** : objet et parties, faits, procédure, montants, rédigée à partir des fiches de ses pièces, avec les numéros des pièces citées. Elle s'affiche **tout de suite** quand on choisit le dossier dans la liste, sans attendre le modèle. Les échéances affichées à côté sont lues dans l'agenda de la personne à ce moment-là, sans passer par le modèle.
+
+Droits : une fiche de pièce n'entre dans une réponse que si la personne voit la pièce. Une fiche de dossier n'est montrée que si la personne voit **exactement** les pièces dont elle a été tirée : sinon elle pourrait révéler une pièce cachée. **Mise à jour** : quand quelqu'un ouvre l'assistant (chargement de la liste des dossiers) ou pose une question, l'assistant compare ce que Nextcloud lui montre avec l'index. Une pièce ajoutée ou modifiée est indexée, puis sa fiche est préparée et celle du dossier refaite. Une pièce supprimée sort de l'index, et la fiche du dossier est refaite sans elle. L'assistant n'a pas de compte qui surveille Nextcloud (aucun compte privilégié) : une pièce ajoutée la nuit est prise en compte à la première ouverture du matin. Testé le 5 novembre (ajout puis suppression d'un fichier fictif dans le dossier Fournil) et par `tests/test_fiches.py`. Les fiches sont dans `plateforme/sortie/ia/fiches.json`, sur la box.
+
+**À la demande** : rien n'est préparé à l'avance. Un dossier devient « suivi » la première fois que quelqu'un le choisit dans la liste ou pose une question qui le concerne. Ses fiches se préparent alors en tâche de fond, puis restent à jour. La réponse du moment utilise les extraits, comme avant ; les suivantes utilisent les fiches. Un dossier jamais ouvert ne coûte rien. **Pour la démo** : ouvrir une fois chaque dossier montré, la veille, puis `./box.sh fiches-ia` pour attendre la fin. Choix fait le 5 novembre : préparer tout le cabinet à l'avance coûtait environ une minute par pièce, y compris pour des dossiers que personne n'ouvre.
+
+Le moteur ne traite qu'une génération à la fois : une fiche ne commence que si personne n'a posé de question depuis 20 s, et elle est abandonnée dès qu'une question arrive (la question attend au plus la fin de la lecture en cours, environ 5 s). Durée mesurée le 5 novembre avec Colibri : environ une minute par pièce, une dizaine de minutes pour un dossier de 10 pièces. Suivre la préparation des dossiers suivis : `./box.sh fiches-ia`. Vérifier qu'aucune fiche n'invente un chiffre : `python3 prototype/ia/evaluation/verifier_fiches.py` (chaque date, montant et nombre d'une fiche doit se trouver dans sa source).
 - Formats lus : PDF (avec les pages), DOCX (avec les titres de section), texte.
+- **PDF aux mots collés** : dans certains PDF (souvent ceux avec des tableaux), les mots ne sont séparés que par leur position, et pypdf rend « Restedûcumulé » ou « 340000euros ». La recherche par mots ne les trouve plus. Constaté le 5 novembre sur 3 pièces de démo, dont le décompte locatif du dossier Fournil : c'est pourquoi le reste dû de 5 500 euros n'apparaissait jamais dans le résumé. Une page dont plus de 2 % des mots font 18 caractères ou plus est relue avec pdfminer.six, qui retrouve les espaces (mais lit les tableaux colonne par colonne). Changer `extraction.VERSION` fait relire tous les documents et refaire leurs fiches.
 
 ## Journal d'audit
 
@@ -84,9 +100,11 @@ Chaque connexion et chaque question sont inscrites dans `plateforme/sortie/journ
 | Route | Rôle |
 |---|---|
 | `GET /` | Interface de conversation (une page, aucune ressource externe) |
-| `GET /api/etat` | Modèle, nombre de documents indexés, prêt ou non (sans connexion) |
+| `GET /api/etat` | Modèle, nombre de documents indexés, prêt ou non, progression des fiches (sans connexion) |
 | `POST /api/connexion` `{login, mot_de_passe}` | Ouvre une session (cookie `session`, HttpOnly) |
-| `POST /api/question` `{question}` | Réponse au fil de l'eau (`text/event-stream`) : événements `etape`, `texte`, `fin` (sources, durée, mesures), `erreur` |
+| `POST /api/question` `{question, dossier}` | Réponse au fil de l'eau (`text/event-stream`) : événements `etape`, `texte`, `fin` (sources, durée, mesures dont `coupee`, `couverture` : pièces du dossier lues, citées ou non lues, `perimetre`), `erreur`. `dossier` (facultatif) : nom d'un dossier de `/api/dossiers` |
+| `GET /api/dossiers` | Dossiers clients visibles par la personne, nombre de pièces, fiche prête ou non |
+| `GET /api/dossier?nom=…` | Fiche du dossier (si à jour et autorisée), échéances de l'agenda, pièces avec leur fiche. Aucun appel au modèle. Inscrit au journal |
 | `GET /api/document/<fileid>` | Document cité, relu avec les droits de la personne ; ajouter `#page=N` |
 | `GET /api/journal` | Entrées du journal pour la personne connectée |
 | `POST /api/deconnexion` | Ferme la session et révoque le mot de passe d'application |
@@ -99,7 +117,28 @@ Banc de mesure : [`mesures/mesurer_modeles.py`](mesures/mesurer_modeles.py), 5 q
 
 ## Autre moteur : Colibri
 
-`IA_MOTEUR=openai` et `IA_MOTEUR_URL` permettent d'utiliser un serveur compatible OpenAI, comme [Colibri](https://github.com/JustVugg/colibri), qui fait tourner de gros modèles « à experts » (Qwen3.6-35B-A3B) en lisant une partie du modèle sur le disque. Mesuré le 3 novembre sur le portable de démo (16 Go) : **inutilisable pour la démo** (voir la section 5 de `docs/prototype.md`). À réessayer sur une box avec au moins 32 Go de mémoire.
+`IA_MOTEUR=openai` et `IA_MOTEUR_URL` permettent d'utiliser un serveur compatible OpenAI, comme [Colibri](https://github.com/JustVugg/colibri), qui fait tourner de gros modèles « à experts » (Qwen3.6-35B-A3B) en lisant une partie du modèle sur le disque. Sur processeur seul, mesuré inutilisable sur le portable de démo (16 Go). Avec la carte graphique (Vulkan) et un contexte de 4 096 tokens, mesuré le 5 novembre : environ 35 s jusqu'au premier mot sur les questions de la démo (section 5 de `docs/prototype.md`).
+
+Installation sur le portable de démo (Colibri 2.1.0, modèle de 23 Go, environ 26 Go de disque libre nécessaires) :
+
+```bash
+git clone --depth 1 --branch v2.1.0 https://github.com/JustVugg/colibri.git ~/colibri
+hf download Kreuzzelg/qwen36-35b-a3b-colibri-i4-gs64 --local-dir ~/Models/qwen36_i4_gs64
+# Moteur avec Vulkan, sans droits administrateur : en-têtes Vulkan et glslc extraits des paquets Debian.
+mkdir -p ~/vkdev/deb && cd ~/vkdev/deb && apt-get download libvulkan-dev glslc libshaderc1
+for f in *.deb; do dpkg-deb -x "$f" ~/vkdev/root; done
+cd ~/colibri/c && LD_LIBRARY_PATH=~/vkdev/root/usr/lib/x86_64-linux-gnu C_INCLUDE_PATH=~/vkdev/root/usr/include \
+    make qwen36 ARCH=native VK=1 GLSLC=~/vkdev/root/usr/bin/glslc
+```
+
+Puis dans `plateforme/.env` : `COLIBRI_DIR` et `COLIBRI_MODELE` (chemins complets, sans `~`), `COLIBRI_VULKAN=1`, `COLIBRI_CTX=4096`, `COLIBRI_STREAM_ROWS=2`, et `./box.sh moteur-ia demarrer`. L'archive précompilée de la version 2.1.0 demande glibc 2.43 et ne démarre pas sur Debian 13.
+
+Ce que fait Colibri, et pourquoi ces réglages (journal `plateforme/sortie/ia/colibri.log`, 5 novembre) :
+
+- **Seuls les experts utilisés sont chargés, et ça fonctionne sur le portable de démo.** Le modèle fait 23 Go. Le moteur occupe 2,9 Go de mémoire vive et 4,4 Go sur la carte graphique. Les 1 473 experts les plus utilisés (sur 10 240) restent sur la carte. Ils couvrent 87 à 88 % des appels aux experts sur une question complète. Les autres sont relus sur le SSD (environ 2,6 Go/s).
+- **Ce qui coûtait du temps, c'est la lecture de la question (prefill).** Par défaut, un expert absent de la carte n'y est envoyé que s'il traite au moins 16 lignes du texte. Sinon le processeur le calcule, à environ 1,3 ms par ligne. Sur la question 1, une soixantaine d'experts par couche (460 à 780 lignes) restaient sur le processeur à chaque étape de lecture. Avec `COLIBRI_STREAM_ROWS=2` (variable `COLI_VK_TIER_STREAM_ROWS` de Colibri), il en reste 4 à 9 par couche : premier mot de la question 1 en 25 s au lieu de 67 s, réponse complète en 51 s au lieu de 114 s. Même résultat sur la grille d'évaluation.
+- **Lancement en service utilisateur systemd** (`box-colibri`, voir `systemctl --user status box-colibri`). Lancé avec `setsid` depuis un terminal, Colibri restait dans le groupe de processus (cgroup) de la fenêtre. Le 5 novembre à 15h07, la fin de la session ouverte dans cette fenêtre l'a arrêté en pleine réponse, et l'assistant l'affichait toujours comme actif. Le service est relancé tout seul s'il s'arrête sur une erreur (`Restart=on-failure`), et le journal précédent est gardé dans `colibri.log.1`.
+- **La carte graphique qui « cesse de répondre ».** Colibri considère la carte comme perdue dès qu'un calcul dépasse 10 s (délai fixé dans son code), puis continue sur le processeur seul (plusieurs minutes par question). C'est arrivé le 5 novembre après 4 ou 5 questions, sans erreur du pilote dans le journal du noyau. À ce moment-là, Colibri occupait 5,85 Go des 6,1 Go de la carte, et ses tampons grossissaient d'environ 20 Mo à chaque question. **HYPOTHÈSE** : la carte pleine, le pilote déplace de la mémoire vers la RAM et les calculs ralentissent au-delà de 10 s. Deux réponses : `COLIBRI_RESERVE_GO=1.5` laisse 1,5 Go libre au lieu de 1 (1 171 experts sur la carte au lieu de 1 473 ; 9 questions de suite sans incident ensuite, pic à 5,5 Go). Et une garde (`box-colibri-garde`) qui relance Colibri dès que le message apparaît dans le journal (testée : relancé et de nouveau prêt en moins d'une minute).
 
 ## Limites connues
 

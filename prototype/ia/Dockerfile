@@ -8,6 +8,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY assistant/ assistant/
 COPY modeles.json modeles.json
+COPY tests/ tests/
 
 EXPOSE 8000
 CMD ["python", "-m", "assistant"]

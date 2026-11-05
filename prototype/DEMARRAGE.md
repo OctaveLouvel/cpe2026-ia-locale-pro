@@ -61,9 +61,9 @@ Ce qui tourne ensuite (`./box.sh etat` pour le voir) :
 4. Cliquer sur **Activer**. L'assistant charge le modèle et prépare l'index des documents.
 5. Poser une question sur **https://ia.cabinet.localhost**. Les questions de la démo sont dans [`docs/prototype.md`](../docs/prototype.md), section 6.
 
-Même chose en ligne de commande : `./box.sh ia` (menu numéroté), ou `./box.sh ia installer qwen3:4b` puis `./box.sh ia activer qwen3:4b`.
+Même chose en ligne de commande : `./box.sh ia` (menu numéroté), ou `./box.sh ia installer qwen3:4b-instruct-2507-q4_K_M` puis `./box.sh ia activer qwen3:4b-instruct-2507-q4_K_M` (pas `qwen3:4b`, qui réfléchit en anglais avant de répondre).
 
-Option : **Colibri**, déjà installé hors conteneur sur la machine. Renseigner `COLIBRI_DIR` et `COLIBRI_MODELE` dans `.env`, lancer `./box.sh moteur-ia demarrer`, puis l'activer sur la même page. Colibri n'écoute que sur le réseau interne de la box.
+Option : **Colibri**, déjà installé hors conteneur sur la machine. Renseigner `COLIBRI_DIR` et `COLIBRI_MODELE` dans `.env` (et `COLIBRI_VULKAN=1` si le moteur est compilé pour la carte graphique, voir [`ia/README.md`](ia/README.md)), lancer `./box.sh moteur-ia demarrer`, puis l'activer sur la même page. Colibri n'écoute que sur le réseau interne de la box.
 
 ## 5. Avant la démo : vérifier hors ligne
 
@@ -72,6 +72,15 @@ Option : **Colibri**, déjà installé hors conteneur sur la machine. Renseigner
 ```
 
 À lancer **câble débranché et wifi coupé**. Le script vérifie que les services ne joignent pas internet, que l'assistant ne peut pas joindre le coffre-fort, que les pages ne chargent rien de l'extérieur. Résultat attendu : 0 échec.
+
+Si l'assistant utilise Colibri, vérifier aussi le moteur juste avant de passer :
+
+```bash
+./box.sh moteur-ia etat                  # doit afficher le modèle et « active (running) »
+systemctl --user is-active box-colibri-garde       # doit afficher « active »
+```
+
+Puis poser une question de la démo. Si Colibri ne répond pas : `./box.sh moteur-ia arreter`, `./box.sh moteur-ia demarrer`, puis `./box.sh ia activer qwen3.6-colibri`. S'il ne répond toujours pas, passer sur le modèle de secours : `./box.sh ia activer qwen3:4b-instruct-2507-q4_K_M`.
 
 Pour installer sur une machine **sans internet du tout** : sur une machine connectée, `./box.sh preparer-hors-ligne` produit `sortie/images-box.tar`. Le copier sur la box, puis `docker load -i images-box.tar` et `./box.sh installer --demo`.
 
@@ -95,5 +104,6 @@ Pour installer sur une machine **sans internet du tout** : sur une machine conne
 | « nextcloud n'est pas prêt » | Premier démarrage lent, ou erreur | `./box.sh journaux nextcloud` |
 | L'assistant affiche « Aucun modèle choisi » | Aucun modèle activé | Section 4 |
 | L'assistant est très lent | Modèle trop gros pour la mémoire | Choisir un modèle marqué « Tient en mémoire » |
+| Colibri ne répond plus, l'assistant affiche pourtant Colibri comme actif | Colibri a été lancé par une ancienne version de `box.sh` depuis un terminal, puis la fenêtre a été fermée. Ou bien la carte graphique a décroché (« stopped answering » dans `sortie/ia/colibri.log`) : la garde `box-colibri-garde` le relance alors toute seule en moins d'une minute | Attendre une minute et reposer la question. Sinon : `./box.sh moteur-ia arreter` puis `./box.sh moteur-ia demarrer`. Le journal du lancement précédent est dans `sortie/ia/colibri.log.1` |
 | Alerte de certificat après une réinstallation | Chaque installation crée une nouvelle autorité | Réimporter `sortie/autorite-locale.crt` |
 | `https://cabinet.localhost` ne répond pas depuis un autre ordinateur | La box n'écoute que sur elle-même par défaut | [Accès depuis un autre ordinateur](plateforme/README.md#accès-depuis-un-autre-ordinateur-démo-avec-la-box-posée-sur-la-table) |

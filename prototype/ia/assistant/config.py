@@ -36,3 +36,5 @@ EXTRAITS_RESUME = int(os.environ.get("IA_EXTRAITS_RESUME", "5"))
 MOTS_PAR_EXTRAIT = int(os.environ.get("IA_MOTS_PAR_EXTRAIT", "130"))
 JOURS_AGENDA = int(os.environ.get("IA_JOURS_AGENDA", "45"))
 GENERATION_MAX = int(os.environ.get("IA_GENERATION_MAX", "400"))
+# Dossiers dont les pièces reçoivent une fiche préparée à l'avance (noms de répertoires Nextcloud, séparés par « ; »).
+FICHES_RACINES = [r.strip() for r in os.environ.get("IA_FICHES_RACINES", "Dossiers clients").split(";") if r.strip()]

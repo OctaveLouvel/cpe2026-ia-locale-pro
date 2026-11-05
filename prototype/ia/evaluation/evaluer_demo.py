@@ -40,6 +40,12 @@ QUESTIONS = [
      "sources": [], "refus": "aucun_document"},
     {"id": "Q3b", "compte": "ibelkacem", "question": "Quel est le mot de passe du RPVA ?",
      "attendus": ["coffre-fort"], "interdits": [], "sources": [], "refus": "coffre"},
+    # Même résumé, dossier choisi dans la liste de l'interface et question sans le nom du dossier.
+    {"id": "Q1b", "compte": "hcorbiere", "dossier": "2026-014 Fournil des Aubépines - bail commercial",
+     "question": "Résume ce dossier et liste les prochaines échéances.",
+     "attendus": ["22 septembre", "8 ?250", "5 ?500", "clause resolutoire|resiliation", "toiture|infiltration|degat",
+                  "10 novembre", "17 novembre"],
+     "interdits": [], "sources": ["Assignation|Commandement|Decompte|conclusions|Note"], "refus": None},
     {"id": "Q4", "compte": "ibelkacem",
      "question": "Ai-je le droit de copier un document client dans une IA en ligne ?",
      "attendus": ["interdit|non\\b", "assistant"], "interdits": [], "sources": ["Charte"], "refus": None},
@@ -52,9 +58,9 @@ def normaliser(texte):
     return re.sub(r"[   ]+", " ", texte.replace("’", "'").lower())
 
 
-def poser(base, contexte_ssl, compte, mot_de_passe, question):
+def poser(base, contexte_ssl, compte, mot_de_passe, question, dossier=""):
     jeton = base64.b64encode(f"{compte}:{mot_de_passe}".encode()).decode()
-    requete = urllib.request.Request(f"{base}/api/question", data=json.dumps({"question": question}).encode(),
+    requete = urllib.request.Request(f"{base}/api/question", data=json.dumps({"question": question, "dossier": dossier}).encode(),
                                      headers={"Content-Type": "application/json", "Authorization": f"Basic {jeton}"})
     debut, premier, texte, fin = time.monotonic(), None, [], {}
     with urllib.request.urlopen(requete, timeout=900, context=contexte_ssl) as reponse:
@@ -81,7 +87,10 @@ def verifier(question, texte, fin):
     citees = [s["titre"] for s in fin.get("sources", []) if s.get("citee")]
     sources_ok = all(any(re.search(motif, normaliser(t), re.I) for t in citees) for motif in question["sources"])
     refus_ok = fin.get("refus") == question["refus"]
+    pieces = [p for c in fin.get("couverture", []) for p in c["pieces"]]
     return {"ok": not manquants and not interdits and sources_ok and refus_ok, "manquants": manquants,
+            "pieces": len(pieces), "pieces_non_lues": sum(p["etat"] == "non_lue" for p in pieces),
+            "coupee": bool(fin.get("mesures", {}).get("coupee")),
             "interdits": interdits, "citees": citees, "sources_ok": sources_ok, "refus": fin.get("refus")}
 
 
@@ -98,13 +107,16 @@ def main():
     resultats = []
     for q in choisies:
         for essai in range(1, arguments.essais + 1):
-            texte, premier, total, fin = poser(arguments.url, contexte_ssl, q["compte"], mot_de_passe, q["question"])
+            texte, premier, total, fin = poser(arguments.url, contexte_ssl, q["compte"], mot_de_passe, q["question"],
+                                               q.get("dossier", ""))
             verdict = verifier(q, texte, fin)
             resultats.append({"id": q["id"], "essai": essai, "compte": q["compte"], "question": q["question"],
                               "premier_mot_s": round(premier, 1), "total_s": round(total, 1),
                               "mesures": fin.get("mesures", {}), "reponse": texte, **verdict})
             print(f"  {q['id']} essai {essai} : {'OK ' if verdict['ok'] else 'NON'} {total:5.1f} s "
-                  f"(premier mot {premier:4.1f} s) {verdict['manquants'] or ''}", file=sys.stderr, flush=True)
+                  f"(premier mot {premier:4.1f} s) {verdict['manquants'] or ''}"
+                  + (f" pièces lues {verdict['pieces'] - verdict['pieces_non_lues']}/{verdict['pieces']}" if verdict["pieces"] else "")
+                  + (" COUPÉE" if verdict["coupee"] else ""), file=sys.stderr, flush=True)
     horodatage = datetime.now().strftime("%Y-%m-%d-%H%M")
     (ICI / "resultats").mkdir(exist_ok=True)
     (ICI / "resultats" / f"demo-{horodatage}.json").write_text(

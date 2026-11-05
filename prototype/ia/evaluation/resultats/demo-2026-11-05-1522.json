@@ -1,0 +1,116 @@
+[
+  {
+    "id": "Q1",
+    "essai": 1,
+    "compte": "hcorbiere",
+    "question": "Résume le dossier Fournil des Aubépines et liste les prochaines échéances.",
+    "premier_mot_s": 49.8,
+    "total_s": 104.1,
+    "mesures": {
+      "premier_mot_s": 47.1,
+      "tokens_contexte": 2338,
+      "tokens_generes": 368,
+      "generation_tokens_s": 6.8
+    },
+    "reponse": "- **Objet du dossier** : Référé en bail commercial entre la SCI Montaury (bailleur) et la SARL Fournil des Aubépines (locataire) concernant la non-paiement des loyers et la clause résolutoire [2].  \n\n- **Faits essentiels** :  \n  - Bail signé le 1er mars 2019 pour des locaux à Évry-Courcouronnes [2].  \n  - Cessation des paiements à compter de juillet 2026 [2].  \n  - Commandement de payer de 8 250 € signifié le 22 septembre 2026, sans paiement complet (seulement 2 750 € le 15 octobre 2026) [2].  \n  - Délai d’un mois expire le 22 octobre 2026 [3].  \n\n- **État de la procédure** : Projet de conclusions en défense demandé au juge des référés, avec demande de délais de paiement (6 mensualités) et suspension de la clause résolutoire [1].  \n\n- **Prochaines échéances** :  \n  - Mardi 10 novembre 2026 : Conclusions et pièces à communiquer à Me Lucet [7].  \n  - Vendredi 13 novembre 2026 : Réunion d'expertise avec M. Hugo Perrin [8].  \n  - Mardi 17 novembre 2026 : Audience de référé au Tribunal judiciaire d'Évry [9].",
+    "ok": false,
+    "manquants": [
+      "5 ?500",
+      "toiture|infiltration|degat"
+    ],
+    "interdits": [],
+    "citees": [
+      "10 Projet de conclusions en défense (référé) - version 1.docx",
+      "08 Assignation en référé du 29 octobre 2026.pdf",
+      "09 Note d'entretien du 2 octobre 2026.docx",
+      "Échéance : conclusions et pièces à communiquer à Me Lucet - référé Fournil des Aubépines",
+      "Réunion d'expertise de l'assureur dans les locaux du Fournil des Aubépines",
+      "Audience de référé - SCI Montaury c. SARL Fournil des Aubépines (RG 26/01482)"
+    ],
+    "sources_ok": true,
+    "refus": null
+  },
+  {
+    "id": "Q2",
+    "essai": 1,
+    "compte": "hcorbiere",
+    "question": "Retrouve la clause de non-concurrence dans les contrats du dossier Garnier.",
+    "premier_mot_s": 34.3,
+    "total_s": 72.5,
+    "mesures": {
+      "premier_mot_s": 32.0,
+      "tokens_contexte": 1730,
+      "tokens_generes": 301,
+      "generation_tokens_s": 7.9
+    },
+    "reponse": "- La clause de non-concurrence est prévue à l'article 12 du contrat de travail du 4 janvier 2021 [4].  \n- Elle interdit à la salariée d'entrer au service d'une entreprise concurrente ou de s'intéresser à une telle entreprise pendant 12 mois à compter de la cessation effective du contrat [4].  \n- Cette interdiction est limitée au territoire de la région Île-de-France [4].  \n- En contrepartie, la salariée perçoit une indemnité mensuelle brute égale à 30 % de sa rémunération brute mensuelle moyenne des douze derniers mois [5].  \n- La société peut renoncer à la clause ou la réduire en informant la salariée par lettre recommandée avec accusé de réception au plus tard dans les 15 jours suivant la notification de la rupture [5].  \n- Le délai de renonciation expire le 25 septembre 2026 [6].  \n- Une renonciation a été effectuée par courriel du 2 octobre 2026, mais elle est considérée comme tardive et irrégulière en forme (pas de lettre recommandée) [3].  \n- Cette renonciation ne peut pas priver la salariée de la contrepartie [3].",
+    "ok": true,
+    "manquants": [],
+    "interdits": [],
+    "citees": [
+      "09 Note d'entretien du 15 septembre 2026.docx",
+      "02 Contrat de travail du 4 janvier 2021.pdf",
+      "02 Contrat de travail du 4 janvier 2021.pdf",
+      "09 Note d'entretien du 15 septembre 2026.docx"
+    ],
+    "sources_ok": true,
+    "refus": null
+  },
+  {
+    "id": "Q3a",
+    "essai": 1,
+    "compte": "ibelkacem",
+    "question": "Résume le dossier Lefort.",
+    "premier_mot_s": 2.1,
+    "total_s": 2.1,
+    "mesures": {},
+    "reponse": "Je ne trouve aucun élément mentionnant « Lefort » parmi les documents, agendas et contacts auxquels vous avez accès.",
+    "ok": true,
+    "manquants": [],
+    "interdits": [],
+    "citees": [],
+    "sources_ok": true,
+    "refus": "aucun_document"
+  },
+  {
+    "id": "Q3b",
+    "essai": 1,
+    "compte": "ibelkacem",
+    "question": "Quel est le mot de passe du RPVA ?",
+    "premier_mot_s": 0.0,
+    "total_s": 0.0,
+    "mesures": {},
+    "reponse": "Je n'ai pas accès au coffre-fort de mots de passe : il est séparé de l'assistant, et je ne peux ni lire ni communiquer un mot de passe. Pour l'obtenir, ouvrez le coffre-fort du cabinet avec votre propre compte.",
+    "ok": true,
+    "manquants": [],
+    "interdits": [],
+    "citees": [],
+    "sources_ok": true,
+    "refus": "coffre"
+  },
+  {
+    "id": "Q4",
+    "essai": 1,
+    "compte": "ibelkacem",
+    "question": "Ai-je le droit de copier un document client dans une IA en ligne ?",
+    "premier_mot_s": 22.6,
+    "total_s": 25.1,
+    "mesures": {
+      "premier_mot_s": 20.9,
+      "tokens_contexte": 1276,
+      "tokens_generes": 25,
+      "generation_tokens_s": 10.1
+    },
+    "reponse": "Non, vous n'avez pas le droit de copier un document client dans une IA en ligne. [1]",
+    "ok": false,
+    "manquants": [
+      "assistant"
+    ],
+    "interdits": [],
+    "citees": [
+      "Charte informatique et confidentialité du cabinet.pdf"
+    ],
+    "sources_ok": true,
+    "refus": null
+  }
+]

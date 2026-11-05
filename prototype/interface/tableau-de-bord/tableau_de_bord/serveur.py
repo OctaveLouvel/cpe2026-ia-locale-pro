@@ -1,4 +1,4 @@
-"""Serveur du tableau de bord : page d'accueil de la box (https://<domaine>) et son état en direct.
+"""Serveur du tableau de bord : page d'accueil de la box (https://<domaine>) et page État de santé (/etat-de-sante).
 
 Bibliothèque standard uniquement. Ce qui est montré (état des services, sauvegardes, connexions sortantes,
 versions) est visible de tous les postes du cabinet : aucune donnée de dossier, aucun nom de personne.
@@ -13,6 +13,7 @@ from pathlib import Path
 from . import collecte, config
 
 PAGE = (Path(__file__).parent / "page.html").read_bytes()
+ETAT = (Path(__file__).parent / "etat.html").read_bytes()
 POLITIQUE = ("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; "
              "img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
 
@@ -40,6 +41,9 @@ class Gestionnaire(BaseHTTPRequestHandler):
         chemin = urllib.parse.urlsplit(self.path).path
         if chemin in ("/", "/index.html"):
             return self._repondre(PAGE, type_contenu="text/html; charset=utf-8",
+                                  entetes={"Content-Security-Policy": POLITIQUE, "Referrer-Policy": "no-referrer"})
+        if chemin == "/etat-de-sante":
+            return self._repondre(ETAT, type_contenu="text/html; charset=utf-8",
                                   entetes={"Content-Security-Policy": POLITIQUE, "Referrer-Policy": "no-referrer"})
         if chemin == "/api/sante":
             return self._repondre({"ok": True})

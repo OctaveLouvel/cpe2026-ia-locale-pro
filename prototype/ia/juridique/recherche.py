@@ -29,7 +29,8 @@ MOTS_VIDES = set("""a au aux avec ce ces cet cette dans de des du elle en et eux
 mais me meme mes moi mon ne nos notre nous on ou par pas pour qu que qui sa se ses son sur ta te tes toi ton tu
 un une vos votre vous y est sont ete etre avoir ont fait faire plus tout tous aussi comme si sans entre quel
 quelle quels quelles quoi dit dire prevoit peut peuvent doit doivent selon cas article articles art code loi
-jurisprudence arret arrets decision decisions cour droit francais quand comment combien est-ce""".split())
+jurisprudence arret arrets decision decisions cour droit francais quand comment combien est-ce recent recente
+recents recentes dernier derniere derniers dernieres nouveau nouvelle actuel actuelle actuellement ligne""".split())
 
 JURIDIQUE = re.compile(
     r"(?i)\b(articles?|art\.|codes?|lois?|d[ée]crets?|ordonnances?|r[èe]glements?|jurisprudences?|arr[êe]ts?|"
@@ -344,7 +345,7 @@ class Juridique:
             if requete:
                 resultat.etapes.append(f"Recherche en ligne (Légifrance, Judilibre) : « {requete} »")
                 try:
-                    reponse = en_ligne.rechercher(self.adresse_en_ligne, requete, utilisateur)
+                    reponse = en_ligne.rechercher(self.adresse_en_ligne, requete, utilisateur, bool(RECENT.search(question)))
                     for a in reponse.get("articles", [])[:2]:
                         if a["id"] not in vus and a.get("texte"):
                             articles.append(({**a, "applicable": True, "en_ligne": True}, "recherche en ligne", None))

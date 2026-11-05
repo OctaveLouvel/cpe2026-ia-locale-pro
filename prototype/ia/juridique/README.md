@@ -77,11 +77,14 @@ Mesuré le 5 novembre 2026 sur le portable de démo (16 Go, sans GPU), hors de l
 
 Manqués en langage courant : la durée du bail commercial (L145-4 absent, articles voisins donnés), le délai de rétractation à distance (L221-20 et L221-21 donnés, pas L221-18), le délai d'appel (articles 906 et 916 donnés, pas 538). Pistes : reclassement par le sens (non mesuré, faute de temps), synonymes du vocabulaire juridique. Les questions de test ont été écrites par l'agent IA : à remplacer par les questions des pilotes.
 
+Recherche en ligne (bac à sable PISTE, 5 novembre) : « contrepartie dérisoire d'une clause de non-concurrence » donne les articles 1169 et 1230 du Code civil et les arrêts de la chambre sociale du 16 mai 2012 (n° 11-10.760) et du 8 avril 2010 ; « Mme Garnier » est retirée de la requête avant l'envoi, et l'appel est inscrit au journal au début et à la fin.
+
 Non mesuré à ce jour : import de la jurisprudence (archives CASS et CAPP téléchargées, import lancé le 5 novembre), archives quotidiennes depuis juillet 2025, qualité des réponses rédigées par le modèle.
 
 ## Limites connues
 
-- **Client en ligne non testé avec un vrai compte PISTE** : écrit d'après les exemples officiels de l'API Légifrance et la spécification OpenAPI de Judilibre, et testé contre un faux serveur qui suit leur format. À valider sur le bac à sable avant la mise en service.
+- **Recherche en ligne testée sur le bac à sable PISTE le 5 novembre**, pas en production : jeton OAuth, recherche et lecture d'articles Légifrance, recherche Judilibre, passerelle et journal. Le moteur de Légifrance classe mal les questions en langage courant (des annexes ou des articles d'autres codes remontent en tête) : la recherche est limitée au texte des articles, les annexes sont écartées, et la base de la box reste la source principale. Judilibre donne des décisions pertinentes ; « récent » trie par date.
+- Une application PISTE doit être reliée aux deux API, **dans l'environnement voulu** (bac à sable et production sont séparés) : sans cela, toute requête reçoit 403 sans message, même avec un jeton valide.
 - Les noms de codes sont reconnus contre ceux de la base : une référence à un code absent, ou une abréviation inconnue, est ignorée plutôt que mal résolue.
 - La recherche plein texte compare des mots (préfixes, sans accents), pas des notions : « rupture du contrat de travail » ne trouve pas « licenciement ». Le reclassement par le sens n'agit que sur les 20 premiers résultats.
 - Le fonds CAPP ne contient qu'une partie des décisions des cours d'appel. Judilibre (en ligne) en publie aussi.

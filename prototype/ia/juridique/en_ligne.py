@@ -10,8 +10,9 @@ reste sur le réseau interne et lui envoie une requête de recherche, jamais un 
   fichier .env de la box, jamais dans le dépôt. Sans eux, la passerelle répond « inactive » et rien ne sort.
 
 Écrit d'après la documentation publique des deux API : exemples d'utilisation de l'API Légifrance (DILA) et
-spécification OpenAPI de Judilibre (dépôt Cour-de-cassation/judilibre-search, en-tête « KeyId »). Non testé faute
-de compte PISTE : à valider sur le bac à sable (PISTE_ENVIRONNEMENT=bac_a_sable) avant la mise en service.
+spécification OpenAPI de Judilibre (dépôt Cour-de-cassation/judilibre-search, en-tête « KeyId »). Testé le
+5 novembre 2026 sur le bac à sable PISTE (PISTE_ENVIRONNEMENT=bac_a_sable) : jeton OAuth, recherche et lecture
+d'articles Légifrance, recherche Judilibre (avec la clé « KeyId » comme avec le jeton). Production non testée.
 """
 import json
 import os
@@ -104,18 +105,27 @@ class Piste:
     def articles(self, texte: str, nombre: int = 3) -> list[dict]:
         """Articles de codes en vigueur aujourd'hui, puis leur texte complet (un appel par article)."""
         maintenant = int(time.time() * 1000)
-        corps = {"fond": "CODE_DATE", "recherche": {
-            "champs": [{"typeChamp": "ALL", "operateur": "ET",
-                        "criteres": [{"typeRecherche": "UN_DES_MOTS", "valeur": texte, "operateur": "ET"}]}],
-            "filtres": [{"facette": "DATE_VERSION", "singleDate": maintenant}],
-            "pageNumber": 1, "pageSize": nombre, "operateur": "ET", "sort": "PERTINENCE", "typePagination": "ARTICLE"}}
-        resultats = self._appeler(f"{LEGIFRANCE}/search", corps).get("results", [])
+
+        def chercher(type_recherche):
+            corps = {"fond": "CODE_DATE", "recherche": {
+                "champs": [{"typeChamp": "ARTICLE", "operateur": "ET",
+                            "criteres": [{"typeRecherche": type_recherche, "valeur": texte, "operateur": "ET"}]}],
+                "filtres": [{"facette": "DATE_VERSION", "singleDate": maintenant}],
+                "pageNumber": 1, "pageSize": 10, "operateur": "ET", "sort": "PERTINENCE", "typePagination": "ARTICLE"}}
+            return self._appeler(f"{LEGIFRANCE}/search", corps).get("results", [])
+
+        # Tous les mots d'abord (plus précis) ; un des mots si rien ne correspond. Vérifié sur le bac à sable le
+        # 5 novembre : « un des mots » seul remonte des articles peu pertinents (code de l'environnement pour
+        # une question de responsabilité civile).
+        resultats = chercher("TOUS_LES_MOTS_DANS_UN_CHAMP") or chercher("UN_DES_MOTS")
         identifiants = []
 
         def parcourir(objet):  # les identifiants d'articles sont à plusieurs niveaux selon le type de résultat
             if isinstance(objet, dict):
                 identifiant = objet.get("id")
-                if isinstance(identifiant, str) and identifiant.startswith("LEGIARTI") and identifiant not in identifiants:
+                # Les annexes (barèmes, formulaires) remontent souvent en tête et répondent rarement à la question.
+                annexe = str(objet.get("num") or objet.get("title") or "").lower().startswith("annexe")
+                if isinstance(identifiant, str) and identifiant.startswith("LEGIARTI") and not annexe and identifiant not in identifiants:
                     identifiants.append(identifiant)
                 for valeur in objet.values():
                     parcourir(valeur)
@@ -137,9 +147,11 @@ class Piste:
 
     # ------------------------------------------------------------ Judilibre
 
-    def decisions(self, texte: str, nombre: int = 3) -> list[dict]:
-        donnees = self._appeler(f"{JUDILIBRE}/search", params={"query": texte, "page_size": nombre,
-                                                                  "resolve_references": "true"})
+    def decisions(self, texte: str, nombre: int = 3, recent: bool = False) -> list[dict]:
+        params = {"query": texte, "page_size": nombre, "resolve_references": "true"}
+        if recent:  # « jurisprudence récente » : les plus récentes d'abord, plutôt que les plus pertinentes
+            params.update(sort="date", order="desc")
+        donnees = self._appeler(f"{JUDILIBRE}/search", params=params)
         decisions = []
         for d in donnees.get("results", [])[:nombre]:
             extraits = (d.get("highlights") or {}).get("text") or []
@@ -186,6 +198,7 @@ class Passerelle(BaseHTTPRequestHandler):
             return self._repondre({"erreur": "Requête invalide."}, 400)
         texte = " ".join(str(corps.get("texte", "")).split())
         utilisateur = str(corps.get("utilisateur", ""))[:64] or None
+        recent = bool(corps.get("recent"))
         if not texte or len(texte) > LONGUEUR_MAX:
             return self._repondre({"erreur": f"Requête vide ou de plus de {LONGUEUR_MAX} caractères."}, 400)
         if not piste.active:
@@ -194,7 +207,7 @@ class Passerelle(BaseHTTPRequestHandler):
                   "requete": texte}
         journal.ecrire("connexion_sortante", utilisateur, detail, "en_cours")
         resultat, erreurs = {"articles": [], "decisions": []}, []
-        for cle, fonction in (("articles", piste.articles), ("decisions", piste.decisions)):
+        for cle, fonction in (("articles", piste.articles), ("decisions", lambda t: piste.decisions(t, recent=recent))):
             try:
                 resultat[cle] = fonction(texte)
             except Indisponible as erreur:
@@ -217,10 +230,10 @@ def lancer_passerelle(port: int = 8000):
 
 # ------------------------------------------------------------ côté assistant
 
-def rechercher(adresse: str, texte: str, utilisateur: str | None) -> dict:
+def rechercher(adresse: str, texte: str, utilisateur: str | None, recent: bool = False) -> dict:
     """Appel de la passerelle depuis l'assistant (réseau interne)."""
     requete = urllib.request.Request(adresse.rstrip("/") + "/rechercher",
-                                     data=json.dumps({"texte": texte, "utilisateur": utilisateur}).encode(),
+                                     data=json.dumps({"texte": texte, "utilisateur": utilisateur, "recent": recent}).encode(),
                                      headers={"Content-Type": "application/json"})
     try:
         with urllib.request.urlopen(requete, timeout=2 * DELAI + 10) as r:

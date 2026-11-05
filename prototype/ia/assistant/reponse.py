@@ -24,7 +24,7 @@ from .recherche import contacts_utiles, rechercher
 
 TOURS_MAX = 4
 # Place laissée aux résultats d'outils dans le contexte du modèle (en caractères, environ 3 par token).
-CARACTERES_PAR_TOKEN = 3
+CARACTERES_PAR_TOKEN = 2.5  # prudent : le français, les nombres et les crochets coûtent plus d'un token par mot
 EVENEMENTS_MAX = 20
 
 OUTILS = [
@@ -291,7 +291,10 @@ def repondre(session: Session, question: str, index, moteur, fiches=None, dossie
     maintenant = datetime.now(PARIS)
     question = " ".join(question.split())[:1000]
     systeme = consignes.agent(maintenant, session.nom)
-    budget = (config.CONTEXTE - config.GENERATION_MAX - len(systeme) // CARACTERES_PAR_TOKEN - 400) * CARACTERES_PAR_TOKEN
+    # Contexte du modèle : consigne, description des outils, conversation, question, réponse attendue ; le reste
+    # va aux résultats d'outils (au-delà, le moteur refuse la requête).
+    fixe = len(systeme) + len(json.dumps(OUTILS, ensure_ascii=False)) + len(question) + sum(len(q) + len(r) for q, r in historique)
+    budget = int((moteur.contexte - config.GENERATION_MAX - 300) * CARACTERES_PAR_TOKEN - fixe)
     outils = Outils(session, index, moteur, fiches, dossier_choisi, budget)
     if dossier_choisi:  # choisi dans la liste de la page : une information pour le modèle, pas une décision
         outils.visibles()

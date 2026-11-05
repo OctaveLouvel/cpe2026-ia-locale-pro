@@ -31,6 +31,9 @@ FUSEAU = "Europe/Paris"
 # Taille du contexte (tokens) et nombre d'extraits donnés au modèle. Sur processeur, la lecture du contexte
 # domine le temps de réponse : peu d'extraits, mais les bons.
 CONTEXTE = int(os.environ.get("IA_CONTEXTE", "4096"))
+# Avec Ollama, l'assistant à outils a besoin de plus de place (description des outils, résultats de plusieurs
+# outils). Colibri garde CONTEXTE, qui doit rester égal à son réglage COLIBRI_CTX.
+CONTEXTE_OLLAMA = int(os.environ.get("IA_CONTEXTE_OLLAMA", "8192"))
 EXTRAITS = int(os.environ.get("IA_EXTRAITS", "5"))
 EXTRAITS_RESUME = int(os.environ.get("IA_EXTRAITS_RESUME", "5"))
 MOTS_PAR_EXTRAIT = int(os.environ.get("IA_MOTS_PAR_EXTRAIT", "130"))

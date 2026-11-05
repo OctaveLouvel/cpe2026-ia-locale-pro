@@ -146,6 +146,11 @@ class Moteur:
                "generation_tokens_s": round(usage.get("generes", 0) / generation, 1),
                "coupee": usage.get("raison") == "length", "longueur_max": longueur_max}
 
+    @property
+    def contexte(self):
+        """Taille du contexte du moteur actif, en tokens."""
+        return config.CONTEXTE if self.type == "openai" else config.CONTEXTE_OLLAMA
+
     def discuter(self, messages, outils, temperature=0.2):
         """Un tour de conversation avec outils, au fil de l'eau. Produit ("texte", morceau), puis éventuellement
         ("appels", [{"nom", "arguments"}]) si le modèle choisit d'utiliser des outils, puis ("mesures", {...})."""
@@ -169,7 +174,7 @@ class Moteur:
                      "generes": donnee.get("usage", {}).get("completion_tokens", 0)}
         else:
             corps = {"model": self.modele, "messages": messages, "tools": outils, "stream": True, "keep_alive": "24h",
-                     "think": False, "options": {"temperature": temperature, "num_ctx": config.CONTEXTE,
+                     "think": False, "options": {"temperature": temperature, "num_ctx": self.contexte,
                                                  "repeat_penalty": 1.15, "repeat_last_n": 128,
                                                  "num_predict": config.GENERATION_MAX}}
             with appeler(config.OLLAMA_URL, "/api/chat", corps) as reponse:

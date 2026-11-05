@@ -78,6 +78,10 @@ Plus rien n'est décidé par le code (ni mots-clés, ni réponse toute faite) : 
 | `chercher_contacts` | Recherche dans ses carnets d'adresses |
 | `proposer_rendez_vous` | Prépare un rendez-vous ; la page affiche la proposition, rien n'est fait avant « Confirmer » |
 | `proposer_dossier` | Prépare un dossier dans « Dossiers clients », même principe |
+| `lister_dossiers` | Dossiers clients visibles par la personne |
+| `lire_dossier` | Toutes les pièces d'un dossier : fiche préparée de chaque pièce (DEV-2), ou son début si la fiche n'est pas prête ; sert aux résumés |
+
+Intégré le 5 novembre au soir avec le travail de DEV-2 (PR #8) : le dossier choisi dans la liste est donné au modèle comme information, les dossiers concernés lancent la préparation de leurs fiches, la couverture des pièces (lue, citée, non lue) s'affiche sous chaque réponse, et les fiches en tâche de fond attendent la fin de la question. Contexte : 8 192 tokens avec Ollama (`IA_CONTEXTE_OLLAMA`), la description des outils en prend déjà environ 2 400 ; Colibri garde `IA_CONTEXTE` (4 096, égal à `COLIBRI_CTX`), ce qui laisse peu de place aux résultats d'outils : à augmenter des deux côtés si la carte graphique le permet.
 
 Ce qui reste dans le code est ce qu'on ne peut pas confier au modèle : les **droits** (chaque outil ne voit que ce que Nextcloud montre à la personne), l'**accord** de la personne avant une action, et l'absence de tout outil vers le **coffre-fort**. Les résultats d'outils sont numérotés : le modèle cite ses sources par ces numéros. Sans outil appelé, la page signale « Réponse générale du modèle, sans document source ».
 

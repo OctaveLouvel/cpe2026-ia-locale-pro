@@ -199,6 +199,8 @@ Chaque piège ci-dessous a été identifié pendant l'analyse du projet. **Un ag
 32. **Un RSE déclaratif.** Mesurer la consommation réelle de la box au wattmètre, la convertir en kWh par an, et présenter honnêtement les impacts négatifs (fabrication, consommation continue).
 33. **Viser moins de 700 à 800K€ de chiffre d'affaires à 5 ans.** C'est le minimum annoncé par le jury.
 34. **Rater une session obligatoire.** Les absences au coaching ou aux ateliers entraînent des sanctions individuelles.
+35. **Lancer le moteur d'IA depuis une fenêtre de terminal qu'on ferme ensuite.** *(ajouté le 5 novembre : Colibri s'est arrêté en pleine réponse à 15h07 quand la session qui l'avait lancé s'est fermée, et l'assistant l'affichait toujours comme actif.)* `./box.sh moteur-ia demarrer` le lance maintenant en service systemd. Avant de passer devant le jury : `./box.sh moteur-ia etat` et une question de test.
+36. **Croire qu'un nom de modèle désigne toujours le même modèle.** *(ajouté le 5 novembre : sur Ollama, `qwen3:4b` est devenu une variante qui réfléchit en anglais avant de répondre, ce qui a cassé le modèle de secours.)* Noter le nom complet (`qwen3:4b-instruct-2507-q4_K_M`) et repasser l'évaluation de la démo après chaque téléchargement.
 
 ---
 
@@ -211,6 +213,8 @@ Chaque piège ci-dessous a été identifié pendant l'analyse du projet. **Un ag
 | Matériel de la démo | DEV-1 | Mardi 3 nov, 14h00 | Ce qui est disponible tout de suite et fait tourner un modèle local correct. **Proposition du 3 nov** : portable de DEV-1 (16 Go, sans GPU dédié), à remplacer par un mini-PC ou un portable avec GPU s'il y en a un d'ici mercredi midi. Détail dans [`docs/prototype.md`](docs/prototype.md), section 2. À confirmer au point de 17h30 |
 | Prix des offres | BIZ + DEV-4 | Mercredi 4 nov, 17h30 | Coût matériel réel + réponses des entretiens |
 | Publication de la landing page | BIZ + DEV-3 | Mercredi 4 nov, 17h30 | Texte validé par BIZ, nom du projet, adresse de contact, durée de conservation des inscriptions, hébergeur (le serveur doit garder les inscriptions). Page prête en local : [`prototype/interface/README.md`](prototype/interface/README.md) |
+
+| Ajouts à l'assistant après le gel de la démo (jeudi 5 nov, 16h00) : liste des dossiers, fiche de dossier instantanée, résumé à partir de toutes les pièces, couverture « pièces lues / non lues » sous chaque réponse | DEV-2 + DEV-3 | Jeudi 5 nov, soir | Décidé le 5 novembre vers 17h (« on a encore 20 h »). **À valider par l'équipe** : la vidéo de secours de 16h30 ne montre pas ces écrans, et le scénario de démo (`docs/prototype.md`, section 6) est à revoir. Mesures et risques : `prototype/ia/README.md`, section « Fiches préparées à l'avance » |
 
 ---
 

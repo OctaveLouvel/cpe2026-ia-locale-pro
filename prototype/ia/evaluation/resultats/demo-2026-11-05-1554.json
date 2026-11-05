@@ -1,0 +1,59 @@
+[
+  {
+    "id": "Q1",
+    "essai": 1,
+    "compte": "hcorbiere",
+    "question": "Résume le dossier Fournil des Aubépines et liste les prochaines échéances.",
+    "premier_mot_s": 24.9,
+    "total_s": 51.3,
+    "mesures": {
+      "premier_mot_s": 22.4,
+      "tokens_contexte": 2137,
+      "tokens_generes": 397,
+      "generation_tokens_s": 15.0
+    },
+    "reponse": "Voici le résumé du dossier et les échéances :\n\n**Objet et faits**\n*   La SCI Montaury a donné un bail commercial à la SARL Fournil des Aubépines le 1er mars 2019 [2].\n*   Le locataire a cessé de payer les loyers dès juillet 2026 [2].\n*   Un sinistre (dégât des eaux) du 14 juin 2026, causé par la vétusté de la couverture, a justifié le non-paiement pour les mois de juillet, août et septembre [3].\n*   Un commandement de payer de 8 250 euros a été signifié le 22 septembre 2026 [2].\n*   Le locataire n’a versé que 2 750 euros le 15 octobre 2026 [2].\n\n**État de la procédure**\n*   La SCI Montaury a assigné le locataire en référé [2].\n*   Le délai d’un mois suite au commandement est expiré le 22 octobre 2026 [3].\n*   Me Corbière prépare des conclusions en défense pour demander un délai de paiement et la suspension de la clause résolutoire [1].\n\n**Prochaines échéances**\n*   **Mardi 10 novembre 2026** : Communication des conclusions et pièces à Me Lucet [7].\n*   **Vendredi 13 novembre 2026** : Réunion d’expertise avec M. Hugo Perrin sur la perte d’exploitation [8].\n*   **Mardi 17 novembre 2026** : Audience de référé au Tribunal judiciaire d’Évry, plaidoirie par Me Corbière [9].",
+    "ok": false,
+    "manquants": [
+      "5 ?500"
+    ],
+    "interdits": [],
+    "citees": [
+      "10 Projet de conclusions en défense (référé) - version 1.docx",
+      "08 Assignation en référé du 29 octobre 2026.pdf",
+      "09 Note d'entretien du 2 octobre 2026.docx",
+      "Échéance : conclusions et pièces à communiquer à Me Lucet - référé Fournil des Aubépines",
+      "Réunion d'expertise de l'assureur dans les locaux du Fournil des Aubépines",
+      "Audience de référé - SCI Montaury c. SARL Fournil des Aubépines (RG 26/01482)"
+    ],
+    "sources_ok": true,
+    "refus": null
+  },
+  {
+    "id": "Q2",
+    "essai": 1,
+    "compte": "hcorbiere",
+    "question": "Retrouve la clause de non-concurrence dans les contrats du dossier Garnier.",
+    "premier_mot_s": 20.8,
+    "total_s": 47.4,
+    "mesures": {
+      "premier_mot_s": 18.5,
+      "tokens_contexte": 1628,
+      "tokens_generes": 389,
+      "generation_tokens_s": 14.7
+    },
+    "reponse": "Voici les éléments relatifs à la clause de non-concurrence dans le dossier :\n\n*   **Base contractuelle** : La clause est prévue à l’article 12 du contrat de travail du 4 janvier 2021 [4]. L’avenant n° 1 du 1er février 2023 confirme que cette clause reste inchangée [2].\n*   **Contenu de l’article 12** :\n    *   Interdiction de travailler pour un concurrent ou de s’intéresser à une entreprise concurrente pendant 12 mois après la fin du contrat [4].\n    *   Champ d’activité : conception, distribution ou maintenance d’équipements de mesure industrielle [4].\n    *   Zone géographique : région Île-de-France [4].\n    *   Contrepartie financière : indemnité mensuelle brute égale à 30 % de la rémunération brute mensuelle moyenne des 12 derniers mois [5].\n    *   Modalités de renonciation : la société peut renoncer par lettre recommandée avec accusé de réception au plus tard dans les 15 jours suivant la notification de la rupture [5].\n\n*   **Évolution récente** : Un courriel de la DRH du 2 octobre 2026 informe la salariée de la renonciation à la clause, sans versement de contrepartie [1]. Cette renonciation est jugée tardive et irrégulière en la forme par la note d’entretien du 15 septembre 2026, car le délai de 15 jours (expirant le 25 septembre 2026) était déjà dépassé et la forme requise (lettre recommandée) n’a pas été respectée [3].",
+    "ok": true,
+    "manquants": [],
+    "interdits": [],
+    "citees": [
+      "06 Courriel de Techniflux du 2 octobre 2026 - renonciation à la clause de non-concurrence.pdf",
+      "03 Avenant n° 1 du 1er février 2023.pdf",
+      "09 Note d'entretien du 15 septembre 2026.docx",
+      "02 Contrat de travail du 4 janvier 2021.pdf",
+      "02 Contrat de travail du 4 janvier 2021.pdf"
+    ],
+    "sources_ok": true,
+    "refus": null
+  }
+]

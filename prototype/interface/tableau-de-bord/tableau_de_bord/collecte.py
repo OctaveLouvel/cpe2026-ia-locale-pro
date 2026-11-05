@@ -79,9 +79,10 @@ LIBELLES = {
     "verification_hors_ligne": "Vérification hors ligne",
     "moteur_ia": "Moteur d'IA",
     "modele_ia": "Modèle d'IA",
+    "juridique": "Pack juridique",
 }
 SOURCES = {"plateforme": "Box", "installeur": "Installation", "assistant": "Assistant IA",
-           "tableau-de-bord": "Tableau de bord"}
+           "tableau-de-bord": "Tableau de bord", "juridique": "Pack juridique"}
 
 
 def _date(texte):

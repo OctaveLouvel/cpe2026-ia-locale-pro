@@ -1,0 +1,15 @@
+{
+  "note": "Questions écrites par l'agent IA le 5 novembre 2026 pour tester la RECHERCHE du pack juridique (l'article attendu est-il donné au modèle ?), pas la qualité des réponses. À remplacer par les questions réelles des cabinets pilotes, anonymisées. L'article attendu est celui que cite tout manuel de droit sur la question.",
+  "questions": [
+    {"question": "Que dit l'article 1240 du Code civil ?", "attendu": ["code civil", "1240"], "type": "référence"},
+    {"question": "Que prévoit l'article 700 du code de procédure civile ?", "attendu": ["code de procedure civile", "700"], "type": "référence"},
+    {"question": "Que disent les articles L. 1234-9 et R. 1234-2 C. trav. ?", "attendu": ["code du travail", "L1234-9"], "type": "référence"},
+    {"question": "Que disait l'article 1382 du code civil, version en vigueur en 2010 ?", "attendu": ["code civil", "1382"], "type": "référence datée"},
+    {"question": "Quel est le délai de prescription des actions personnelles ou mobilières ?", "attendu": ["code civil", "2224"], "type": "recherche"},
+    {"question": "Quelles sont les conditions nécessaires à la validité d'un contrat ?", "attendu": ["code civil", "1128"], "type": "recherche"},
+    {"question": "Quelle est la durée minimale du bail commercial ?", "attendu": ["code de commerce", "L145-4"], "type": "recherche"},
+    {"question": "Quel est le délai de rétractation pour un contrat conclu à distance par un consommateur ?", "attendu": ["code de la consommation", "L221-18"], "type": "recherche"},
+    {"question": "Quel est le délai pour faire appel d'un jugement en matière contentieuse ?", "attendu": ["code de procedure civile", "538"], "type": "recherche"},
+    {"question": "Quel préavis le salarié licencié doit-il recevoir selon son ancienneté ?", "attendu": ["code du travail", "L1234-1"], "type": "recherche"}
+  ]
+}

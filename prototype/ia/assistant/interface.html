@@ -74,7 +74,7 @@ table.journal td{border-bottom:1px solid var(--bord);padding:6px 4px;vertical-al
 
   <section id="conversation" hidden>
     <div class="carte" id="accueil">
-      Posez une question sur vos dossiers, vos audiences ou vos contacts. Chaque réponse cite ses sources :
+      Posez une question sur vos dossiers, vos audiences, vos contacts, ou sur les textes et la jurisprudence. Chaque réponse cite ses sources :
       vérifiez-les avant de les utiliser. L'assistant n'a jamais accès au coffre-fort de mots de passe.
       <div class="suggestions">
         <button type="button">Quelles sont mes prochaines audiences ?</button>
@@ -86,7 +86,7 @@ table.journal td{border-bottom:1px solid var(--bord);padding:6px 4px;vertical-al
 
   <section class="carte" id="journal" hidden>
     <strong>Ce qui a été tracé pour votre compte</strong>
-    <p class="pied">Journal d'audit de l'assistant, conservé sur la box. Aucune question n'est envoyée hors du cabinet.</p>
+    <p class="pied">Journal d'audit de l'assistant, conservé sur la box. Aucune question n'est envoyée hors du cabinet. Seule exception, si le cabinet a activé la recherche juridique en ligne : les mots juridiques de la question, sans aucun nom propre, et ce texte est inscrit au journal.</p>
     <table class="journal"><tbody id="lignes-journal"></tbody></table>
   </section>
 </main>
@@ -125,6 +125,12 @@ function carteSource(s, q) {
     details = [s.dossier && `dossier ${s.dossier}`, s.page && `page ${s.page}`, s.section].filter(Boolean).join(" · ");
     liens = `<a href="${s.lien}" target="_blank" rel="noopener">${s.page ? "Ouvrir à la page " + s.page : "Ouvrir"}</a>`
           + `<a href="${s.lien_nextcloud}" target="_blank" rel="noopener">Voir dans les fichiers</a>`;
+  } else if (s.type === "loi" || s.type === "jurisprudence") {
+    // Textes publics (DILA) : lisibles sur la box, et sur Légifrance quand le poste a internet.
+    details = [s.type === "loi" ? s.version : [s.solution, s.publie ? "publiée" : ""].filter(Boolean).join(", "), s.origine]
+              .filter(Boolean).join(" · ");
+    liens = (s.lien ? `<a href="${s.lien}" target="_blank" rel="noopener">Lire le texte</a>` : "")
+          + `<a href="${s.lien_public}" target="_blank" rel="noopener noreferrer">Voir sur Légifrance</a>`;
   } else if (s.type === "agenda") {
     details = `${s.quand} · ${s.agenda}`;
     liens = `<a href="${s.lien_nextcloud}" target="_blank" rel="noopener">Ouvrir l'agenda</a>`;
@@ -132,7 +138,7 @@ function carteSource(s, q) {
     details = s.carnet;
     liens = `<a href="${s.lien_nextcloud}" target="_blank" rel="noopener">Ouvrir les contacts</a>`;
   }
-  const libelle = {document: "Document", agenda: "Agenda", contact: "Contact"}[s.type];
+  const libelle = {document: "Document", agenda: "Agenda", contact: "Contact", loi: "Texte de loi", jurisprudence: "Jurisprudence"}[s.type];
   return `<div class="source${s.citee ? " citee" : ""}" id="source-${q}-${s.numero}">
     <div class="type">[${s.numero}] ${libelle}</div><strong>${echapper(s.titre)}</strong>
     <div>${echapper(details || "")}</div>

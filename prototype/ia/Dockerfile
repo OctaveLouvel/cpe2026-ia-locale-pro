@@ -7,6 +7,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY assistant/ assistant/
+COPY juridique/ juridique/
 COPY modeles.json modeles.json
 
 EXPOSE 8000

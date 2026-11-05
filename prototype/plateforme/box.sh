@@ -591,6 +591,62 @@ cmd_moteur_ia() {
     esac
 }
 
+# ---------------------------------------------------------------- pack juridique (DEV-2)
+
+# Codes, lois et jurisprudence en données ouvertes (DILA), dans sortie/juridique/base.sqlite. La mise à jour
+# est la seule connexion sortante du pack hors ligne : à lancer pendant la fenêtre de maintenance.
+cmd_juridique() {
+    charger_env
+    local action=${1:-etat}
+    shift || true
+    mkdir -p "$SORTIE/juridique/archives"
+    case $action in
+        etat)
+            "${COMPOSE[@]}" run --rm --no-deps juridique-maj etat
+            ;;
+        mettre-a-jour)
+            info "Mise à jour depuis echanges.dila.gouv.fr (${*:-tous les fonds}). Premier passage : plusieurs Go et plusieurs heures."
+            "${COMPOSE[@]}" run --rm --no-deps -e BOX_ADMIN="${USER:-admin}" juridique-maj mettre-a-jour "$@"
+            "${COMPOSE[@]}" restart assistant >/dev/null
+            ok "pack juridique à jour"
+            ;;
+        importer)
+            # Archives déjà copiées dans sortie/juridique/archives/ (installation sans internet).
+            local archives=() f
+            for f in "$SORTIE"/juridique/archives/*.tar.gz; do [ -e "$f" ] && archives+=("/juridique/archives/$(basename "$f")"); done
+            [ ${#archives[@]} -gt 0 ] || echec "aucune archive dans sortie/juridique/archives/"
+            "${COMPOSE[@]}" run --rm --no-deps --network none juridique-maj importer "${archives[@]}"
+            "${COMPOSE[@]}" restart assistant >/dev/null
+            journal juridique "${#archives[@]} archive(s) importée(s) dans le pack juridique"
+            ok "${#archives[@]} archive(s) importée(s)"
+            ;;
+        en-ligne)
+            case ${1:-} in
+                activer)
+                    [ -n "${PISTE_CLIENT_ID:-}" ] && [ -n "${PISTE_CLIENT_SECRET:-}" ] \
+                        || echec "renseigner PISTE_CLIENT_ID et PISTE_CLIENT_SECRET dans .env (compte sur https://piste.gouv.fr)"
+                    sed -i "s|^IA_JURIDIQUE_EN_LIGNE=.*|IA_JURIDIQUE_EN_LIGNE=http://juridique-en-ligne:8000|" .env
+                    grep -q "^IA_JURIDIQUE_EN_LIGNE=" .env || echo "IA_JURIDIQUE_EN_LIGNE=http://juridique-en-ligne:8000" >> .env
+                    charger_env
+                    "${COMPOSE[@]}" --profile juridique-en-ligne up -d juridique-en-ligne assistant
+                    journal juridique "recherche juridique en ligne activée (Légifrance, Judilibre)"
+                    ok "recherche en ligne activée : chaque requête est inscrite au journal d'audit"
+                    ;;
+                desactiver)
+                    sed -i "s|^IA_JURIDIQUE_EN_LIGNE=.*|IA_JURIDIQUE_EN_LIGNE=|" .env
+                    charger_env
+                    "${COMPOSE[@]}" --profile juridique-en-ligne rm -sf juridique-en-ligne >/dev/null
+                    "${COMPOSE[@]}" up -d assistant
+                    journal juridique "recherche juridique en ligne désactivée"
+                    ok "recherche en ligne désactivée"
+                    ;;
+                *) echec "usage : ./box.sh juridique en-ligne activer|desactiver" ;;
+            esac
+            ;;
+        *) echec "usage : ./box.sh juridique etat|mettre-a-jour [LEGI CASS INCA CAPP JADE]|importer|en-ligne activer|desactiver" ;;
+    esac
+}
+
 # Prépare l'index de recherche pour la démo, avec le compte de l'associée (qui voit tous les dossiers).
 cmd_indexer_ia() {
     charger_env
@@ -648,6 +704,7 @@ Usage : ./box.sh <commande>
   ia [commande]        Modèles d'IA : menu pour choisir, installer et activer (liste, installer, activer, supprimer)
   moteur-ia ACTION     demarrer | arreter | etat : moteur Colibri sur le réseau interne
   indexer-ia           Prépare l'index de recherche de l'assistant pour la démo
+  juridique ACTION     Pack juridique : etat | mettre-a-jour [fonds] | importer | en-ligne activer|desactiver
   assistant [adresse]  Assistant web de première configuration (défaut 127.0.0.1:8090)
   preparer-hors-ligne  Exporte toutes les images dans sortie/images-box.tar (installation sans internet)
   reinitialiser        Supprime conteneurs ET volumes (demande confirmation)
@@ -672,6 +729,7 @@ case $commande in
     moteur-ia)            cmd_moteur_ia "$@" ;;
     ia)                   charger_env; exec python3 "$ICI/../ia/gerer_modeles.py" "$@" ;;
     indexer-ia)           cmd_indexer_ia ;;
+    juridique)            cmd_juridique "$@" ;;
     assistant)            exec python3 "$ICI/installeur/assistant.py" "$@" ;;
     preparer-hors-ligne)  cmd_preparer_hors_ligne ;;
     reinitialiser)        cmd_reinitialiser ;;

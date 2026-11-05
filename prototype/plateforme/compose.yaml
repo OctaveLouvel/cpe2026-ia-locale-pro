@@ -197,10 +197,14 @@ services:
       BOX_DOMAIN: ${BOX_DOMAIN:-cabinet.localhost}
       IA_DONNEES: /donnees
       IA_JOURNAL: /journal/assistant.jsonl
+      # Pack juridique (./box.sh juridique) : base en lecture seule ; passerelle en ligne optionnelle.
+      IA_JURIDIQUE_BASE: /juridique/base.sqlite
+      IA_JURIDIQUE_EN_LIGNE: ${IA_JURIDIQUE_EN_LIGNE:-}
       TZ: Europe/Paris
     volumes:
       - ./sortie/ia:/donnees
       - ./sortie/journal:/journal
+      - ./sortie/juridique:/juridique:ro
     networks: [interne]
     depends_on:
       nextcloud:
@@ -211,6 +215,43 @@ services:
       timeout: 10s
       retries: 5
       start_period: 1m
+
+  # Recherche juridique en ligne (Légifrance, Judilibre), optionnelle : profil « juridique-en-ligne », activé par
+  # ./box.sh juridique en-ligne activer quand les identifiants PISTE sont dans .env. Seul conteneur du pack relié à
+  # internet ; il ne reçoit que des requêtes de recherche sans nom propre, et inscrit chacune au journal.
+  juridique-en-ligne:
+    image: box/assistant:0.1
+    profiles: [juridique-en-ligne]
+    restart: unless-stopped
+    user: "${BOX_UID:-1000}:${BOX_GID:-1000}"
+    command: ["python", "-m", "juridique", "passerelle"]
+    environment:
+      PISTE_CLIENT_ID: ${PISTE_CLIENT_ID:-}
+      PISTE_CLIENT_SECRET: ${PISTE_CLIENT_SECRET:-}
+      PISTE_CLE_API: ${PISTE_CLE_API:-}
+      PISTE_ENVIRONNEMENT: ${PISTE_ENVIRONNEMENT:-production}
+      JURIDIQUE_JOURNAL: /journal/juridique.jsonl
+      TZ: Europe/Paris
+    volumes:
+      - ./sortie/journal:/journal
+    networks: [interne, sortie]
+
+  # Outil ponctuel : mise à jour du pack juridique depuis la DILA (./box.sh juridique mettre-a-jour), pendant la
+  # fenêtre de maintenance. Réseau « sortie » seulement : il ne voit aucun service de la box.
+  juridique-maj:
+    image: box/assistant:0.1
+    profiles: [outils]
+    user: "${BOX_UID:-1000}:${BOX_GID:-1000}"
+    entrypoint: ["python", "-u", "-m", "juridique"]
+    environment:
+      JURIDIQUE_BASE: /juridique/base.sqlite
+      JURIDIQUE_ARCHIVES: /juridique/archives
+      JURIDIQUE_JOURNAL: /journal/juridique.jsonl
+      TZ: Europe/Paris
+    volumes:
+      - ./sortie/juridique:/juridique
+      - ./sortie/journal:/journal
+    networks: [sortie]
 
   # Tableau de bord de la box (DEV-3), page d'accueil https://<domaine> : état des services, sauvegardes,
   # connexions sortantes, versions, lien vers le journal d'audit de DEV-4. Bibliothèque standard de Python :

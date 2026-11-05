@@ -112,6 +112,8 @@ flowchart TB
 
 **Décision : le pack métier passe dans la roadmap et n'est pas montré.** Pour avoir les articles en vigueur, il faut l'archive complète plus toutes les archives quotidiennes depuis juillet 2025, puis choisir pour chaque article la version en vigueur : ça ne tient pas en une demi-journée, avec en plus un réseau à 1 ou 2 Mo/s à l'école. Plan pour la V1 : extraire les codes utiles à un petit cabinet (civil, commerce, travail, procédure civile), les mettre à jour chaque mois pendant la fenêtre de maintenance (connexion sortante journalisée), et faire citer par l'assistant l'article et sa date de version.
 
+**5 novembre : pack juridique écrit sur la branche `dev2-juridique`, hors de la démo** ([`prototype/ia/juridique/README.md`](../prototype/ia/juridique/README.md)). Il reprend le plan ci-dessus sans se limiter à quatre codes : tous les codes et textes en vigueur de LEGI avec toutes les versions des articles (la version applicable se choisit à la date des faits), la jurisprudence de la DILA (CASS, INCA, CAPP, JADE) reliée aux articles qu'elle applique, la mise à jour par les archives quotidiennes (connexion sortante journalisée), et en option une recherche en ligne par les API Légifrance et Judilibre (requête sans nom propre, journalisée, désactivée par défaut). La décision pour la démo ne change pas ; la fusion dans `main` après l'oral est à valider par l'équipe (README, section 8).
+
 ## 4. Priorités
 
 | Priorité | Élément |

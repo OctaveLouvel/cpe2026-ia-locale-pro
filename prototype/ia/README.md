@@ -106,4 +106,4 @@ Banc de mesure : [`mesures/mesurer_modeles.py`](mesures/mesurer_modeles.py), 5 q
 - La recherche par le sens demande le modèle d'embeddings ; sans lui, la recherche se fait par mots, ce qui suffit pour les questions de la démo.
 - L'index contient le texte de tous les documents consultés par au moins une personne : il est protégé comme les données (disque de la box), et filtré à chaque question.
 - Le coffre-fort est sur le même réseau Docker interne que l'assistant : l'isolement repose sur l'absence de code et d'identifiants. DEV-4 peut le placer sur un réseau séparé pour le rendre impossible par construction.
-- Pack métier (textes de loi en données ouvertes) : dans la roadmap, voir `docs/prototype.md`, section 3.
+- Pack métier (textes de loi en données ouvertes) : hors de la démo (`docs/prototype.md`, section 3). Écrit sur la branche `dev2-juridique` : voir [`juridique/README.md`](juridique/README.md). Sans base juridique (`sortie/juridique/base.sqlite` absent), l'assistant fonctionne comme avant.

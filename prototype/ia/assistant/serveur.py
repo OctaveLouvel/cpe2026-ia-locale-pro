@@ -5,6 +5,7 @@ Bibliothèque standard uniquement. Derrière le reverse proxy TLS de la box : ht
 """
 import base64
 import hashlib
+import html
 import json
 import secrets
 import sys
@@ -20,6 +21,7 @@ from .index import Index
 from .moteur import Moteur, MoteurIndisponible
 from .nextcloud import AccesRefuse, Client, Indisponible
 from .reponse import Session, repondre
+from juridique.recherche import Juridique
 
 INTERFACE = (Path(__file__).parent / "interface.html").read_bytes()
 PAGE_MODELES = (Path(__file__).parent / "modeles.html").read_bytes()
@@ -31,6 +33,8 @@ POLITIQUE = ("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src '
 
 moteur = Moteur()
 index = Index(moteur)
+juridique = Juridique(config.JURIDIQUE_BASE, config.JURIDIQUE_EN_LIGNE, config.DONNEES / "juridique-vecteurs.sqlite",
+                      total_max=config.EXTRAITS_JURIDIQUES)
 etat = {"pret": False, "message": "Démarrage"}
 sessions: dict[str, tuple[Session, float]] = {}
 sessions_basic: dict[str, tuple[Session, float]] = {}
@@ -140,7 +144,8 @@ class Gestionnaire(BaseHTTPRequestHandler):
         if chemin == "/api/etat":
             return self._repondre({**etat, "modele": moteur.modele, "modele_embeddings": moteur.modele_embeddings,
                                    "documents_indexes": len(index.fichiers), "extraits": len(index.morceaux),
-                                   "recherche_semantique": index.vecteurs is not None})
+                                   "recherche_semantique": index.vecteurs is not None,
+                                   "juridique": juridique.etat()})
         session = self._session()
         if chemin == "/api/session":
             return self._repondre({"connecte": session is not None,
@@ -160,6 +165,8 @@ class Gestionnaire(BaseHTTPRequestHandler):
             return self._repondre({**modeles.etat(moteur), "pret": etat["pret"], "message": etat["message"]})
         if chemin.startswith("/api/document/"):
             return self._document(session, urllib.parse.unquote(chemin.rsplit("/", 1)[1]))
+        if chemin.startswith(("/api/juridique/article/", "/api/juridique/decision/")):
+            return self._texte_juridique(chemin.split("/")[3], urllib.parse.unquote(chemin.rsplit("/", 1)[1]))
         self._repondre({"erreur": "Introuvable."}, 404)
 
     def _document(self, session, fileid):
@@ -174,6 +181,45 @@ class Gestionnaire(BaseHTTPRequestHandler):
         nom = urllib.parse.quote(fichier.nom)
         self._repondre(contenu, type_contenu=fichier.type_mime or "application/octet-stream",
                        entetes={"Content-Disposition": f"inline; filename*=UTF-8''{nom}"})
+
+    def _texte_juridique(self, nature, identifiant):
+        """Article ou décision de la base juridique, lisible hors ligne (données publiques de la DILA)."""
+        if not juridique.disponible:
+            return self._repondre({"erreur": "Pack juridique absent."}, 404)
+        if nature == "article":
+            a = juridique.base.article_par_id(identifiant)
+            if a is None:
+                return self._repondre({"erreur": "Article introuvable."}, 404)
+            versions = juridique.base.versions(a["cid"], a["num_norm"])
+            titre = f"{a['titre']}, article {a['num']}"
+            sous_titre = f"{html.escape(a['chemin'])}<br>Version {a['etat'].lower()} du {a['debut']} au {a['fin'].replace('2999-01-01', 'aujourd’hui')}"
+            corps = html.escape(a["texte"]).replace("\n", "<br>")
+            if a["nota"]:
+                corps += f"<h2>Nota</h2>{html.escape(a['nota']).replace(chr(10), '<br>')}"
+            if len(versions) > 1:
+                corps += "<h2>Versions</h2><ul>" + "".join(
+                    f"<li><a href='/api/juridique/article/{v['id']}'>{v['debut']} au {v['fin'].replace('2999-01-01', 'aujourd’hui')}</a> ({v['etat'].lower()})</li>"
+                    for v in versions) + "</ul>"
+            dossier = "codes" if a["titre"].lower().startswith("code") else "loda"
+            public = f"https://www.legifrance.gouv.fr/{dossier}/article_lc/{a['id']}"
+        else:
+            d = juridique.base.decision(identifiant)
+            if d is None:
+                return self._repondre({"erreur": "Décision introuvable."}, 404)
+            titre = d["titre"]
+            sous_titre = html.escape(" · ".join(x for x in [d["solution"], "publiée" if d["publie"] else "non publiée", d["ecli"]] if x))
+            corps = (f"<h2>Sommaire</h2>{html.escape(d['sommaire']).replace(chr(10), '<br>')}" if d["sommaire"] else "") + \
+                    f"<h2>Texte</h2>{html.escape(d['texte']).replace(chr(10), '<br>')}"
+            public = f"https://www.legifrance.gouv.fr/{'ceta' if d['id'].startswith('CETATEXT') else 'juri'}/id/{d['id']}"
+        page = (f"<!doctype html><html lang='fr'><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'>"
+                f"<title>{html.escape(titre)}</title><style>body{{max-width:760px;margin:0 auto;padding:24px 16px;"
+                "font-family:Inter,system-ui,sans-serif;line-height:1.6;color:#16203a;background:#fff}h1{font-size:1.3rem}"
+                "h2{font-size:1rem;margin-top:28px}.doux{color:#5d6677;font-size:.9rem}a{color:#14274e}"
+                "@media (prefers-color-scheme:dark){body{background:#0e1424;color:#e6eaf1}.doux{color:#9aa3b5}a{color:#c9d8f0}}</style>"
+                f"<h1>{html.escape(titre)}</h1><p class='doux'>{sous_titre}</p><div>{corps}</div>"
+                f"<p class='doux'>Source : DILA, données ouvertes (licence ouverte Etalab). <a href='{html.escape(public)}' rel='noopener noreferrer'>voir sur Légifrance</a> (en ligne)</p></html>")
+        self._repondre(page.encode(), type_contenu="text/html; charset=utf-8",
+                       entetes={"Content-Security-Policy": POLITIQUE, "Referrer-Policy": "no-referrer"})
 
     # ------------------------------------------------------------ POST
 
@@ -291,7 +337,7 @@ class Gestionnaire(BaseHTTPRequestHandler):
         if not etat["pret"]:
             return envoyer({"type": "erreur", "texte": f"L'assistant n'est pas prêt : {etat['message']}."})
         try:
-            for evenement in repondre(session, question, index, moteur):
+            for evenement in repondre(session, question, index, moteur, juridique):
                 envoyer(evenement)
         except (BrokenPipeError, ConnectionResetError):
             pass  # page fermée : la génération s'arrête avec la connexion au moteur

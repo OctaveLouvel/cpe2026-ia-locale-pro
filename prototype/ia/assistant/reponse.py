@@ -1,6 +1,7 @@
 """Réponse à une question : garde-fous, recherche avec les droits de la personne, modèle local, citations,
 journal. Produit des événements que le serveur envoie au navigateur au fil de l'eau."""
 import re
+import sqlite3
 import time
 import urllib.parse
 from dataclasses import dataclass
@@ -10,6 +11,7 @@ from . import config, consignes, journal
 from .index import jetons
 from .nextcloud import PARIS, Client
 from .recherche import (contacts_utiles, dossiers_cites, evenements_utiles, noms_inconnus, rechercher)
+from juridique.recherche import Resultat, est_juridique
 
 COFFRE = re.compile(r"(?i)\b(mots? de passe|password|mdp|coffre[- ]?fort|codes? d.acc[eè]s|identifiants? de connexion"
                     r"|cl[ée] e-?barreau)\b")
@@ -22,6 +24,8 @@ REFUS_COFFRE = ("Je n'ai pas accès au coffre-fort de mots de passe : il est sé
                 "ni lire ni communiquer un mot de passe. Pour l'obtenir, ouvrez le coffre-fort du cabinet avec "
                 "votre propre compte.")
 RIEN = "Je ne trouve pas cette information dans les documents auxquels vous avez accès."
+RIEN_JURIDIQUE = ("Je ne trouve pas cette information dans les documents auxquels vous avez accès, ni dans les "
+                  "textes de loi et la jurisprudence de la box.")
 
 
 @dataclass
@@ -51,7 +55,7 @@ def _quand(evenement):
     return f"{jour}, de {consignes.heure(evenement.debut)}{fin}"
 
 
-def repondre(session: Session, question: str, index, moteur):
+def repondre(session: Session, question: str, index, moteur, juridique=None):
     debut = time.monotonic()
     maintenant = datetime.now(PARIS)
     question = " ".join(question.split())[:1000]
@@ -83,6 +87,9 @@ def repondre(session: Session, question: str, index, moteur):
 
     # 3. Un nom inconnu de cette personne : on ne cherche pas plus loin et on ne dit pas s'il existe ailleurs.
     inconnus = noms_inconnus(question, mots_visibles)
+    # Les noms des codes et des juridictions (« Cour », « Conseil d'État ») ne sont pas des noms de personnes.
+    if juridique is not None and inconnus and est_juridique(question):
+        inconnus = [nom for nom in inconnus if not juridique.connu(nom)]
     if inconnus:
         texte = (f"Je ne trouve aucun élément mentionnant « {', '.join(inconnus)} » parmi les documents, agendas "
                  "et contacts auxquels vous avez accès.")
@@ -127,14 +134,30 @@ def repondre(session: Session, question: str, index, moteur):
         sources.append({"numero": numero, "type": "contact", "titre": c.nom, "carnet": c.carnet,
                         "lien_nextcloud": f"https://cloud.{config.BOX_DOMAIN}/apps/contacts"})
 
-    # 5. Rien de pertinent : pas d'appel au modèle, pas de réponse inventée.
+    # 5. Textes de loi et jurisprudence : références de la question et des pièces retenues, recherche dans
+    #    la base juridique de la box, et en option en ligne (requête sans nom propre, inscrite au journal).
+    if juridique is not None and not resume:
+        pieces = [index.morceaux[i].texte for i in indices]
+        try:
+            trouve = juridique.extraits(question, pieces, maintenant.date(), session.login, moteur)
+        except sqlite3.Error:  # base en cours de mise à jour : on répond avec les seuls documents
+            trouve = Resultat(etapes=["Textes juridiques indisponibles pendant leur mise à jour"])
+        for etape in trouve.etapes:
+            yield {"type": "etape", "texte": etape}
+        for e in trouve.extraits:
+            numero = len(extraits) + 1
+            extraits.append({"numero": numero, "etiquette": e["etiquette"], "texte": e["texte"]})
+            sources.append({"numero": numero, **e["source"]})
+
+    # 6. Rien de pertinent : pas d'appel au modèle, pas de réponse inventée.
     if not extraits:
         journal.ecrire("aucun_resultat", session.login, {"question": question}, "refus")
-        yield {"type": "texte", "texte": RIEN}
+        yield {"type": "texte", "texte": RIEN_JURIDIQUE if juridique is not None and juridique.disponible
+               and est_juridique(question) else RIEN}
         yield fin([], refus="aucun_extrait")
         return
 
-    # 6. Le modèle local rédige, à partir des seuls extraits.
+    # 7. Le modèle local rédige, à partir des seuls extraits.
     yield {"type": "etape", "texte": f"Rédaction par le modèle local à partir de {len(extraits)} extrait(s)"}
     message = consignes.message(question, extraits, maintenant, f"{session.nom} ({session.login})", resume)
     morceaux, mesures = [], {}

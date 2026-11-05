@@ -36,3 +36,10 @@ EXTRAITS_RESUME = int(os.environ.get("IA_EXTRAITS_RESUME", "5"))
 MOTS_PAR_EXTRAIT = int(os.environ.get("IA_MOTS_PAR_EXTRAIT", "130"))
 JOURS_AGENDA = int(os.environ.get("IA_JOURS_AGENDA", "45"))
 GENERATION_MAX = int(os.environ.get("IA_GENERATION_MAX", "400"))
+
+# Pack juridique (codes, lois, jurisprudence) : base SQLite en lecture seule, remplie par ./box.sh juridique.
+# Absente : l'assistant répond seulement à partir des documents du cabinet.
+JURIDIQUE_BASE = Path(os.environ.get("IA_JURIDIQUE_BASE", "/juridique/base.sqlite"))
+# Passerelle de recherche en ligne (Légifrance, Judilibre). Vide : aucune recherche en ligne.
+JURIDIQUE_EN_LIGNE = os.environ.get("IA_JURIDIQUE_EN_LIGNE", "")
+EXTRAITS_JURIDIQUES = int(os.environ.get("IA_EXTRAITS_JURIDIQUES", "4"))

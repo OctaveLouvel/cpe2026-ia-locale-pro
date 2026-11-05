@@ -8,7 +8,12 @@ import re
 from dataclasses import dataclass
 
 import docx
+from pdfminer.high_level import extract_text as pdfminer_texte
 from pypdf import PdfReader
+
+# Version de l'extraction : la changer fait relire tous les documents (et refaire leurs fiches).
+# 2 (5 novembre) : pages aux mots collés relues avec pdfminer.
+VERSION = 2
 
 TYPES_PRIS_EN_CHARGE = {
     "application/pdf": "pdf",
@@ -52,10 +57,30 @@ def _nettoyer(texte: str) -> str:
     return "\n".join(l for l in lignes if l.strip() and not BRUIT.match(l.strip()))
 
 
+def mots_colles(texte: str) -> bool:
+    """Page dont les espaces ont disparu à l'extraction (« Restedûcumulé », « 340000euros ») : courant dans
+    les PDF où les mots ne sont séparés que par leur position. La recherche par mots ne les trouve plus."""
+    mots = [m for m in texte.split() if "@" not in m and "://" not in m]
+    longs = sum(1 for m in mots if len(m) >= 18)
+    return bool(mots) and longs / len(mots) > 0.02
+
+
 def _pdf(contenu: bytes) -> list[Passage]:
+    """pypdf par défaut (il garde les lignes des tableaux) ; pdfminer pour une page aux mots collés (il
+    retrouve les espaces à partir de l'écart entre les lettres, mais lit les tableaux colonne par colonne)."""
     lecteur = PdfReader(io.BytesIO(contenu))
-    return [Passage(_nettoyer(page.extract_text() or ""), page=numero)
-            for numero, page in enumerate(lecteur.pages, start=1)]
+    passages = []
+    for numero, page in enumerate(lecteur.pages, start=1):
+        texte = page.extract_text() or ""
+        if mots_colles(texte):
+            try:
+                autre = pdfminer_texte(io.BytesIO(contenu), page_numbers=[numero - 1])
+                if not mots_colles(autre):
+                    texte = autre
+            except Exception:  # pdfminer refuse certains PDF : on garde le texte de pypdf
+                pass
+        passages.append(Passage(_nettoyer(texte), page=numero))
+    return passages
 
 
 def _docx(contenu: bytes) -> list[Passage]:

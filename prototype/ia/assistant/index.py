@@ -18,6 +18,12 @@ import numpy as np
 from . import config, extraction
 from .moteur import MoteurIndisponible
 
+
+def dans_les_dossiers(chemin: str) -> bool:
+    """Pièce rangée dans un dossier client (IA_FICHES_RACINES, par défaut « Dossiers clients »)."""
+    morceaux = chemin.split("/")[:-1]
+    return len(morceaux) >= 2 and any(r in morceaux for r in config.FICHES_RACINES)
+
 MOTS_VIDES = set("""a au aux avec ce ces cet cette dans de des du elle en et eux il ils je la le les leur lui ma
 mais me meme mes moi mon ne nos notre nous on ou par pas pour qu que qui sa se ses son sur ta te tes toi ton tu
 un une vos votre vous y est sont ete etre avoir ont fait faire plus tout tous aussi comme si sans entre""".split())
@@ -90,7 +96,8 @@ class Index:
 
     def a_indexer(self, fichiers):
         return [f for f in fichiers if f.type_mime in extraction.TYPES_PRIS_EN_CHARGE
-                and self.fichiers.get(f.fileid, {}).get("etag") != f.etag]
+                and (self.fichiers.get(f.fileid, {}).get("etag") != f.etag
+                     or self.fichiers[f.fileid].get("extraction", 1) != extraction.VERSION)]
 
     def mettre_a_jour(self, client, fichiers) -> int:
         """Indexe les fichiers nouveaux ou modifiés, lus avec les droits du client. Renvoie leur nombre."""
@@ -102,11 +109,83 @@ class Index:
                 titre = fichier.nom.rsplit(".", 1)[0]
                 self._remplacer(fichier.fileid, [Morceau(fichier.fileid, titre, e.texte, e.page, e.section)
                                                  for e in extraits])
-                self.fichiers[fichier.fileid] = {"etag": fichier.etag, "nom": fichier.nom}
+                ancien = self.fichiers.get(fichier.fileid, {})
+                self.fichiers[fichier.fileid] = {"etag": fichier.etag, "nom": fichier.nom, "dossier": fichier.dossier,
+                                                 "extraction": extraction.VERSION,
+                                                 "piece_dossier": ancien.get("piece_dossier", False)
+                                                 or dans_les_dossiers(fichier.chemin)}
             if a_faire:
                 self._preparer_bm25()
                 self._enregistrer()
             return len(a_faire)
+
+    def noter_chemins(self, fichiers):
+        """Dossier de chaque fichier indexé, et s'il s'agit d'une pièce de dossier client. Le chemin dépend de
+        la personne (un dossier partagé apparaît à la racine de ses fichiers) : une pièce vue une fois sous
+        « Dossiers clients » le reste, et le nom du dossier (dernier répertoire) est le même pour tous."""
+        with self.verrou:
+            change = False
+            for f in fichiers:
+                entree = self.fichiers.get(f.fileid)
+                if entree is None:
+                    continue
+                piece = entree.get("piece_dossier", False) or dans_les_dossiers(f.chemin)
+                if entree.get("dossier") != f.dossier or entree.get("piece_dossier") != piece:
+                    entree.update(dossier=f.dossier, piece_dossier=piece)
+                    entree.pop("chemin", None)
+                    change = True
+            if change:
+                self._enregistrer()
+
+    def retirer_pieces_absentes(self, fichiers) -> list[str]:
+        """Pièce d'un dossier que la personne voit, mais que Nextcloud ne lui montre plus : supprimée (ou
+        déplacée hors des fichiers). Elle sort de l'index ; sinon la fiche du dossier compterait une pièce que
+        plus personne ne voit et ne s'afficherait plus. Dans Nextcloud, voir un dossier partagé, c'est voir
+        tous ses fichiers : l'absence d'une pièce n'est donc pas un droit retiré à cette personne."""
+        vus = {f.fileid for f in fichiers}
+        with self.verrou:
+            dossiers_vus = {f.dossier for f in fichiers if self.fichiers.get(f.fileid, {}).get("piece_dossier")}
+            partis = [fid for fid, e in self.fichiers.items()
+                      if e.get("piece_dossier") and e.get("dossier") in dossiers_vus and fid not in vus]
+            for fid in partis:
+                self._remplacer(fid, [])
+                del self.fichiers[fid]
+            if partis:
+                self._preparer_bm25()
+                self._enregistrer()
+        return partis
+
+    def synchroniser(self, client, fichiers) -> int:
+        """Ce que Nextcloud montre à la personne : documents nouveaux ou modifiés indexés, dossier de chaque
+        pièce noté, pièces supprimées retirées. Renvoie le nombre de documents indexés."""
+        nombre = self.mettre_a_jour(client, fichiers) if self.a_indexer(fichiers) else 0
+        self.noter_chemins(fichiers)
+        self.retirer_pieces_absentes(fichiers)
+        return nombre
+
+    def est_piece(self, fileid):
+        return self.fichiers.get(fileid, {}).get("piece_dossier", False)
+
+    def texte_document(self, fileid, mots_max=None):
+        """Texte complet d'un document indexé, reconstitué à partir de ses extraits (dans l'ordre)."""
+        with self.verrou:
+            morceaux = [m for m in self.morceaux if m.fileid == fileid]
+        lignes, section = [], None
+        for m in morceaux:
+            if m.section and m.section != section:
+                lignes.append(f"\n{m.section}")
+                section = m.section
+            lignes.append(m.texte.strip())
+        texte = "\n".join(lignes).strip()
+        if mots_max:
+            mots = texte.split(" ")
+            if len(mots) > mots_max:
+                texte = " ".join(mots[:mots_max]) + " […]"
+        return texte
+
+    def nombre_de_mots(self, fileid):
+        with self.verrou:
+            return sum(len(m.texte.split()) for m in self.morceaux if m.fileid == fileid)
 
     def _remplacer(self, fileid, nouveaux):
         garder = [i for i, m in enumerate(self.morceaux) if m.fileid != fileid]

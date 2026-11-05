@@ -11,15 +11,18 @@ import sys
 import threading
 import time
 import urllib.parse
+from datetime import datetime, timedelta
 from http import cookies
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from . import config, journal, modeles
+from . import config, consignes, journal, modeles
+from .fiches import Fiches
 from .index import Index
 from .moteur import Moteur, MoteurIndisponible
-from .nextcloud import AccesRefuse, Client, Indisponible
-from .reponse import Session, repondre
+from .nextcloud import PARIS, AccesRefuse, Client, Indisponible
+from .recherche import evenements_utiles
+from .reponse import Session, dossiers_visibles, repondre
 
 INTERFACE = (Path(__file__).parent / "interface.html").read_bytes()
 PAGE_MODELES = (Path(__file__).parent / "modeles.html").read_bytes()
@@ -31,6 +34,7 @@ POLITIQUE = ("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src '
 
 moteur = Moteur()
 index = Index(moteur)
+fiches = Fiches(index, moteur)
 etat = {"pret": False, "message": "Démarrage"}
 sessions: dict[str, tuple[Session, float]] = {}
 sessions_basic: dict[str, tuple[Session, float]] = {}
@@ -140,7 +144,8 @@ class Gestionnaire(BaseHTTPRequestHandler):
         if chemin == "/api/etat":
             return self._repondre({**etat, "modele": moteur.modele, "modele_embeddings": moteur.modele_embeddings,
                                    "documents_indexes": len(index.fichiers), "extraits": len(index.morceaux),
-                                   "recherche_semantique": index.vecteurs is not None})
+                                   "recherche_semantique": index.vecteurs is not None,
+                                   "fiches": fiches.progression()})
         session = self._session()
         if chemin == "/api/session":
             return self._repondre({"connecte": session is not None,
@@ -158,9 +163,58 @@ class Gestionnaire(BaseHTTPRequestHandler):
             if not session.admin:
                 return self._repondre({"erreur": "Réservé aux administrateurs du cabinet."}, 403)
             return self._repondre({**modeles.etat(moteur), "pret": etat["pret"], "message": etat["message"]})
+        if chemin == "/api/dossiers":
+            return self._dossiers(session)
+        if chemin == "/api/dossier":
+            nom = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query).get("nom", [""])[0]
+            return self._dossier(session, nom)
         if chemin.startswith("/api/document/"):
             return self._document(session, urllib.parse.unquote(chemin.rsplit("/", 1)[1]))
         self._repondre({"erreur": "Introuvable."}, 404)
+
+    def _dossiers(self, session):
+        """Dossiers clients que la personne voit, pour la liste de choix de l'interface."""
+        try:
+            fichiers = session.client.fichiers()
+            # À l'ouverture de l'assistant : une pièce ajoutée est indexée (sa fiche suivra), une supprimée retirée.
+            index.synchroniser(session.client, fichiers)
+        except (AccesRefuse, Indisponible):
+            return self._repondre({"erreur": "Nextcloud ne répond pas."}, 502)
+        par_dossier = dossiers_visibles(fichiers, index)
+        return self._repondre([{"nom": nom, "pieces": len(pieces),
+                                "fiche": fiches.dossier(nom, {f.fileid for f in pieces}) is not None}
+                               for nom, pieces in par_dossier.items()])
+
+    def _dossier(self, session, nom):
+        """Fiche d'un dossier : texte préparé à l'avance (s'il est à jour et que la personne voit exactement les
+        mêmes pièces), échéances lues dans l'agenda de la personne, liste des pièces. Aucun appel au modèle."""
+        try:
+            fichiers = session.client.fichiers()
+            index.synchroniser(session.client, fichiers)
+            pieces = dossiers_visibles(fichiers, index).get(nom)
+            if pieces is None:
+                return self._repondre({"erreur": "Dossier introuvable ou non accessible."}, 404)
+            maintenant = datetime.now(PARIS)
+            evenements = session.client.evenements(maintenant - timedelta(days=1),
+                                                   maintenant + timedelta(days=config.JOURS_AGENDA))
+        except (AccesRefuse, Indisponible):
+            return self._repondre({"erreur": "Nextcloud ne répond pas."}, 502)
+        par_id = {f.fileid: f for f in pieces}
+        fiches.demander({nom})
+        fiche = fiches.dossier(nom, set(par_id))
+        echeances = [{"titre": e.titre, "quand": _quand_court(e), "lieu": e.lieu, "agenda": e.agenda,
+                      "lien_nextcloud": f"https://cloud.{config.BOX_DOMAIN}/apps/calendar/dayGridMonth/"
+                                        f"{e.debut.date().isoformat()}"}
+                     for e in evenements_utiles(evenements, {nom}, maintenant, limite=10)]
+        corps = {"nom": nom, "echeances": echeances, "fiches_pretes": fiches.avancement(par_id),
+                 "pieces": [{"titre": f.nom, "lien": f"/api/document/{f.fileid}",
+                             "fiche": fiches.piece(f.fileid)} for f in pieces]}
+        if fiche:
+            corps["fiche"] = {"texte": fiche["texte"], "date": fiche["date"], "modele": fiche["modele"],
+                              "sources": [{"numero": n, "titre": par_id[f].nom, "lien": f"/api/document/{f}"}
+                                          for n, f in enumerate(fiche["ordre"], 1) if f in par_id]}
+        journal.ecrire("fiche_dossier", session.login, {"dossier": nom, "fiche": bool(fiche)})
+        return self._repondre(corps)
 
     def _document(self, session, fileid):
         """Document cité, relu avec les droits de la personne : Nextcloud refuse s'il ne lui est plus visible."""
@@ -190,13 +244,13 @@ class Gestionnaire(BaseHTTPRequestHandler):
         if chemin == "/api/deconnexion":
             return self._deconnexion(session)
         if chemin == "/api/question":
-            return self._question(session, str(corps.get("question", "")))
+            return self._question(session, str(corps.get("question", "")), str(corps.get("dossier", "")))
         if chemin.startswith("/api/modeles/"):
             if not session.admin:
                 return self._repondre({"erreur": "Réservé aux administrateurs du cabinet."}, 403)
             return self._modeles(session, chemin.rsplit("/", 1)[1], str(corps.get("id", "")))
         if chemin == "/api/indexer":
-            nombre = index.mettre_a_jour(session.client, session.client.fichiers())
+            nombre = index.synchroniser(session.client, session.client.fichiers())
             journal.ecrire("indexation", session.login, {"documents_indexes": nombre})
             return self._repondre({"indexes": nombre, "documents": len(index.fichiers), "extraits": len(index.morceaux)})
         self._repondre({"erreur": "Introuvable."}, 404)
@@ -273,7 +327,7 @@ class Gestionnaire(BaseHTTPRequestHandler):
             fin = {"type": "erreur", "texte": str(erreur)}
         self.wfile.write(f"data: {json.dumps(fin, ensure_ascii=False)}\n\n".encode())
 
-    def _question(self, session, question):
+    def _question(self, session, question, dossier=""):
         self.send_response(200)
         self.send_header("Content-Type", "text/event-stream; charset=utf-8")
         self.send_header("Cache-Control", "no-store")
@@ -291,7 +345,7 @@ class Gestionnaire(BaseHTTPRequestHandler):
         if not etat["pret"]:
             return envoyer({"type": "erreur", "texte": f"L'assistant n'est pas prêt : {etat['message']}."})
         try:
-            for evenement in repondre(session, question, index, moteur):
+            for evenement in repondre(session, question, index, moteur, fiches, dossier):
                 envoyer(evenement)
         except (BrokenPipeError, ConnectionResetError):
             pass  # page fermée : la génération s'arrête avec la connexion au moteur
@@ -308,8 +362,14 @@ def _admin(client):
         return False
 
 
+def _quand_court(evenement):
+    jour = consignes.date_longue(evenement.debut.date())
+    return jour if evenement.journee else f"{jour}, {consignes.heure(evenement.debut)}"
+
+
 def lancer():
     relancer_preparation()
+    threading.Thread(target=fiches.travailler, args=(lambda: etat["pret"],), daemon=True).start()
     serveur = ThreadingHTTPServer(("0.0.0.0", config.PORT), Gestionnaire)
     serveur.daemon_threads = True
     print(f"Assistant prêt à recevoir des connexions sur le port {config.PORT} "

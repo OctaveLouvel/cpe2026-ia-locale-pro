@@ -19,7 +19,7 @@ header{background:var(--carte);border-bottom:1px solid var(--bord)}
 .barre .promesse{color:var(--doux);font-size:.85rem;flex:1;min-width:200px}
 .pastille{font-size:.8rem;padding:3px 10px;border-radius:999px;border:1px solid var(--bord);color:var(--doux)}
 .pastille.pret{color:var(--ok);border-color:var(--ok)}
-main{max-width:900px;margin:0 auto;padding:20px 16px 140px}
+main{max-width:900px;margin:0 auto;padding:20px 16px 190px}
 .carte{background:var(--carte);border:1px solid var(--bord);border-radius:10px;padding:20px;margin-bottom:16px}
 label{display:block;font-weight:600;margin:12px 0 4px}
 input,textarea{width:100%;padding:10px;border:1px solid var(--bord);border-radius:8px;background:var(--fond);color:var(--texte);font:inherit}
@@ -42,7 +42,24 @@ a.cite{font-size:.75rem;vertical-align:super;text-decoration:none;color:var(--ac
 details summary{cursor:pointer;color:var(--doux);font-size:.85rem;margin-top:8px}
 .pied{color:var(--doux);font-size:.8rem;margin-top:10px}
 .saisie{position:fixed;left:0;right:0;bottom:0;background:var(--carte);border-top:1px solid var(--bord)}
-.saisie form{max-width:900px;margin:0 auto;padding:12px 16px;display:flex;gap:10px;align-items:flex-end}
+.saisie form{max-width:900px;margin:0 auto;padding:10px 16px 12px}
+.ligne-dossier{display:flex;gap:8px;align-items:center;margin-bottom:8px;font-size:.9rem;color:var(--doux)}
+.ligne-dossier select{flex:1;min-width:0;max-width:520px;padding:6px 8px;border:1px solid var(--bord);border-radius:8px;background:var(--fond);color:var(--texte);font:inherit}
+.ligne-saisie{display:flex;gap:10px;align-items:flex-end}
+.couverture{margin-top:10px;font-size:.85rem;color:var(--doux)}
+.couverture ul{list-style:none;padding:0;margin:6px 0}
+.couverture li{padding:2px 0}
+.badge{display:inline-block;font-size:.72rem;padding:1px 7px;border-radius:999px;margin-right:6px;border:1px solid var(--bord)}
+.badge.citee{color:var(--ok);border-color:var(--ok);background:var(--ok-fond)}
+.badge.lue{color:var(--accent)}
+.badge.non_lue{color:var(--attente);border-color:var(--attente);background:var(--attente-fond)}
+.avertissement{margin-top:8px;padding:6px 10px;border-radius:8px;background:var(--attente-fond);color:var(--attente);font-size:.85rem}
+.fiche-dossier h2{font-size:1.05rem;margin:0 0 4px}
+.fiche-dossier a,.couverture a{color:var(--accent)}
+.fiche-dossier h3{font-size:.9rem;margin:14px 0 4px;color:var(--doux);text-transform:uppercase;letter-spacing:.04em}
+.fiche-dossier ol,.fiche-dossier ul.echeances{margin:4px 0;padding-left:22px}
+.fiche-dossier .pieces li{margin:2px 0}
+.fiche-dossier .pieces .apercu{color:var(--doux);font-size:.8rem;white-space:pre-line}
 .saisie textarea{resize:none;height:56px}
 .suggestions{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 0}
 .suggestions button{background:var(--fond);color:var(--accent);border:1px solid var(--bord);font-weight:500;font-size:.85rem}
@@ -76,10 +93,8 @@ table.journal td{border-bottom:1px solid var(--bord);padding:6px 4px;vertical-al
     <div class="carte" id="accueil">
       Posez une question sur vos dossiers, vos audiences ou vos contacts. Chaque réponse cite ses sources :
       vérifiez-les avant de les utiliser. L'assistant n'a jamais accès au coffre-fort de mots de passe.
-      <div class="suggestions">
-        <button type="button">Quelles sont mes prochaines audiences ?</button>
-        <button type="button">Que dit la charte du cabinet sur l'IA ?</button>
-      </div>
+      Pour travailler sur un dossier, choisissez-le dans la liste en bas de page : sa fiche s'affiche tout de suite.
+      <div class="suggestions" id="suggestions"></div>
     </div>
     <div id="fil"></div>
   </section>
@@ -92,8 +107,12 @@ table.journal td{border-bottom:1px solid var(--bord);padding:6px 4px;vertical-al
 </main>
 
 <div class="saisie" id="saisie" hidden><form id="formulaire">
-  <textarea id="question" placeholder="Votre question (Entrée pour envoyer, Maj+Entrée pour aller à la ligne)" required></textarea>
-  <button id="envoyer">Envoyer</button>
+  <div class="ligne-dossier"><label for="dossier" style="margin:0;font-weight:500">Dossier</label>
+    <select id="dossier"><option value="">Tous mes documents</option></select></div>
+  <div class="ligne-saisie">
+    <textarea id="question" placeholder="Votre question (Entrée pour envoyer, Maj+Entrée pour aller à la ligne)" required></textarea>
+    <button id="envoyer">Envoyer</button>
+  </div>
 </form></div>
 
 <script>
@@ -140,6 +159,69 @@ function carteSource(s, q) {
     <div class="liens">${liens}</div></div>`;
 }
 
+const SUGGESTIONS_GENERALES = ["Quelles sont mes prochaines échéances ?",
+  "Ai-je le droit de copier un document client dans une IA en ligne ?", "Que dit la charte du cabinet sur l'IA ?"];
+const SUGGESTIONS_DOSSIER = ["Résume ce dossier et liste les prochaines échéances.",
+  "Quels montants sont en jeu dans ce dossier ?", "Quelles sont les prochaines échéances de ce dossier ?"];
+
+function afficherSuggestions() {
+  const liste = $("dossier").value ? SUGGESTIONS_DOSSIER : SUGGESTIONS_GENERALES;
+  $("suggestions").innerHTML = liste.map((t) => `<button type="button">${echapper(t)}</button>`).join("");
+  for (const b of $("suggestions").querySelectorAll("button")) b.addEventListener("click", () => poser(b.textContent));
+}
+
+async function chargerDossiers() {
+  try {
+    const r = await fetch("/api/dossiers");
+    if (!r.ok) return;
+    const liste = await r.json(), choisi = $("dossier").value;
+    $("dossier").innerHTML = `<option value="">Tous mes documents</option>` + liste.map((d) =>
+      `<option value="${echapper(d.nom)}">${echapper(d.nom)} (${d.pieces} pièce${d.pieces > 1 ? "s" : ""})</option>`).join("");
+    if (liste.some((d) => d.nom === choisi)) $("dossier").value = choisi;
+  } catch {}
+}
+
+// Fiche d'un dossier : préparée à l'avance, affichée sans attendre le modèle. Échéances lues dans l'agenda.
+async function afficherDossier(nom) {
+  const r = await fetch("/api/dossier?nom=" + encodeURIComponent(nom));
+  if (!r.ok) return;
+  const d = await r.json(), q = "d" + (++numeroQuestion);
+  $("accueil").hidden = true;
+  const bloc = document.createElement("div");
+  const sources = (d.fiche ? d.fiche.sources : []);
+  const rendu = d.fiche ? rendre(d.fiche.texte, q) : `<p class="etape">Fiche du dossier en préparation par le modèle local (${d.fiches_pretes} pièce(s) sur ${d.pieces.length} déjà lues). Elle s'affichera la prochaine fois que vous ouvrirez ce dossier. En attendant, posez votre question : l'assistant lit les pièces.</p>`;
+  const echeances = d.echeances.length ? `<ul class="echeances">${d.echeances.map((e) =>
+      `<li><strong>${echapper(e.quand)}</strong> : <a href="${e.lien_nextcloud}" target="_blank" rel="noopener">${echapper(e.titre)}</a>${e.lieu ? " · " + echapper(e.lieu) : ""}</li>`).join("")}</ul>`
+    : `<p class="pied">Aucune échéance dans l'agenda pour les prochaines semaines.</p>`;
+  const pieces = d.pieces.map((p) => {
+    const n = sources.findIndex((s) => s.titre === p.titre) + 1;
+    return `<li id="source-${q}-${n || "x"}"><a href="${p.lien}" target="_blank" rel="noopener">${echapper(p.titre)}</a>`
+      + (p.fiche ? `<details><summary>Fiche de la pièce</summary><div class="apercu">${echapper(p.fiche)}</div></details>` : "") + "</li>";
+  }).join("");
+  bloc.innerHTML = `<div class="carte fiche-dossier"><h2>Dossier ${echapper(d.nom)}</h2>
+    <div class="pied">${d.fiche ? `Fiche préparée par le modèle local ${echapper(d.fiche.modele)} à partir des ${sources.length} pièces, le ${new Date(d.fiche.date).toLocaleString("fr-FR")}. Vérifiez dans les pièces avant de l'utiliser.` : ""}</div>
+    <div class="reponse">${rendu}</div>
+    <h3>Prochaines échéances (agenda)</h3>${echeances}
+    <h3>Pièces du dossier (${d.pieces.length})</h3><ol class="pieces">${pieces}</ol></div>`;
+  $("fil").append(bloc);
+  bloc.scrollIntoView({behavior: "smooth"});
+}
+
+function rendreCouverture(ev) {
+  let html = "";
+  for (const c of ev.couverture || []) {
+    const n = (e) => c.pieces.filter((p) => p.etat === e).length;
+    const lues = c.pieces.length - n("non_lue");
+    html += `<details><summary>Dossier ${echapper(c.dossier)} : ${c.pieces.length} pièce(s), ${lues} lue(s) par le modèle, ${n("citee")} citée(s)`
+      + (n("non_lue") ? ` · <strong>${n("non_lue")} non lue(s)</strong>` : "") + `</summary><ul>`
+      + c.pieces.map((p) => `<li><span class="badge ${p.etat}">${{citee: "citée", lue: "lue", non_lue: "non lue"}[p.etat]}</span>`
+        + `<a href="${p.lien}" target="_blank" rel="noopener">${echapper(p.titre)}</a></li>`).join("") + "</ul></details>";
+  }
+  if (ev.perimetre === "tous" && !ev.refus)
+    html += `<div>Recherche dans tous vos documents : aucun dossier reconnu dans la question. Choisissez un dossier dans la liste pour limiter la recherche.</div>`;
+  return html;
+}
+
 async function verifierEtat() {
   try {
     const e = await (await fetch("/api/etat")).json();
@@ -155,7 +237,8 @@ async function verifierSession() {
   $("connexion").hidden = connecte;
   for (const id of ["conversation", "saisie", "identite", "deconnexion", "voir-journal"]) $(id).hidden = !connecte;
   $("lien-modeles").hidden = $("lien-journal").hidden = !(connecte && s.admin);
-  if (connecte) { $("identite").textContent = s.nom; $("question").focus(); } else { $("login").focus(); }
+  if (connecte) { $("identite").textContent = s.nom; $("question").focus(); chargerDossiers(); afficherSuggestions(); }
+  else { $("login").focus(); }
 }
 
 $("connexion").addEventListener("submit", async (ev) => {
@@ -170,7 +253,7 @@ $("connexion").addEventListener("submit", async (ev) => {
 
 $("deconnexion").addEventListener("click", async () => {
   await fetch("/api/deconnexion", {method: "POST", headers: {"Content-Type": "application/json"}, body: "{}"});
-  $("fil").innerHTML = ""; $("journal").hidden = true; verifierSession();
+  $("fil").innerHTML = ""; $("journal").hidden = true; $("dossier").innerHTML = `<option value="">Tous mes documents</option>`; verifierSession();
 });
 
 $("voir-journal").addEventListener("click", async () => {
@@ -190,7 +273,7 @@ async function poser(question) {
   $("accueil").hidden = true;
   const bloc = document.createElement("div");
   bloc.innerHTML = `<div class="question">${echapper(question)}</div>
-    <div class="carte"><div class="etape">Envoi…</div><div class="reponse"></div><div class="sources"></div><div class="pied"></div></div>`;
+    <div class="carte"><div class="etape">Envoi…</div><div class="reponse"></div><div class="avertissement" hidden></div><div class="sources"></div><div class="couverture"></div><div class="pied"></div></div>`;
   $("fil").append(bloc);
   bloc.scrollIntoView({behavior: "smooth"});
   const etape = bloc.querySelector(".etape"), reponse = bloc.querySelector(".reponse");
@@ -198,7 +281,7 @@ async function poser(question) {
   $("envoyer").disabled = true;
   try {
     const r = await fetch("/api/question", {method: "POST", headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({question})});
+      body: JSON.stringify({question, dossier: $("dossier").value})});
     if (r.status === 401) { verifierSession(); return; }
     const lecteur = r.body.getReader(), decodeur = new TextDecoder();
     let tampon = "";
@@ -219,7 +302,12 @@ async function poser(question) {
           bloc.querySelector(".sources").innerHTML = citees.map((s) => carteSource(s, q)).join("")
             + (autres.length ? `<details><summary>${autres.length} autre(s) extrait(s) consulté(s), non cité(s)</summary>`
                + autres.map((s) => carteSource(s, q)).join("") + "</details>" : "");
+          bloc.querySelector(".couverture").innerHTML = rendreCouverture(ev);
           const m = ev.mesures || {};
+          const avert = [];
+          if (m.coupee) avert.push(`Réponse coupée : la limite de ${m.longueur_max} tokens a été atteinte. Posez une question plus précise.`);
+          if (ev.retires) avert.push(`${ev.retires} extrait(s) écarté(s) faute de place dans le contexte du modèle.`);
+          if (avert.length) { const a = bloc.querySelector(".avertissement"); a.textContent = avert.join(" "); a.hidden = false; }
           bloc.querySelector(".pied").textContent = `Réponse en ${String(ev.duree_s).replace(".", ",")} s`
             + (m.premier_mot_s ? ` (premier mot à ${String(m.premier_mot_s).replace(".", ",")} s)` : "")
             + ` · modèle local ${ev.modele} · rien n'est sorti de la box`;
@@ -241,7 +329,7 @@ $("formulaire").addEventListener("submit", (ev) => {
 $("question").addEventListener("keydown", (ev) => {
   if (ev.key === "Enter" && !ev.shiftKey) { ev.preventDefault(); $("formulaire").requestSubmit(); }
 });
-for (const b of document.querySelectorAll(".suggestions button")) b.addEventListener("click", () => poser(b.textContent));
+$("dossier").addEventListener("change", () => { afficherSuggestions(); if ($("dossier").value) afficherDossier($("dossier").value); });
 
 verifierEtat();
 verifierSession();

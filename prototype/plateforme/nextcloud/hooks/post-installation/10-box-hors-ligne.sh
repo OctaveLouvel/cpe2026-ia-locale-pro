@@ -65,6 +65,10 @@ echo "[box] Apparence"
 essayer theming:config name "${BOX_NOM:-asoterIA}"
 essayer theming:config slogan "Fichiers, agenda et contacts du cabinet"
 essayer theming:config url "https://${BOX_DOMAIN:-cabinet.localhost}"
-essayer theming:config color "#14274e"
+essayer theming:config primary_color "#14274e"
+# En-tête et page de connexion sur fond marine : icône claire. Onglet du navigateur : icône marine en PNG (ImageMagick rend mal le SVG).
+essayer theming:config logo /opt/box/theming/asoteria-icone-sombre.svg
+essayer theming:config logoheader /opt/box/theming/asoteria-icone-sombre.svg
+essayer theming:config favicon /opt/box/theming/asoteria-icone.png
 
 echo "[box] Configuration terminée"

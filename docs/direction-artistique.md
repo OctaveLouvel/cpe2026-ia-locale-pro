@@ -45,7 +45,9 @@ Les couleurs d'état ne servent qu'aux états, jamais à la décoration.
 
 ## 5. Logo
 
-Fichiers et règles : [`livrables/logo/`](../livrables/logo/). Il apparaît en tête du tableau de bord, de l'assistant (et de ses pages Modèles et Journal), de l'installeur, de la landing page, de l'executive summary, et en icône d'onglet partout.
+Fichiers et règles : [`livrables/logo/`](../livrables/logo/). Il apparaît en tête du tableau de bord, de l'assistant (et de ses pages Modèles et Journal), de l'installeur, de la landing page, de Nextcloud (en-tête, page de connexion), de l'executive summary, et en icône d'onglet partout.
+
+Les pages l'intègrent en `data:` (la box fonctionne hors ligne) et Nextcloud en garde une copie dans `prototype/plateforme/nextcloud/theming/`. Si le logo change, mettre à jour toutes ces copies, puis reconstruire les images de l'assistant et de Nextcloud : un conteneur construit avant le changement garde l'ancien logo.
 
 ## 6. Ton
 

@@ -64,13 +64,6 @@ table.journal td{border-bottom:1px solid var(--bord);padding:6px 4px;vertical-al
 </div></header>
 
 <main>
-  <form class="carte" id="connexion">
-    <strong>Connexion avec votre compte du cabinet</strong>
-    <label for="login">Identifiant</label><input id="login" autocomplete="username" required>
-    <label for="mdp">Mot de passe</label><input id="mdp" type="password" autocomplete="current-password" required>
-    <div style="margin-top:14px"><button>Se connecter</button></div>
-    <div class="erreur" id="erreur-connexion"></div>
-  </form>
 
   <section id="conversation" hidden>
     <div class="carte" id="accueil">
@@ -149,29 +142,19 @@ async function verifierEtat() {
   } catch { $("etat").textContent = "Hors service"; setTimeout(verifierEtat, 5000); }
 }
 
+// Connexion unique : sans session, la page de connexion de la box, qui ramène ici ensuite.
+const DOMAINE = location.hostname.replace(/^ia\./, "") + (location.port ? `:${location.port}` : "");
+const PAGE_CONNEXION = `https://${DOMAINE}/connexion?retour=${encodeURIComponent(location.href)}`;
+
 async function verifierSession() {
   const s = await (await fetch("/api/session")).json();
-  const connecte = s.connecte;
-  $("connexion").hidden = connecte;
-  for (const id of ["conversation", "saisie", "identite", "deconnexion", "voir-journal"]) $(id).hidden = !connecte;
-  $("lien-modeles").hidden = $("lien-journal").hidden = !(connecte && s.admin);
-  if (connecte) { $("identite").textContent = s.nom; $("question").focus(); } else { $("login").focus(); }
+  if (!s.connecte) { location.replace(PAGE_CONNEXION); return; }
+  for (const id of ["conversation", "saisie", "identite", "deconnexion", "voir-journal"]) $(id).hidden = false;
+  $("lien-modeles").hidden = $("lien-journal").hidden = !s.admin;
+  $("identite").textContent = s.nom; $("question").focus();
 }
 
-$("connexion").addEventListener("submit", async (ev) => {
-  ev.preventDefault();
-  $("erreur-connexion").textContent = "";
-  const r = await fetch("/api/connexion", {method: "POST", headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({login: $("login").value, mot_de_passe: $("mdp").value})});
-  $("mdp").value = "";
-  if (!r.ok) { $("erreur-connexion").textContent = (await r.json()).erreur; return; }
-  verifierSession();
-});
-
-$("deconnexion").addEventListener("click", async () => {
-  await fetch("/api/deconnexion", {method: "POST", headers: {"Content-Type": "application/json"}, body: "{}"});
-  $("fil").innerHTML = ""; $("journal").hidden = true; verifierSession();
-});
+$("deconnexion").addEventListener("click", () => { location.href = `https://${DOMAINE}/deconnexion`; });
 
 $("voir-journal").addEventListener("click", async () => {
   const lignes = await (await fetch("/api/journal")).json();

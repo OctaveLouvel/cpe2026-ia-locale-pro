@@ -30,6 +30,7 @@ class Session:
     nom: str
     client: Client
     admin: bool = False  # peut choisir et installer les modèles d'IA
+    secret: str = ""     # mot de passe d'application Nextcloud : connexion unique aux services de la box
 
 
 def _etiquette_document(morceau, fichier):

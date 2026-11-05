@@ -143,7 +143,7 @@ async function installer(m, div) {
 
 async function charger() {
   const s = await (await fetch("/api/session")).json();
-  if (!s.connecte) { message("Connectez-vous d'abord sur la page de l'assistant."); $("contenu").hidden = true; return; }
+  if (!s.connecte) { location.replace(`https://${location.hostname.replace(/^ia\./, "")}/connexion?retour=${encodeURIComponent(location.href)}`); return; }
   const r = await fetch("/api/modeles");
   if (!r.ok) { message((await r.json()).erreur, true); $("contenu").hidden = true; return; }
   const e = await r.json();

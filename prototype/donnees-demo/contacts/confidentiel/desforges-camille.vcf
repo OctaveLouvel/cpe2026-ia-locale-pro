@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+UID:desforges-camille@corbiere-avocats.example
+FN:Me Camille Desforges
+N:Desforges;Camille;;Me;
+ORG:Cabinet Desforges (fictif)
+TITLE:Avocate au barreau de l'Essonne\, conseil de Mme Sarah Lefort
+TEL;TYPE=WORK,VOICE:+33 1 99 00 36 54
+EMAIL;TYPE=WORK:c.desforges@desforges-avocat.example
+NOTE:Consœur\, dossier 2026-009. Contact FICTIF (données de démonstratio
+ n).
+CATEGORIES:Confrère,Dossier 2026-009
+END:VCARD

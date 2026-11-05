@@ -17,12 +17,15 @@ prototype/
 
 Chaque dossier contient un `README.md` qui explique en quelques lignes comment lancer sa partie.
 
-## État au 3 novembre
+## État au 4 novembre
 
-- **Plateforme (DEV-1), prête** : [`plateforme/README.md`](plateforme/README.md). Deux commandes, `./box.sh installer` puis `./box.sh donnees-demo`, donnent une box complète avec le cabinet fictif. Sauvegarde chiffrée avec restauration testée, assistant d'installation, vérification hors ligne.
-- **Données de démo, prêtes** : [`donnees-demo/README.md`](donnees-demo/README.md). Les PDF et DOCX sont utilisables tout de suite par DEV-2 pour le premier prototype de recherche, avec la liste des comptes qui peuvent lire chaque document (`index.json`).
-- **Interface (DEV-3), 4 novembre** : [`interface/README.md`](interface/README.md). Tableau de bord sur https://cabinet.localhost, lancé par `./box.sh installer`. Landing page et liste d'attente prêtes en local, à publier après validation du texte par BIZ.
-- IA (DEV-2), sécurité (DEV-4) : à brancher sur le réseau `interne` de la plateforme, voir la section « Pour les autres équipes » du README de la plateforme.
+**Pour lancer la box : [`DEMARRAGE.md`](DEMARRAGE.md)**, une commande : `./box.sh installer --demo`.
+
+- **Plateforme (DEV-1)** : [`plateforme/README.md`](plateforme/README.md). Services conteneurisés, installeur, sauvegarde chiffrée avec restauration testée, vérification hors ligne.
+- **IA (DEV-2)** : [`ia/README.md`](ia/README.md). Assistant avec les droits Nextcloud, citations et refus ; choix et installation du modèle sur la page Modèles d'IA.
+- **Interface (DEV-3)** : [`interface/README.md`](interface/README.md). Tableau de bord sur https://cabinet.localhost ; landing page et liste d'attente, à publier après validation du texte par BIZ.
+- **Sécurité et mesures (DEV-4)** : [`../docs/securite.md`](../docs/securite.md). Coffre-fort sur un réseau séparé, journal d'audit, mesure de consommation dans [`securite/`](securite/).
+- **Données de démo** : [`donnees-demo/README.md`](donnees-demo/README.md). Cabinet fictif : documents, agendas, contacts, droits.
 
 ## Rappels
 

@@ -1,0 +1,16 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+UID:bensaid-karim@corbiere-avocats.example
+FN:M. Karim Bensaïd
+N:Bensaïd;Karim;;M.;
+ORG:SARL Fournil des Aubépines
+TITLE:Gérant
+TEL;TYPE=CELL:+33 6 39 98 12 47
+TEL;TYPE=WORK,VOICE:+33 1 99 00 27 15
+EMAIL;TYPE=WORK:k.bensaid@fournil-aubepines.example
+ADR;TYPE=WORK:;;12 place du Marché-Neuf;Évry-Courcouronnes;;91000;France
+NOTE:Client\, dossier 2026-014 (bail commercial). Contact FICTIF (données 
+ de démonstration).
+CATEGORIES:Client,Dossier 2026-014
+END:VCARD

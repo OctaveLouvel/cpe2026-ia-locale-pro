@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+UID:morin-agnes@corbiere-avocats.example
+FN:Mme Agnès Morin
+N:Morin;Agnès;;Mme;
+ORG:Morin Expertise Comptable (fictif)
+TITLE:Expert-comptable de la SARL Fournil des Aubépines
+TEL;TYPE=WORK,VOICE:+33 1 99 00 88 23
+EMAIL;TYPE=WORK:a.morin@morin-compta.example
+NOTE:Fournit les bilans et l'attestation de perte de chiffre d'affaires\, d
+ ossier 2026-014. Contact FICTIF (données de démonstration).
+CATEGORIES:Dossier 2026-014
+END:VCARD

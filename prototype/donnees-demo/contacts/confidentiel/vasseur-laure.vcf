@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+UID:vasseur-laure@corbiere-avocats.example
+FN:Me Laure Vasseur
+N:Vasseur;Laure;;Me;
+ORG:Étude Vasseur (fictive)
+TITLE:Notaire
+TEL;TYPE=WORK,VOICE:+33 1 99 00 47 72
+EMAIL;TYPE=WORK:l.vasseur@notaire-vasseur.example
+NOTE:État liquidatif et dépôt de la convention de divorce\, dossier 2026
+ -009. Contact FICTIF (données de démonstration).
+CATEGORIES:Notaire,Dossier 2026-009
+END:VCARD

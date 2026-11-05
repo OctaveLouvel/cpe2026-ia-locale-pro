@@ -1,16 +1,29 @@
 # Logo asoterIA
 
-Fait sur Canva le 4 novembre 2026 : un bouclier (confidentialité, secret professionnel) traversé de deux nœuds de circuit (IA), et le nom en bleu marine.
+Dessiné par l'équipe le 4 novembre 2026, en SVG, sans outil en ligne. Il dit ce que fait la box :
+
+- **un cube**, vu de trois quarts : la box posée dans le cabinet ;
+- **un petit réseau de neurones en son centre**, en bleu : l'assistant IA qui tourne dans la box ;
+- le réseau **ne touche pas les bords** du cube : l'IA travaille à l'intérieur, rien ne sort.
+
+Le nom suit : « asoter » en bleu marine, « IA » en bleu et en gras.
 
 | Fichier | Usage |
 |---|---|
-| `asoteria-logo.png` | Sur fond clair : slides, executive summary, documents |
-| `asoteria-logo-sombre.png` | Sur fond sombre : texte clair, bouclier inchangé |
-| `asoteria-icone.png` | Bouclier seul, carré : favicon, avatar, petits formats |
+| `asoteria-logo.svg` / `.png` | Sur fond clair : slides, executive summary, documents |
+| `asoteria-logo-sombre.svg` / `.png` | Sur fond sombre (en-têtes du tableau de bord et de la landing page) |
+| `asoteria-icone.svg` / `.png` | Cube seul : favicon, avatar, petits formats |
+| `asoteria-icone-sombre.svg` | Cube seul sur fond sombre |
+| `generer_logo.py` | Script qui produit tous les SVG : modifier les couleurs ou les proportions ici, puis relancer |
 
-Fonds transparents, obtenus en retirant le fond blanc de l'export Canva (l'offre gratuite n'exporte pas en transparent). Pour une version vectorielle ou une retouche, partir du design Canva : https://www.canva.com/d/rGmQydqzfIY-M5q (modification), https://www.canva.com/d/-0FDyNFXx_nhVkx (lecture).
+Régénérer : `python3 generer_logo.py .` (demande `fonttools`), puis les PNG avec `rsvg-convert -w 2000 asoteria-logo.svg -o asoteria-logo.png`.
 
 Règles d'usage :
 - Écrire le nom **asoterIA** : « asoter » en minuscules, « IA » en majuscules, en un seul mot.
-- Ne pas déformer le logo, laisser de l'espace autour.
-- Couleurs relevées sur l'export : bleu marine `#112550` pour le nom, dégradé de bleus de `#3674b9` à `#4ab6eb` pour le bouclier.
+- Ne pas déformer le logo, laisser autour au moins la moitié de la hauteur du cube.
+- Couleurs : bleu marine `#14274e` (cube, « asoter »), bleu `#2f74d0` (réseau, « IA ») ; sur fond sombre, `#e8edf4` et `#6aa8f0`.
+- Police du nom : Adwaita Sans (licence SIL Open Font License 1.1, dérivée d'Inter), convertie en tracés : le SVG s'affiche pareil partout, sans police installée.
+
+Les propositions faites sur Canva le même jour (non retenues) restent dans le compte Canva de l'équipe.
+
+Usage dans les pages et les documents : [`docs/direction-artistique.md`](../../docs/direction-artistique.md).

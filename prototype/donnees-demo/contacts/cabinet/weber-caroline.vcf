@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+UID:weber-caroline@corbiere-avocats.example
+FN:Mme Caroline Weber
+N:Weber;Caroline;;Mme;
+ORG:SAS Techniflux
+TITLE:Directrice des ressources humaines
+TEL;TYPE=WORK,VOICE:+33 1 99 00 19 66
+EMAIL;TYPE=WORK:drh@techniflux.example
+NOTE:Partie adverse\, dossier 2026-021. Ne pas contacter directement : pass
+ er par Me Ollier. Contact FICTIF (données de démonstration).
+CATEGORIES:Partie adverse,Dossier 2026-021
+END:VCARD

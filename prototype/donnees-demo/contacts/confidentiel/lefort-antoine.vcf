@@ -1,0 +1,13 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+UID:lefort-antoine@corbiere-avocats.example
+FN:M. Antoine Lefort
+N:Lefort;Antoine;;M.;
+TEL;TYPE=CELL:+33 6 39 98 21 36
+EMAIL;TYPE=WORK:antoine.lefort@courriel.example
+ADR;TYPE=WORK:;;27 chemin des Orchidées-Sauvages;Lisses;;91090;France
+NOTE:Client\, dossier 2026-009 (divorce). Confidentiel. Contact FICTIF (don
+ nées de démonstration).
+CATEGORIES:Client,Dossier 2026-009
+END:VCARD

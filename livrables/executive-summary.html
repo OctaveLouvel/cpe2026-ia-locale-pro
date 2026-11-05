@@ -10,18 +10,18 @@
 <style>
   @page { size: A4; margin: 12mm 14mm 11mm 14mm; }
   :root {
-    --encre: #1b2430;
-    --doux: #55606e;
-    --accent: #1f4e79;
-    --accent-clair: #e8eff6;
-    --trait: #d5dce4;
-    --fait: #2e7d4f;
+    --encre: #1b2333;
+    --doux: #5f6879;
+    --accent: #14274e;
+    --accent-clair: #eef2f8;
+    --trait: #e3e7ed;
+    --fait: #2e7d57;
   }
   * { box-sizing: border-box; }
   html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   body {
     margin: 0;
-    font-family: "Noto Sans", sans-serif;
+    font-family: Inter, "Adwaita Sans", "Noto Sans", sans-serif;
     font-size: 8.7pt;
     line-height: 1.36;
     color: var(--encre);
@@ -33,7 +33,7 @@
   strong { font-weight: 600; }
 
   header {
-    border-bottom: 2pt solid var(--accent);
+    border-bottom: 0.8pt solid var(--trait);
     padding-bottom: 5pt;
     margin-bottom: 7pt;
   }
@@ -47,14 +47,14 @@
   }
   h1 .logo { height: 21pt; width: auto; display: block; }
   h1 {
-    font-family: "Noto Serif", serif;
+    font-family: Inter, "Adwaita Sans", "Noto Sans", sans-serif;
     font-size: 21pt;
     font-weight: 600;
     color: var(--accent);
     margin: 2pt 0 1pt;
     line-height: 1.1;
   }
-  .mission { font-family: "Noto Serif", serif; font-style: italic; font-size: 9.6pt; color: var(--doux); }
+  .mission { font-family: Inter, "Adwaita Sans", "Noto Sans", sans-serif; font-size: 9.6pt; color: var(--doux); }
 
   .bref {
     display: grid;
@@ -69,13 +69,13 @@
   .bref b { color: var(--accent); font-weight: 600; display: inline-block; min-width: 46pt; }
   .pvu {
     grid-column: 1 / -1;
-    border-top: 0.6pt solid #c4d3e2;
+    border-top: 0.6pt solid var(--trait);
     padding-top: 4pt;
     font-size: 9.4pt !important;
   }
 
   h2 {
-    font-family: "Noto Serif", serif;
+    font-family: Inter, "Adwaita Sans", "Noto Sans", sans-serif;
     font-size: 10.6pt;
     font-weight: 600;
     color: var(--accent);
@@ -99,7 +99,7 @@
   }
   .chiffre b {
     display: block;
-    font-family: "Noto Serif", serif;
+    font-family: Inter, "Adwaita Sans", "Noto Sans", sans-serif;
     font-size: 13.5pt;
     font-weight: 600;
     color: var(--accent);
@@ -122,7 +122,7 @@
   th, td { text-align: left; padding: 2.6pt 5pt; border-bottom: 0.5pt solid var(--trait); vertical-align: top; }
   th { background: var(--accent-clair); font-weight: 600; color: var(--accent); }
   td.n, th.n { text-align: right; white-space: nowrap; }
-  tr.nous td { background: #f4f7fa; font-weight: 600; }
+  tr.nous td { background: var(--accent-clair); font-weight: 600; }
 
   .note { font-size: 7.2pt; color: var(--doux); }
   sup { font-size: 6pt; color: var(--accent); }
@@ -152,7 +152,7 @@
 
 <header>
   <div class="surtitre"><span>Challenge Projets d'Entreprendre 2026 · Executive summary</span><span>Équipe n°<span class="todo">[numéro]</span></span></div>
-  <h1><img class="logo" src="logo/asoteria-logo.png" alt="asoterIA"></h1>
+  <h1><img class="logo" src="logo/asoteria-logo.svg" alt="asoterIA"></h1>
   <div class="mission">Donner aux petits cabinets d'avocats l'IA sans renoncer au secret professionnel.</div>
 </header>
 

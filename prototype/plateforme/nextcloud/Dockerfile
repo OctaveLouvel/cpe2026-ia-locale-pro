@@ -22,6 +22,9 @@ RUN set -eux; \
     tar -xzf contacts.tar.gz -C /usr/src/nextcloud/custom_apps; \
     rm calendar.tar.gz contacts.tar.gz
 
+# Logo asoterIA pour l'apparence de Nextcloud (copies de livrables/logo/, appliquées par le hook).
+COPY theming/ /opt/box/theming/
+
 # Exécuté une seule fois, juste après la première installation (utilisateur www-data).
 # (chmod séparé : compatible avec le constructeur classique de Docker, sans BuildKit)
 COPY hooks/post-installation/ /docker-entrypoint-hooks.d/post-installation/

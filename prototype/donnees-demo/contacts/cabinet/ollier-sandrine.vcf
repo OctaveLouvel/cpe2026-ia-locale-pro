@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+UID:ollier-sandrine@corbiere-avocats.example
+FN:Me Sandrine Ollier
+N:Ollier;Sandrine;;Me;
+ORG:Ollier Avocats (fictif)
+TITLE:Avocate au barreau de Paris\, conseil de la SAS Techniflux
+TEL;TYPE=WORK,VOICE:+33 1 99 00 75 18
+EMAIL;TYPE=WORK:s.ollier@ollier-avocats.example
+NOTE:Consœur adverse\, dossier 2026-021. Contact FICTIF (données de démo
+ nstration).
+CATEGORIES:Confrère,Dossier 2026-021
+END:VCARD

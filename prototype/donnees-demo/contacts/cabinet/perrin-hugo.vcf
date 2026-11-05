@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:3.0
+PRODID:-//Box du cabinet//Donnees de demonstration FICTIVES//FR
+UID:perrin-hugo@corbiere-avocats.example
+FN:M. Hugo Perrin
+N:Perrin;Hugo;;M.;
+ORG:Perrin Expertises (fictif)
+TITLE:Expert mandaté par l'assureur du Fournil des Aubépines
+TEL;TYPE=CELL:+33 6 39 98 44 61
+EMAIL;TYPE=WORK:h.perrin@perrin-expertises.example
+NOTE:Dossier 2026-014 : rapport du 9 juillet 2026\, réunion d'expertise le
+  13 novembre 2026. Contact FICTIF (données de démonstration).
+CATEGORIES:Expert,Dossier 2026-014
+END:VCARD

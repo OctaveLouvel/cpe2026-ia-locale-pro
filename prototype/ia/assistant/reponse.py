@@ -13,8 +13,9 @@ from .recherche import (contacts_utiles, dossiers_cites, evenements_utiles, noms
 
 COFFRE = re.compile(r"(?i)\b(mots? de passe|password|mdp|coffre[- ]?fort|codes? d.acc[eè]s|identifiants? de connexion"
                     r"|cl[ée] e-?barreau)\b")
-AGENDA = re.compile(r"(?i)\b([ée]ch[ée]ances?|audiences?|rendez-vous|rdv|agenda|prochaine?s?|calendrier|planning"
-                    r"|quand|dates?|d[ée]lais?|convocations?)\b")
+AGENDA = re.compile(r"(?i)\b([ée]ch[ée]ances?|audiences?|rendez[- ]?vous|rdv|agenda|prochaine?s?|calendrier|planning"
+                    r"|quand|dates?|d[ée]lais?|convocations?|r[ée]unions?|appels?|demain|apr[èe]s-demain|aujourd'hui"
+                    r"|cette semaine|semaine prochaine|(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche))\b")
 RESUME = re.compile(r"(?i)\b(r[ée]sum\w*|synth[èe]se|o[uù] en est|point sur|fais le point)\b")
 CONTACTS = re.compile(r"(?i)\b(t[ée]l[ée]phone|num[ée]ro|joindre|courriel|e-?mail|coordonn[ée]es|contacts?|adresse)\b")
 
@@ -25,9 +26,12 @@ RIEN = "Je ne trouve pas cette information dans les documents auxquels vous avez
 # Question qui porte sur le cabinet (ses dossiers, documents, agendas, contacts) : on cherche dans ses données.
 # Sinon (« Bonjour », « Rédige un courriel de relance », « Qu'est-ce qu'une SCI ? ») : réponse générale du modèle.
 DOCUMENTAIRE = re.compile(r"(?i)\b(dossiers?|documents?|pi[eè]ces?|fichiers?|clients?|affaires?|audiences?|"
-                          r"[ée]ch[ée]ances?|agendas?|rendez-vous|rdv|contacts?|t[ée]l[ée]phone|coordonn[ée]es|charte|"
-                          r"cabinet|conclusions?|assignations?|factures?|honoraires|r[ée]sum\w*|synth[èe]se|o[uù] en est|"
-                          r"selon|d'apr[èe]s|mes|mon|ma|notre|nos|loyers?|bail|contrat|courriers?)\b")
+                          r"[ée]ch[ée]ances?|agendas?|rendez[- ]?vous|rdv|r[ée]unions?|planning|calendrier|contacts?|"
+                          r"t[ée]l[ée]phone|coordonn[ée]es|charte|cabinet|conclusions?|assignations?|factures?|honoraires|"
+                          r"r[ée]sum\w*|synth[èe]se|o[uù] en est|selon|d'apr[èe]s|mes|mon|ma|notre|nos|loyers?|bail|"
+                          r"contrat|courriers?|j'ai|ai-je|je dois|dois-je)\b")
+# Phrase de refus que le modèle ajoute parfois après une réponse sourcée : retirée de la réponse affichée.
+REFUS_PARASITE = re.compile(r"\s*Je ne trouve pas cette information dans les documents auxquels vous avez accès\.?\s*$")
 
 
 @dataclass
@@ -126,6 +130,31 @@ def repondre(session: Session, question: str, index, moteur, historique=()):
                          config.EXTRAITS_RESUME if resume else config.EXTRAITS, 1 if resume else 3, resume) \
         if documentaire else []
     agenda = evenements_utiles(evenements, dossiers, maintenant) if documentaire and (resume or AGENDA.search(question)) else []
+    # « Demain j'ai quoi ? », « mes rendez-vous de lundi » : seulement les événements de ce jour, et si l'agenda
+    # est vide ce jour-là, une réponse fixe plutôt qu'un appel au modèle.
+    jour = actions.lire_date(question, maintenant.date()) if documentaire and AGENDA.search(question) and not resume else None
+    if jour is not None:
+        debut_jour = datetime(jour.year, jour.month, jour.day, tzinfo=PARIS)
+        if not (maintenant - timedelta(days=60) <= debut_jour <= maintenant + timedelta(days=config.JOURS_AGENDA)):
+            evenements = session.client.evenements(debut_jour, debut_jour + timedelta(days=1))
+        agenda = [e for e in evenements if e.debut.date() == jour][:8]
+        # La liste vient directement des agendas, sans le modèle : exacte, immédiate, chaque ligne citée.
+        lignes, sources_jour = [], []
+        for n, e in enumerate(agenda, 1):
+            heure = "journée entière" if e.journee else (f"{consignes.heure(e.debut)}"
+                                                         + (f" à {consignes.heure(e.fin)}" if e.fin else ""))
+            lieu = f", {e.lieu}" if e.lieu else ""
+            lignes.append(f"- {heure} : {e.titre}{lieu} [{n}]")
+            sources_jour.append({"numero": n, "type": "agenda", "titre": e.titre, "agenda": e.agenda, "quand": _quand(e),
+                                 "citee": True, "lien_nextcloud": f"https://cloud.{config.BOX_DOMAIN}/apps/calendar/"
+                                                                  f"timeGridDay/{jour.isoformat()}"})
+        texte = (f"{consignes.date_longue(jour).capitalize()} :\n" + "\n".join(lignes)) if agenda else \
+            f"Aucun rendez-vous ni aucune audience dans vos agendas le {consignes.date_longue(jour)}."
+        journal.ecrire("question", session.login, {"question": question, "mode": "agenda",
+                                                   "sources": [s["titre"] for s in sources_jour]})
+        yield {"type": "texte", "texte": texte}
+        yield fin(sources_jour, citees=[s["numero"] for s in sources_jour])
+        return
     carnet = contacts_utiles(contacts, question) if documentaire and CONTACTS.search(question) else []
 
     extraits, sources = [], []
@@ -183,6 +212,7 @@ def repondre(session: Session, question: str, index, moteur, historique=()):
             morceaux.append(morceau)
             yield {"type": "texte", "texte": morceau}
     reponse = "".join(morceaux)
+    nettoyee = REFUS_PARASITE.sub("", reponse) if re.search(r"\[\d+\]", reponse) else reponse
     citees = sorted({int(n) for n in re.findall(r"\[(\d+)\]", reponse)} & {s["numero"] for s in sources})
     for source in sources:
         source["citee"] = source["numero"] in citees
@@ -191,7 +221,7 @@ def repondre(session: Session, question: str, index, moteur, historique=()):
         "sources": [f"{s['titre']}" + (f" p. {s['page']}" if s.get("page") else "") for s in sources if s["citee"]]
                    or [s["titre"] for s in sources],
         "duree_s": round(time.monotonic() - debut, 1), **mesures})
-    yield fin(sources, citees=citees, mesures=mesures)
+    yield fin(sources, citees=citees, mesures=mesures, **({"texte": nettoyee} if nettoyee != reponse else {}))
 
 
 def lien_document(fileid: str) -> str:

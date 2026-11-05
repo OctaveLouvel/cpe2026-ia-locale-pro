@@ -242,6 +242,7 @@ async function poser(question) {
           bloc.querySelector(".sources").innerHTML = citees.map((s) => carteSource(s, q)).join("")
             + (autres.length ? `<details><summary>${autres.length} autre(s) extrait(s) consulté(s), non cité(s)</summary>`
                + autres.map((s) => carteSource(s, q)).join("") + "</details>" : "");
+          if (ev.texte) { texte = ev.texte; reponse.innerHTML = rendre(texte, q); }
           if (texte) historique.push([question, texte]);
           if (ev.generale) bloc.querySelector(".sources").innerHTML =
             `<div class="generale">Réponse générale du modèle, sans document source du cabinet : à vérifier avant usage.</div>`;

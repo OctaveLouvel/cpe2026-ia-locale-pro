@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>asoterIA - Présentation Jury (Groupe 32)</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJhc290ZXJJQSI+PHRpdGxlPmFzb3RlcklBPC90aXRsZT48cG9seWdvbiBwb2ludHM9IjUwLjAwLDguMDAgODYuMzcsMjkuMDAgODYuMzcsNzEuMDAgNTAuMDAsOTIuMDAgMTMuNjMsNzEuMDAgMTMuNjMsMjkuMDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzE0Mjc0ZSIgc3Ryb2tlLXdpZHRoPSI4IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PGcgc3Ryb2tlPSIjMTQyNzRlIiBzdHJva2Utd2lkdGg9IjQuMDAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+PGxpbmUgeDE9IjUwIiB5MT0iNTAiIHgyPSIxMy42MyIgeTI9IjI5LjAwIi8+PGxpbmUgeDE9IjUwIiB5MT0iNTAiIHgyPSI4Ni4zNyIgeTI9IjI5LjAwIi8+PGxpbmUgeDE9IjUwIiB5MT0iNTAiIHgyPSI1MC4wMCIgeTI9IjkyLjAwIi8+PC9nPjxnIHN0cm9rZT0iIzJmNzRkMCIgc3Ryb2tlLXdpZHRoPSI1LjYwIiBzdHJva2UtbGluZWNhcD0icm91bmQiPjxsaW5lIHgxPSI1MCIgeTE9IjUwIiB4Mj0iMzEuODEiIHkyPSIzOS41MCIvPjxsaW5lIHgxPSI1MCIgeTE9IjUwIiB4Mj0iNjguMTkiIHkyPSIzOS41MCIvPjxsaW5lIHgxPSI1MCIgeTE9IjUwIiB4Mj0iNTAuMDAiIHkyPSI3MS4wMCIvPjwvZz48ZyBmaWxsPSIjMmY3NGQwIj48Y2lyY2xlIGN4PSIzMS44MSIgY3k9IjM5LjUwIiByPSI2LjI0Ii8+PGNpcmNsZSBjeD0iNjguMTkiIGN5PSIzOS41MCIgcj0iNi4yNCIvPjxjaXJjbGUgY3g9IjUwLjAwIiBjeT0iNzEuMDAiIHI9IjYuMjQiLz48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI5LjIwIi8+PC9nPjwvc3ZnPg==">
+
+    <!-- 2 polices uniquement, avec fallback système propre hors-ligne -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           THÈME MINIMALISTE (fidèle à landing_page.html)
+           2 polices max, 1 couleur d'accent (#1d3557)
+           =========================================== */
+        :root {
+            --stage-bg: #0f141b;
+            --slide-bg: #f6f7f9;
+
+            --fond: #f6f7f9;
+            --carte: #ffffff;
+            --texte: #1b2333;
+            --doux: #5f6879;
+            --bord: #e3e7ed;
+            --accent: #14274e;
+            --accent-doux: #eef2f8;
+            --ok: #2e7d57;
+            --ok-fond: #e8f3ed;
+
+            --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            --font-body: 'DM Sans', system-ui, -apple-system, sans-serif;
+        }
+
+        /* ===========================================
+           FIXED 16:9 STAGE: MANDATORY BASE STYLES
+           Include this ENTIRE file in every presentation.
+           Slides are authored at 1920×1080 and scaled as a whole.
+           =========================================== */
+
+        /* 1. Lock the browser viewport */
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            background: var(--stage-bg, #000);
+            font-family: var(--font-body);
+            color: var(--texte);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 2. Full-window deck viewport */
+        .deck-viewport {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            background: var(--stage-bg, #000);
+        }
+
+        /* 3. Fixed 16:9 design canvas.
+           JavaScript sets transform: translate(...) scale(...). */
+        .deck-stage {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            transform-origin: 0 0;
+            background: var(--slide-bg, #fff);
+        }
+
+        /* 4. Slides stack inside the fixed stage.
+           Content must be laid out at 1920×1080, not reflowed per device. */
+        .slide {
+            position: absolute;
+            inset: 0;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            display: block;
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+            background: var(--slide-bg, #fff);
+            transition: opacity 0.25s ease;
+        }
+
+        .slide.active,
+        .slide.visible {
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 1;
+        }
+
+        /* 5. Keep media inside authored slide bounds */
+        img,
+        video,
+        canvas,
+        svg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* 6. Presentation chrome stays outside the slide design system */
+        .deck-controls {
+            position: fixed;
+            left: 50%;
+            bottom: 22px;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(23, 32, 44, 0.85);
+            padding: 8px 18px;
+            border-radius: 999px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .deck-controls button {
+            background: rgba(255, 255, 255, 0.15);
+            border: 0;
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        /* 7. Print one fixed-size slide per page */
+        @media print {
+            html,
+            body {
+                width: 1920px;
+                height: auto;
+                overflow: visible;
+                background: #fff;
+            }
+
+            .deck-viewport {
+                position: static;
+                overflow: visible;
+                background: #fff;
+            }
+
+            .deck-stage {
+                position: static;
+                width: auto;
+                height: auto;
+                transform: none !important;
+                background: none;
+            }
+
+            .slide {
+                position: relative;
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                width: 1920px;
+                height: 1080px;
+                break-after: page;
+                page-break-after: always;
+            }
+
+            .slide:last-child {
+                break-after: auto;
+                page-break-after: auto;
+            }
+
+            .deck-controls {
+                display: none !important;
+            }
+        }
+
+        /* 8. Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+        }
+
+        /* ===========================================
+           STRUCTURE GÉNÉRALE DES SLIDES
+           =========================================== */
+        .slide-canvas {
+            width: 1920px;
+            height: 1080px;
+            padding: 88px 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Slides sombres (Couverture, Démo, Conclusion) */
+        .slide-dark {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        .cover-logo {
+            height: 76px;
+            width: auto;
+        }
+
+        .cover-center {
+            max-width: 1420px;
+        }
+
+        .cover-title {
+            font-family: var(--font-display);
+            font-size: 84px;
+            font-weight: 800;
+            line-height: 1.12;
+            letter-spacing: -0.025em;
+        }
+
+        .cover-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 26px;
+            color: rgba(255, 255, 255, 0.72);
+            font-weight: 500;
+        }
+
+        /* En-tête standard des slides claires */
+        .slide-header {
+            border-left: 8px solid var(--accent);
+            padding-left: 32px;
+        }
+
+        .slide-dark .slide-header {
+            border-left-color: #ffffff;
+        }
+
+        .slide-title {
+            font-family: var(--font-display);
+            font-size: 58px;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            color: var(--texte);
+        }
+
+        .slide-dark .slide-title {
+            color: #ffffff;
+        }
+
+        /* Pied de page standard */
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--doux);
+            font-size: 22px;
+            font-weight: 500;
+        }
+
+        .slide-dark .slide-footer {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* ===========================================
+           COMPOSANTS DE BASE (Cartes KPI, Icônes)
+           =========================================== */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 48px;
+            margin: auto 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 48px;
+            margin: auto 0;
+        }
+
+        .card {
+            background: var(--carte);
+            border: 2px solid var(--bord);
+            border-radius: 24px;
+            padding: 64px 48px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card.highlight {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #ffffff;
+        }
+
+        .big-number {
+            font-family: var(--font-display);
+            font-size: 116px;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -0.03em;
+            color: var(--accent);
+            margin-bottom: 24px;
+        }
+
+        .card.highlight .big-number {
+            color: #ffffff;
+        }
+
+        .card-label {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--texte);
+            line-height: 1.25;
+        }
+
+        .card.highlight .card-label {
+            color: #ffffff;
+        }
+
+        .card-sub {
+            font-size: 26px;
+            font-weight: 500;
+            color: var(--doux);
+            margin-top: 10px;
+        }
+
+        .card.highlight .card-sub {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .icon-square {
+            width: 68px;
+            height: 68px;
+            border-radius: 16px;
+            background: var(--accent-doux);
+            color: var(--accent);
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+
+        /* ===========================================
+           LAYOUT A : SPLIT GAUCHE / EMPILÉ DROITE (Slide 3 Vision)
+           =========================================== */
+        .split-vision {
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 56px;
+            align-items: stretch;
+            margin: auto 0;
+        }
+
+        .vision-focal {
+            background: var(--accent);
+            color: #ffffff;
+            border-radius: 24px;
+            padding: 64px 56px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .vision-focal-tag {
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .vision-focal-title {
+            font-family: var(--font-display);
+            font-size: 68px;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .vision-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            justify-content: center;
+        }
+
+        .row-item {
+            background: var(--carte);
+            border: 2px solid var(--bord);
+            border-radius: 20px;
+            padding: 34px 42px;
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .row-item-title {
+            font-family: var(--font-display);
+            font-size: 38px;
+            font-weight: 700;
+            color: var(--texte);
+        }
+
+        /* ===========================================
+           LAYOUT B : ENTONNOIR DE MARCHÉ (Slide 4 Marché)
+           =========================================== */
+        .funnel-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            margin: auto 0;
+        }
+
+        .funnel-bar {
+            background: var(--carte);
+            border: 2px solid var(--bord);
+            border-radius: 22px;
+            padding: 36px 56px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .funnel-bar.tam { width: 100%; }
+        .funnel-bar.sam { width: 72%; }
+        .funnel-bar.som {
+            width: 46%;
+            padding: 32px 42px;
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #ffffff;
+        }
+
+        .funnel-val {
+            font-family: var(--font-display);
+            font-size: 68px;
+            font-weight: 800;
+            color: var(--accent);
+            line-height: 1;
+        }
+
+        .funnel-bar.som .funnel-val {
+            color: #ffffff;
+        }
+
+        .funnel-lbl {
+            font-size: 34px;
+            font-weight: 700;
+            color: var(--doux);
+        }
+
+        .funnel-bar.som .funnel-lbl {
+            color: #ffffff;
+            font-size: 28px;
+        }
+
+        /* ===========================================
+           LAYOUT C : FICHE PERSONA (Slide 5 Persona)
+           =========================================== */
+        .persona-layout {
+            display: grid;
+            grid-template-columns: 0.75fr 1.25fr;
+            gap: 48px;
+            margin: auto 0;
+            align-items: stretch;
+        }
+
+        .persona-id {
+            background: var(--accent);
+            color: #ffffff;
+            border-radius: 24px;
+            padding: 56px 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 24px;
+        }
+
+        .persona-avatar {
+            width: 88px;
+            height: 88px;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, 0.14);
+            display: grid;
+            place-items: center;
+            color: #ffffff;
+        }
+
+        .persona-role {
+            font-family: var(--font-display);
+            font-size: 52px;
+            font-weight: 800;
+            line-height: 1.15;
+        }
+
+        .persona-sub {
+            font-size: 28px;
+            color: rgba(255, 255, 255, 0.78);
+            font-weight: 500;
+        }
+
+        .persona-needs {
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            justify-content: center;
+        }
+
+        /* ===========================================
+           LAYOUT D : MATRICE 2x2 (Slide 6 Concurrence)
+           =========================================== */
+        .matrix-wrap {
+            margin: auto 0;
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .matrix-y-labels {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            height: 520px;
+            text-align: right;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--doux);
+            padding-right: 16px;
+        }
+
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 250px);
+            gap: 24px;
+        }
+
+        .matrix-cell {
+            background: var(--carte);
+            border: 2px solid var(--bord);
+            border-radius: 20px;
+            padding: 36px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .matrix-cell.winner {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #ffffff;
+        }
+
+        .matrix-names {
+            font-family: var(--font-display);
+            font-size: 40px;
+            font-weight: 800;
+            color: var(--texte);
+        }
+
+        .matrix-cell.winner .matrix-names {
+            color: #ffffff;
+            font-size: 54px;
+        }
+
+        .matrix-x-labels {
+            grid-column: 2;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            text-align: center;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--doux);
+            margin-top: 8px;
+        }
+
+        /* ===========================================
+           LAYOUT E : BARRES COMPARATIVES DE PRIX (Slide 7)
+           =========================================== */
+        .bars-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            margin: auto 0;
+        }
+
+        .bar-row {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            align-items: center;
+            gap: 36px;
+        }
+
+        .bar-actor {
+            font-family: var(--font-display);
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--texte);
+            text-align: right;
+        }
+
+        .bar-track {
+            background: transparent;
+            display: flex;
+            align-items: center;
+        }
+
+        .bar-fill {
+            height: 112px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 42px;
+            font-family: var(--font-display);
+            font-size: 46px;
+            font-weight: 800;
+        }
+
+        .bar-fill.ours {
+            width: 34%;
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        .bar-fill.theirs-1 {
+            width: 92%;
+            background: var(--carte);
+            border: 2px solid var(--bord);
+            color: var(--doux);
+        }
+
+        .bar-fill.theirs-2 {
+            width: 100%;
+            background: var(--carte);
+            border: 2px solid var(--bord);
+            color: var(--doux);
+        }
+
+        /* ===========================================
+           LAYOUT F : TRANSITION DÉMO CENTRÉE (Slide 8)
+           =========================================== */
+        .demo-center {
+            margin: auto 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 48px;
+        }
+
+        .demo-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(255, 255, 255, 0.14);
+            padding: 14px 28px;
+            border-radius: 999px;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .demo-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #e0b552;
+        }
+
+        .demo-pills {
+            display: flex;
+            gap: 28px;
+            flex-wrap: wrap;
+        }
+
+        .demo-pill {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.22);
+            padding: 26px 44px;
+            border-radius: 18px;
+            font-size: 34px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        /* ===========================================
+           LAYOUT G : ARCHITECTURE EN 2 COUCHES (Slide 9)
+           =========================================== */
+        .arch-diagram {
+            margin: auto 0;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .arch-core {
+            background: var(--accent);
+            color: #ffffff;
+            border-radius: 22px;
+            padding: 36px 48px;
+            text-align: center;
+            font-family: var(--font-display);
+            font-size: 42px;
+            font-weight: 800;
+        }
+
+        .arch-branches {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 28px;
+        }
+
+        /* ===========================================
+           LAYOUT H : PÔLES D'ÉQUIPE (Slide 10)
+           =========================================== */
+        .team-poles {
+            margin: auto 0;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 36px;
+            align-items: stretch;
+        }
+
+        .pole-card {
+            background: var(--carte);
+            border: 2px solid var(--bord);
+            border-radius: 24px;
+            padding: 42px 38px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .pole-header {
+            font-family: var(--font-display);
+            font-size: 26px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+            padding-bottom: 18px;
+            border-bottom: 2px solid var(--accent-doux);
+        }
+
+        .member-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .member-name {
+            font-family: var(--font-display);
+            font-size: 34px;
+            font-weight: 800;
+            color: var(--texte);
+        }
+
+        .member-role {
+            font-size: 25px;
+            font-weight: 600;
+            color: var(--doux);
+        }
+
+        /* ===========================================
+           LAYOUT I : FRise CHRONOLOGIQUE (Slide 12 Go-to-Market)
+           =========================================== */
+        .timeline-2 {
+            margin: auto 0;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .timeline-arrow {
+            font-family: var(--font-display);
+            font-size: 64px;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        /* ===========================================
+           TABLEAU FINANCIER ÉPURÉ (Slide 15 Finances)
+           =========================================== */
+        .fin-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--carte);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 2px solid var(--bord);
+            margin: auto 0;
+        }
+
+        .fin-table th,
+        .fin-table td {
+            padding: 26px 32px;
+            font-size: 30px;
+            text-align: right;
+            border-bottom: 1px solid var(--bord);
+        }
+
+        .fin-table th:first-child,
+        .fin-table td:first-child {
+            text-align: left;
+            font-weight: 700;
+        }
+
+        .fin-table thead th {
+            background: var(--accent);
+            color: #ffffff;
+            font-family: var(--font-display);
+            font-weight: 700;
+        }
+
+        .fin-table tr.row-strong td {
+            background: var(--accent-doux);
+            color: var(--accent);
+            font-weight: 800;
+        }
+
+        .fin-table.compact th,
+        .fin-table.compact td {
+            padding: 13px 24px;
+            font-size: 22px;
+        }
+
+        .fin-table.dense th,
+        .fin-table.dense td {
+            padding: 10px 24px;
+            font-size: 21px;
+            line-height: 1.25;
+        }
+
+        /* ===========================================
+           ÉDITION INLINE (Touche E ou coin haut-gauche)
+           =========================================== */
+        .edit-hotzone {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 80px;
+            height: 80px;
+            z-index: 10000;
+            cursor: pointer;
+        }
+
+        .edit-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 10001;
+            background: var(--accent);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .edit-toggle.show,
+        .edit-toggle.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="edit-hotzone" id="editHotzone"></div>
+    <button class="edit-toggle" id="editToggle" title="Mode édition (Touche E)">✏️ Éditer</button>
+
+    <div class="deck-viewport">
+        <main class="deck-stage" id="deckStage">
+
+            <!-- ===========================================
+                 SLIDE 1 : COUVERTURE
+                 =========================================== -->
+            <section class="slide slide-dark active visible">
+                <div class="slide-canvas">
+                    <div>
+                        <img class="cover-logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMzEgMTAwIiB3aWR0aD0iMTMyNCIgaGVpZ2h0PSI0MDAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iYXNvdGVySUEiPjx0aXRsZT5hc290ZXJJQTwvdGl0bGU+PHBvbHlnb24gcG9pbnRzPSI1MC4wMCwxMC4wMCA4NC42NCwzMC4wMCA4NC42NCw3MC4wMCA1MC4wMCw5MC4wMCAxNS4zNiw3MC4wMCAxNS4zNiwzMC4wMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZThlZGY0IiBzdHJva2Utd2lkdGg9IjciIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48ZyBzdHJva2U9IiNlOGVkZjQiIHN0cm9rZS13aWR0aD0iMy41MCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48bGluZSB4MT0iNTAiIHkxPSI1MCIgeDI9IjE1LjM2IiB5Mj0iMzAuMDAiLz48bGluZSB4MT0iNTAiIHkxPSI1MCIgeDI9Ijg0LjY0IiB5Mj0iMzAuMDAiLz48bGluZSB4MT0iNTAiIHkxPSI1MCIgeDI9IjUwLjAwIiB5Mj0iOTAuMDAiLz48L2c+PGcgc3Ryb2tlPSIjNmFhOGYwIiBzdHJva2Utd2lkdGg9IjQuOTAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+PGxpbmUgeDE9IjUwIiB5MT0iNTAiIHgyPSIzMi42OCIgeTI9IjQwLjAwIi8+PGxpbmUgeDE9IjUwIiB5MT0iNTAiIHgyPSI2Ny4zMiIgeTI9IjQwLjAwIi8+PGxpbmUgeDE9IjUwIiB5MT0iNTAiIHgyPSI1MC4wMCIgeTI9IjcwLjAwIi8+PC9nPjxnIGZpbGw9IiM2YWE4ZjAiPjxjaXJjbGUgY3g9IjMyLjY4IiBjeT0iNDAuMDAiIHI9IjUuNDYiLz48Y2lyY2xlIGN4PSI2Ny4zMiIgY3k9IjQwLjAwIiByPSI1LjQ2Ii8+PGNpcmNsZSBjeD0iNTAuMDAiIGN5PSI3MC4wMCIgcj0iNS40NiIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjguMDUiLz48L2c+PHBhdGggZmlsbD0iI2U4ZWRmNCIgZD0iTTExOC4xNDg0Mjg5NzY1MzU4IDY5LjY0NzU3OTY2OTk1MjM5UTExNS4zNDg3NjEyMDA5MDQ4NSA2OS42NDc1Nzk2Njk5NTIzOSAxMTMuMDg2OTgzMDg0Njc4NjUgNjguNjE0MjQ4NzIyNzkxNjdRMTEwLjgyNTIwNDk2ODQ1MjQ1IDY3LjU4MDkxNzc3NTYzMDk1IDEwOS41MDQyMDc5MDkxMDcyMSA2NS41NzQzNzM4NDEyODU3UTEwOC4xODMyMTA4NDk3NjE5NiA2My41Njc4Mjk5MDY5NDA0NiAxMDguMTgzMjEwODQ5NzYxOTYgNjAuNjYyNjkzMzgxMzA5NTFRMTA4LjE4MzIxMDg0OTc2MTk2IDU4LjE1MDQyNjk4MzgzMzMxIDEwOS4xNTE5NDI2NzAzNDUzIDU2LjU0NDY2NjIzMDY3ODU2UTExMC4xMjA2NzQ0OTA5Mjg2NSA1NC45Mzg5MDU0Nzc1MjM4MDQgMTExLjc1OTM5NjY0MjQ0NjUyIDUzLjk5NjAxNjIwNDM1NzE1UTExMy4zOTgxMTg3OTM5NjQzOSA1My4wNTMxMjY5MzExOTA0OSAxMTUuNDE2NTI3NDc5ODg3MDEgNTIuNTc4NzgyMjkwMjIwMjZRMTE3LjQzNDkzNjE2NTgwOTYzIDUyLjEwNDQzNzY0OTI1MDAzIDExOS41MzQyODk4OTY0ODgxOSA1MS44NTk3NDkzNzY3NzM4MzRRMTIyLjE0MjUzMzI0MjcwMjQ4IDUxLjU0NTQ1MTM0MzA1OTU0IDEyMy43NzI4MTc3MDExMDEzIDUxLjM0NjY0MzMyODY2NjY5UTEyNS40MDMxMDIxNTk1MDAxMiA1MS4xNDc4MzUzMTQyNzM4MzQgMTI2LjE4MzU3MTg3NTA5NTM3IDUwLjY4NzcyODM3NTE5NjQ2UTEyNi45NjQwNDE1OTA2OTA2MSA1MC4yMjc2MjE0MzYxMTkwOCAxMjYuOTY0MDQxNTkwNjkwNjEgNDkuMTg5Mjc5ODU0Mjk3NjRWNDkuMDQwNTY4NTMwNTU5NTRRMTI2Ljk2NDA0MTU5MDY5MDYxIDQ3LjM4OTQ0NzMzMTQyODUzIDEyNi4zMjgzMjY2NzIzMTU2IDQ2LjI0NTg5NjkwNTY2MDYzUTEyNS42OTI2MTE3NTM5NDA1OCA0NS4xMDIzNDY0Nzk4OTI3MyAxMjQuNDM1NDE5NjE5MDgzNCA0NC40OTAzNjEwNjQ2NzI0N1ExMjMuMTc4MjI3NDg0MjI2MjMgNDMuODc4Mzc1NjQ5NDUyMjEgMTIxLjMwNjY3Njk4MzgzMzMxIDQzLjg3ODM3NTY0OTQ1MjIxUTExOS4zOTY2Mjk4MTAzMzMyNSA0My44NzgzNzU2NDk0NTIyMSAxMTguMDE3MDkzNTM5MjM3OTggNDQuNDcxMTEyNzI4MTE4OVExMTYuNjM3NTU3MjY4MTQyNyA0NS4wNjM4NDk4MDY3ODU1OCAxMTUuNzcyNzEwNjIxMzU2OTYgNDUuOTc5MDU3ODc4MjU1ODQ0UTExNC45MDc4NjM5NzQ1NzEyMyA0Ni44OTQyNjU5NDk3MjYxMDUgMTE0LjQ4NTQ1OTUwNjUxMTY5IDQ3Ljg5ODg1Njc1OTA3MTM1TDEwOS4wMjY5NjA4NDk3NjE5NiA0Ni40OTU1OTA5ODQ4MjEzMlExMTAuMDMyNjEwNTk1MjI2MjkgNDMuODQ0MTA1MDY0ODY4OTMgMTExLjkwNTIxMDM3NTc4NTgzIDQyLjIzNTQ0NjcyMTMxNTM4NFExMTMuNzc3ODEwMTU2MzQ1MzcgNDAuNjI2Nzg4Mzc3NzYxODQgMTE2LjIwMDE1OTUxOTkxMDgxIDM5Ljg4OTU2NjA2Mzg4MDkyUTExOC42MjI1MDg4ODM0NzYyNiAzOS4xNTIzNDM3NSAxMjEuMjI3MDQ1OTUzMjczNzcgMzkuMTUyMzQzNzVRMTIzLjAwMjYwMDE5MzAyMzY4IDM5LjE1MjM0Mzc1IDEyNS4wMDY1MDE2MTUwNDc0NSAzOS41NzcxMTYzNDAzOTg3OVExMjcuMDEwNDAzMDM3MDcxMjMgNDAuMDAxODg4OTMwNzk3NTggMTI4Ljc3MzMxMjgwNzA4MzEzIDQxLjEwNDAzNTQzNzEwNzA4NlExMzAuNTM2MjIyNTc3MDk1MDMgNDIuMjA2MTgxOTQzNDE2NTk1IDEzMS42NDk5NzM5Mjg5MjgzOCA0NC4yMTkwNTUzNTQ1OTUxODRRMTMyLjc2MzcyNTI4MDc2MTcyIDQ2LjIzMTkyODc2NTc3Mzc3IDEzMi43NjM3MjUyODA3NjE3MiA0OS40Mjk3NTE2OTQyMDI0MlY2OS4wSDEyNy4xNTIyOTg4Njc3MDI0OFY2NC45NjM3MTIwOTYyMTQzSDEyNi44NTQ4NzYyMjAyMjYyOVExMjYuMjgyNzExMTQ4MjYyMDIgNjYuMTA1OTM0MDIzODU3MTIgMTI1LjE0OTE4NjgxOTc5MTggNjcuMTg1OTM0NjAzMjE0MjZRMTI0LjAxNTY2MjQ5MTMyMTU2IDY4LjI2NTkzNTE4MjU3MTQxIDEyMi4yODIyODIyMzMyMzgyMiA2OC45NTY3NTc0MjYyNjE5UTEyMC41NDg5MDE5NzUxNTQ4OCA2OS42NDc1Nzk2Njk5NTIzOSAxMTguMTQ4NDI4OTc2NTM1OCA2OS42NDc1Nzk2Njk5NTIzOVpNMTE5LjQzNTY1NTk1MTQ5OTk0IDY1LjAwNDMzNjI5NzUxMjA1UTEyMS44MTYwOTYwNjc0Mjg1OSA2NS4wMDQzMzYyOTc1MTIwNSAxMjMuNTAwMTczODM2OTQ2NDkgNjQuMDcwOTMzOTk3NjMxMDdRMTI1LjE4NDI1MTYwNjQ2NDM5IDYzLjEzNzUzMTY5Nzc1MDA5IDEyNi4wODM2MzgzOTk4Mzk0IDYxLjYxNzcyMTc5NjAzNTc3UTEyNi45ODMwMjUxOTMyMTQ0MiA2MC4wOTc5MTE4OTQzMjE0NCAxMjYuOTgzMDI1MTkzMjE0NDIgNTguMzg1NjIzNDU1MDQ3NjFWNTQuNTk3NzAxMTMyMjk3NTE2UTEyNi42NjkyNTY2Mjc1NTk2NiA1NC45MDcyNTMyNjUzODA4NiAxMjUuNzgzODQyODAyMDQ3NzMgNTUuMTYyNzUyMTgxMjkxNThRMTI0Ljg5ODQyODk3NjUzNTggNTUuNDE4MjUxMDk3MjAyMyAxMjMuNzc0MTI2ODg3MzIxNDcgNTUuNjE0OTUwODk1MzA5NDVRMTIyLjY0OTgyNDc5ODEwNzE1IDU1LjgxMTY1MDY5MzQxNjU5NSAxMjEuNTg1NjQwNjY4ODY5MDIgNTUuOTQ5NTUxMzczNzIwMTdRMTIwLjUyMTQ1NjUzOTYzMDg5IDU2LjA4NzQ1MjA1NDAyMzc0IDExOS44NDU0MDE0NjU4OTI3OSA1Ni4xNzEyOTk1MTcxNTQ2OTRRMTE4LjIxNjk2MDQ4OTc0OTkxIDU2LjM3NzQ5MTExNjUyMzc0IDExNi44NTUzNTM3MTMwMzU1OCA1Ni44Nzc0MTM1NzA4ODA4OVExMTUuNDkzNzQ2OTM2MzIxMjYgNTcuMzc3MzM2MDI1MjM4MDQgMTE0LjY5MjE4MDU3Mzk0MDI4IDU4LjI5OTY2Mjk0NzY1NDcyNFExMTMuODkwNjE0MjExNTU5MyA1OS4yMjE5ODk4NzAwNzE0MSAxMTMuODkwNjE0MjExNTU5MyA2MC43NDMzODMzNDc5ODgxM1ExMTMuODkwNjE0MjExNTU5MyA2Mi4xNDQ1NDA5MDU5NTI0NTQgMTE0LjYxMDQ0MTMyNzA5NTAzIDYzLjA4OTgwNzk1NzQxMDgxUTExNS4zMzAyNjg0NDI2MzA3NyA2NC4wMzUwNzUwMDg4NjkxNyAxMTYuNTc3OTY4Nzc2MjI2MDQgNjQuNTE5NzA1NjUzMTkwNjFRMTE3LjgyNTY2OTEwOTgyMTMyIDY1LjAwNDMzNjI5NzUxMjA1IDExOS40MzU2NTU5NTE0OTk5NCA2NS4wMDQzMzYyOTc1MTIwNVpNMTUwLjc0OTU3NzY3NzI0OTkgNjkuNjEzODI4ODk3NDc2MlExNDcuNTQxNzUyNzkxNDA0NzIgNjkuNjEzODI4ODk3NDc2MiAxNDUuMDUzNzUwMTkzMTE5MDQgNjguNjg1NDQyMDYwMjMyMTZRMTQyLjU2NTc0NzU5NDgzMzM3IDY3Ljc1NzA1NTIyMjk4ODEzIDE0MC45Njc2MzUxNjA2ODQ1OCA2NS45NTI3NTExODk0NzAyOVExMzkuMzY5NTIyNzI2NTM1OCA2NC4xNDg0NDcxNTU5NTI0NSAxMzguODQ2OTI0ODc3MTY2NzQgNjEuNTUwNzU0NTQ3MTE5MTRMMTQ0LjMwOTYzOTk2NjQ4Nzg4IDYwLjQwODAwMzE1MTQxNjc4UTE0NC45MjM0Njg4NjM5NjQwOCA2Mi43MTAzOTA5ODUwMTIwNTQgMTQ2LjU3NDg0OTk2OTE0ODYzIDYzLjgwODU4NTc5Mjc3OTkyUTE0OC4yMjYyMzEwNzQzMzMxOSA2NC45MDY3ODA2MDA1NDc3OSAxNTAuNzkxNzYxMzE0ODY4OTIgNjQuOTA2NzgwNjAwNTQ3NzlRMTUzLjYwMTQ2MDAxNTc3Mzc3IDY0LjkwNjc4MDYwMDU0Nzc5IDE1NS4yNjA3NTQxNzM5OTQwNiA2My43NDAyOTAwNDU3MzgyMlExNTYuOTIwMDQ4MzMyMjE0MzUgNjIuNTczNzk5NDkwOTI4NjUgMTU2LjkyMDA0ODMzMjIxNDM1IDYwLjkyMDU3MDA3NTUxMTkzUTE1Ni45MjAwNDgzMzIyMTQzNSA1OS41MTQ2NjY2MTY5MTY2NiAxNTUuODk3MjYzMjk0NDU4MzggNTguNTkyMDc0OTYwNDcwMlExNTQuODc0NDc4MjU2NzAyNDIgNTcuNjY5NDgzMzA0MDIzNzQgMTUyLjc2NjY4MjAwNDkyODU4IDU3LjIwMTcyODA0NTk0MDRMMTQ3LjgwNTQzNDMyMjM1NzE3IDU2LjA3OTUzOTAwMDk4ODAxUTE0My43MTIxOTU2MTEwMDAwNiA1NS4xNTQwNDk3NTQxNDI3NiAxNDEuNzA4ODE4ODI5MDU5NiA1My4xMzAxMDU3OTM0NzYxMDVRMTM5LjcwNTQ0MjA0NzExOTEzIDUxLjEwNjE2MTgzMjgwOTQ1IDEzOS43MDU0NDIwNDcxMTkxMyA0Ny45MjgzOTEwOTg5NzYxMzVRMTM5LjcwNTQ0MjA0NzExOTEzIDQ1LjI5NzQ3NzE4NTcyNjE2NiAxNDEuMTY5NjEwMzI3NDgyMjIgNDMuMzIzODk0NjQ5NzQ0MDM0UTE0Mi42MzM3Nzg2MDc4NDUzIDQxLjM1MDMxMjExMzc2MTkgMTQ1LjIwMzUyMDQ1Mjk3NjIyIDQwLjI1MTMyNzkzMTg4MDk1UTE0Ny43NzMyNjIyOTgxMDcxNCAzOS4xNTIzNDM3NSAxNTEuMTA1NTM5NTM2NDc2MTMgMzkuMTUyMzQzNzVRMTU0LjI5NDM4MDgxOTc5NzUgMzkuMTUyMzQzNzUgMTU2LjU2MTY4OTM4Mjc5MTUgNDAuMDgwOTk1MzIxMjczODA0UTE1OC44Mjg5OTc5NDU3ODU1MiA0MS4wMDk2NDY4OTI1NDc2MSAxNjAuMjQxMjIxMjI1MjYxNjggNDIuNjU5NDM5NTkzNTUzNTRRMTYxLjY1MzQ0NDUwNDczNzg1IDQ0LjMwOTIzMjI5NDU1OTQ4IDE2Mi4yNzQ2NTY5ODcxOTAyNCA0Ni41MDEzOTU4MjE1NzEzNUwxNTcuMDcwMzM4NDA0MTc4NiA0Ny42NTE1MzA4MDIyNDk5MVExNTYuNTExMzUyMDk3OTg4MTIgNDYuMDkzMjI5MDU1NDA0NjYgMTU1LjE0NTc5MzYyMjczMjE2IDQ0LjkxMjc2NTUzMjczMjAxUTE1My43ODAyMzUxNDc0NzYyIDQzLjczMjMwMjAxMDA1OTM2IDE1MS4xNjUxMjgwMjgzOTI4IDQzLjczMjMwMjAxMDA1OTM2UTE0OC43NTYyMTI1MDg2Nzg0MyA0My43MzIzMDIwMTAwNTkzNiAxNDcuMTQ3NTQ0NTA5MTcyNDMgNDQuODE0NjgwMzY3NzA4MjA2UTE0NS41Mzg4NzY1MDk2NjY0NCA0NS44OTcwNTg3MjUzNTcwNTYgMTQ1LjUzODg3NjUwOTY2NjQ0IDQ3LjU3NjY1NTMyODI3Mzc3UTE0NS41Mzg4NzY1MDk2NjY0NCA0OS4wMzU4MjI2Mjk5Mjg1OSAxNDYuNjEzODcxMjgyMzM5MSA0OS45NTEwMzA3MDEzOTg4NVExNDcuNjg4ODY2MDU1MDExNzQgNTAuODY2MjM4NzcyODY5MTEgMTUwLjEwNjc0MzkwNzkyODQ2IDUxLjQxNTczMzI3Nzc5NzdMMTU0Ljg0MjgwNjczMjY1NDU3IDUyLjQ3MDQyMDc3Nzc5NzdRMTU4Ljk0MDc5MTM0NDY0MjYzIDUzLjM5MTE2NDEyNDAxMTk5IDE2MC45MjAxNzM4ODkzOTg1NyA1NS4zNzQ3Njc5MjkzMTU1N1ExNjIuODk5NTU2NDM0MTU0NSA1Ny4zNTgzNzE3MzQ2MTkxNCAxNjIuODk5NTU2NDM0MTU0NSA2MC40MzMzMTE0MDI3OTc3UTE2Mi44OTk1NTY0MzQxNTQ1IDYzLjEyMTcwNTU5MTY3ODYyIDE2MS4zNjAyNDMxMTc4MDkzIDY1LjE5MTAwMDM0MjM2OTA4UTE1OS44MjA5Mjk4MDE0NjQwOCA2Ny4yNjAyOTUwOTMwNTk1NCAxNTcuMDgxMTIwMDc5NzU1NzggNjguNDM3MDYxOTk1MjY3ODdRMTU0LjM0MTMxMDM1ODA0NzQ4IDY5LjYxMzgyODg5NzQ3NjIgMTUwLjc0OTU3NzY3NzI0OTkgNjkuNjEzODI4ODk3NDc2MlpNMTgxLjI0NDAxODAzMDE2NjYxIDY5LjYxMzgyODg5NzQ3NjJRMTc3LjA5MzgyODUxMTIzODEgNjkuNjEzODI4ODk3NDc2MiAxNzQuMDAxMjI0MDgyNzA4MzUgNjcuNzEzMDE4NDQ3MTYwNzJRMTcwLjkwODYxOTY1NDE3ODYgNjUuODEyMjA3OTk2ODQ1MjUgMTY5LjE5OTc2MzEwMTMzOTMzIDYyLjM4Njg0NjU3MjE2MDcyUTE2Ny40OTA5MDY1NDg1MDAwNSA1OC45NjE0ODUxNDc0NzYxOTYgMTY3LjQ5MDkwNjU0ODUwMDA1IDU0LjQyNjMyODg5NzQ3NjE5NlExNjcuNDkwOTA2NTQ4NTAwMDUgNDkuODI2MzA4Nzg2ODY5MDUgMTY5LjE5OTc2MzEwMTMzOTMzIDQ2LjM5MDEzNjcxODc1UTE3MC45MDg2MTk2NTQxNzg2IDQyLjk1Mzk2NDY1MDYzMDk1IDE3NC4wMDEyMjQwODI3MDgzNSA0MS4wNTMxNTQyMDAzMTU0NzVRMTc3LjA5MzgyODUxMTIzODEgMzkuMTUyMzQzNzUgMTgxLjI0NDAxODAzMDE2NjYxIDM5LjE1MjM0Mzc1UTE4NS40MTU4Mjg4MzU5NjQyIDM5LjE1MjM0Mzc1IDE4OC41MTQ0OTgwMDcyOTc1IDQxLjA1MzE1NDIwMDMxNTQ3NVExOTEuNjEzMTY3MTc4NjMwODIgNDIuOTUzOTY0NjUwNjMwOTUgMTkzLjMyMjAyMzczMTQ3MDEgNDYuMzkwMTM2NzE4NzVRMTk1LjAzMDg4MDI4NDMwOTM4IDQ5LjgyNjMwODc4Njg2OTA1IDE5NS4wMzA4ODAyODQzMDkzOCA1NC40MjYzMjg4OTc0NzYxOTZRMTk1LjAzMDg4MDI4NDMwOTM4IDU4Ljk2MTQ4NTE0NzQ3NjE5NiAxOTMuMzIyMDIzNzMxNDcwMSA2Mi4zODY4NDY1NzIxNjA3MlExOTEuNjEzMTY3MTc4NjMwODIgNjUuODEyMjA3OTk2ODQ1MjUgMTg4LjUxNDQ5ODAwNzI5NzUgNjcuNzEzMDE4NDQ3MTYwNzJRMTg1LjQxNTgyODgzNTk2NDIgNjkuNjEzODI4ODk3NDc2MiAxODEuMjQ0MDE4MDMwMTY2NjEgNjkuNjEzODI4ODk3NDc2MlpNMTgxLjI0NDAxODAzMDE2NjYxIDY0LjcwOTAzMTUyMjI3NDAyUTE4My45MzQwMTAyNzkxNzg2IDY0LjcwOTAzMTUyMjI3NDAyIDE4NS42OTAzMzU0OTQyNzk4NSA2My4yOTgzODIxNjMwNDc3OVExODcuNDQ2NjYwNzA5MzgxMSA2MS44ODc3MzI4MDM4MjE1NjQgMTg4LjI5ODMyMzc2MjQxNjgzIDU5LjU0NzkwMjQwNTI2MTk5UTE4OS4xNDk5ODY4MTU0NTI1NiA1Ny4yMDgwNzIwMDY3MDI0MiAxODkuMTQ5OTg2ODE1NDUyNTYgNTQuNDE2ODM3MDk2MjE0Mjk0UTE4OS4xNDk5ODY4MTU0NTI1NiA1MS41OTkyMzQ5OTgyMjYxNjYgMTg4LjI5ODMyMzc2MjQxNjgzIDQ5LjI0NDkwMjE2Mzc0Mzk3UTE4Ny40NDY2NjA3MDkzODExIDQ2Ljg5MDU2OTMyOTI2MTc4IDE4NS42OTAzMzU0OTQyNzk4NSA0NS40NzM4NTUyMjcyMzE5OFExODMuOTM0MDEwMjc5MTc4NiA0NC4wNTcxNDExMjUyMDIxOCAxODEuMjQ0MDE4MDMwMTY2NjEgNDQuMDU3MTQxMTI1MjAyMThRMTc4LjU3MDkwMTE2NzM5MjcyIDQ0LjA1NzE0MTEyNTIwMjE4IDE3Ni44MzM4MjQyODg4NDUwNSA0NS40NzM4NTUyMjcyMzE5OFExNzUuMDk2NzQ3NDEwMjk3MzggNDYuODkwNTY5MzI5MjYxNzggMTc0LjI0NTA4NDM1NzI2MTY1IDQ5LjIzNDA5MTUyMDMwOTQ1UTE3My4zOTM0MjEzMDQyMjU5IDUxLjU3NzYxMzcxMTM1NzEyIDE3My4zOTM0MjEzMDQyMjU5IDU0LjQxNjgzNzA5NjIxNDI5NFExNzMuMzkzNDIxMzA0MjI1OSA1Ny4yMDgwNzIwMDY3MDI0MiAxNzQuMjQ1MDg0MzU3MjYxNjUgNTkuNTQ3OTAyNDA1MjYxOTlRMTc1LjA5Njc0NzQxMDI5NzM4IDYxLjg4NzczMjgwMzgyMTU2NCAxNzYuODMzODI0Mjg4ODQ1MDUgNjMuMjk4MzgyMTYzMDQ3NzlRMTc4LjU3MDkwMTE2NzM5MjcyIDY0LjcwOTAzMTUyMjI3NDAyIDE4MS4yNDQwMTgwMzAxNjY2MSA2NC43MDkwMzE1MjIyNzQwMlpNMjEzLjY4MTY4ODIzNzE5MDIzIDM5LjUyMTQ4NDM3NVY0NC4yMzY5NjU1MzcwNzEyM0gxOTcuNjkxNjAxNTYyNDk5OThWMzkuNTIxNDg0Mzc1Wk0yMDEuOTk3ODk1NjQ2MDk1MjYgMzIuNTA3ODEyNUgyMDcuNzk3NTc5MzM2MTY2MzZWNjEuMDI2MDQ4NDgxNDY0Mzg2UTIwNy43OTc1NzkzMzYxNjYzNiA2Mi44MTM3NTE1MTg3MjYzNSAyMDguNTQyNDU0Nzk3MDI5NDggNjMuNjQyNzM5MTc2NzUwMThRMjA5LjI4NzMzMDI1Nzg5MjYgNjQuNDcxNzI2ODM0Nzc0MDIgMjExLjAxMjI3NzY1MDgzMzEgNjQuNDcxNzI2ODM0Nzc0MDJRMjExLjQ2NTI2NTczODk2NDA2IDY0LjQ3MTcyNjgzNDc3NDAyIDIxMi4yMDE5NjM0MTI3NjE2NyA2NC4zNjM4ODUxMzQ0NTg1NFEyMTIuOTM4NjYxMDg2NTU5MjggNjQuMjU2MDQzNDM0MTQzMDcgMjEzLjQ2NjUzNDMwNDYxODgyIDY0LjE1MDU3NDY4NDE0MzA3TDIxNC40OTQzMjUxNDkwNTkyOCA2OC43OTkwODM3NjkzMjE0NFEyMTMuNTYxNDYxOTczMTkwMyA2OS4xMDU0Njg3NSAyMTIuNTA0NDA2MzUwODUxMDQgNjkuMjQ0NDIzNTM4NDQ2NDNRMjExLjQ0NzM1MDcyODUxMTggNjkuMzgzMzc4MzI2ODkyODUgMjEwLjQzNDMyNzA1NDAyMzczIDY5LjM4MzM3ODMyNjg5Mjg1UTIwNi40MDcwMTExMzkzOTI4NCA2OS4zODMzNzgzMjY4OTI4NSAyMDQuMjAyNDUzMzkyNzQ0MDUgNjcuMzIxMjAyNDI3MTQ4ODJRMjAxLjk5Nzg5NTY0NjA5NTI2IDY1LjI1OTAyNjUyNzQwNDc5IDIwMS45OTc4OTU2NDYwOTUyNiA2MS41MDQzNDQ4MjA5NzYyNlpNMjMxLjc0ODI0MDI1NjMwOTUgNjkuNjEzODI4ODk3NDc2MlEyMjcuMzk2MDc1NTcwNTgzMzIgNjkuNjEzODI4ODk3NDc2MiAyMjQuMjQwOTgwMjMxNzYxOSA2Ny43MzIwMDIwNDk2ODQ1MlEyMjEuMDg1ODg0ODkyOTQwNSA2NS44NTAxNzUyMDE4OTI4NSAyMTkuMzg1NDY2MDMzMjIwMjcgNjIuNDQ4ODA4MDE0MzkyODVRMjE3LjY4NTA0NzE3MzUwMDA0IDU5LjA0NzQ0MDgyNjg5Mjg1IDIxNy42ODUwNDcxNzM1MDAwNCA1NC40Njk1NzE0NzEyMTQyOTRRMjE3LjY4NTA0NzE3MzUwMDA0IDQ5LjkyOTY2OTMyMDU4MzM0IDIxOS4zNTU0MDcwNTMyMzIxNyA0Ni40ODI2ODY2MDkwMjk3N1EyMjEuMDI1NzY2OTMyOTY0MyA0My4wMzU3MDM4OTc0NzYxOTYgMjI0LjA4MjUxMjM3MjczMjE0IDQxLjA5NDAyMzgyMzczODFRMjI3LjEzOTI1NzgxMjQ5OTk4IDM5LjE1MjM0Mzc1IDIzMS4yNDY3MzQyMjU3NDk5NSAzOS4xNTIzNDM3NVEyMzMuNzczNzU4MTM3MjI2MDggMzkuMTUyMzQzNzUgMjM2LjEzMDQ1NDI2NjA3MTMgMzkuOTc3NjM0Nzg3NTU5NTFRMjM4LjQ4NzE1MDM5NDkxNjUgNDAuODAyOTI1ODI1MTE5MDIgMjQwLjM1NzkwMTg2NTI0MzkgNDIuNTcyNjg5NzEyMDQ3NThRMjQyLjIyODY1MzMzNTU3MTI3IDQ0LjM0MjQ1MzU5ODk3NjEzNSAyNDMuMzIxODM3NTA4Njc4NCA0Ny4xNTg5OTY3NjA4NDUxODRRMjQ0LjQxNTAyMTY4MTc4NTU2IDQ5Ljk3NTUzOTkyMjcxNDIzIDI0NC40MTUwMjE2ODE3ODU1NiA1My45NjI3OTAwNzE5NjQyNjRWNTYuMDIxMDA5NDQ1MTkwNDNIMjIwLjkxMTMzNTg0OTc2MTk0VjUxLjY5MDQ3NTcwMjI4NTc3SDI0MS40MjU1Mjc1MzY4NjkwM0wyMzguNzE3MTEwMTIxMjUwMTMgNTMuMTE5NTc5MTk1OTc2MjZRMjM4LjcxNzExMDEyMTI1MDEzIDUwLjQxODUxNjM5NzQ3NjE5NiAyMzcuODc2MjU3NzExNjQ4OTIgNDguMzQ5MjExOTkwODMzMjhRMjM3LjAzNTQwNTMwMjA0NzcgNDYuMjc5OTA3NTg0MTkwMzcgMjM1LjM4MDA2NzY3MDM0NTI4IDQ1LjExNTAwMDYwNTU4MzE5UTIzMy43MjQ3MzAwMzg2NDI4NiA0My45NTAwOTM2MjY5NzYwMSAyMzEuMjY1NzE3ODI4MjczNzUgNDMuOTUwMDkzNjI2OTc2MDFRMjI4LjgwNjcwNTYxNzkwNDY0IDQzLjk1MDA5MzYyNjk3NjAxIDIyNy4wNjQ4ODI4Mzg3MjYwMiA0NS4xMzY2MjE4OTI0NTIyNFEyMjUuMzIzMDYwMDU5NTQ3NCA0Ni4zMjMxNTAxNTc5Mjg0NyAyMjQuNDA2NTMzMTQ1OTA0NTIgNDguMjYyNzI2ODQzMzU3MDg2UTIyMy40OTAwMDYyMzIyNjE2MyA1MC4yMDIzMDM1Mjg3ODU3MDYgMjIzLjQ5MDAwNjIzMjI2MTYzIDUyLjQ5MjU2MTg3Njc3MzgzNFY1NS40MzU2NTU5NTE0OTk5NFEyMjMuNDkwMDA2MjMyMjYxNjMgNTguNDY3ODkyMTY5OTUyMzkgMjI0LjUzMTI1MDIzMjQ1ODEgNjAuNTY4MzA5NjY0NzI2MjZRMjI1LjU3MjQ5NDIzMjY1NDU1IDYyLjY2ODcyNzE1OTUwMDEyIDIyNy40NTIyMTc2OTIxMzY3NCA2My43NDI0MDMwOTAwMDAxNVEyMjkuMzMxOTQxMTUxNjE4OTMgNjQuODE2MDc5MDIwNTAwMTggMjMxLjgwNzgyODc0ODIyNjE0IDY0LjgxNjA3OTAyMDUwMDE4UTIzMy40Mjk0MTU2MDc0NTIzNyA2NC44MTYwNzkwMjA1MDAxOCAyMzQuNzU1OTUyNzY5NTE3ODggNjQuMzUwNjk2NzEyNzMyMzJRMjM2LjA4MjQ4OTkzMTU4MzM4IDYzLjg4NTMxNDQwNDk2NDQ1IDIzNy4wMzk2MjE3MzQ2MTkxMiA2Mi45NTA4NTc5OTY5NDA2MVEyMzcuOTk2NzUzNTM3NjU0ODUgNjIuMDE2NDAxNTg4OTE2NzggMjM4LjUwNzc1MTM2OTQ3NjMgNjAuNjM2ODY1MzE3ODIxNUwyNDMuOTQ5OTA0MTA4MDQ3NDYgNjEuOTIxNDczOTIwMzQ1MzA2UTI0My4yNTQ4NjU0MzE3ODU1NiA2NC4yMTIyNTIwODA0NDA1MiAyNDEuNTc3Mzg2NzAxMTA3IDY1Ljk0NDgzODEzNjQzNDU2UTIzOS44OTk5MDc5NzA0Mjg0NCA2Ny42Nzc0MjQxOTI0Mjg1OSAyMzcuNDA2NjMwMDAzNDUyMjggNjguNjQ1NjI2NTQ0OTUyMzlRMjM0LjkxMzM1MjAzNjQ3NjEgNjkuNjEzODI4ODk3NDc2MiAyMzEuNzQ4MjQwMjU2MzA5NSA2OS42MTM4Mjg4OTc0NzYyWk0yNTAuMzYyMTU5MjUyMTY2NzIgNjkuMFYzOS41MjE0ODQzNzVIMjU1Ljk3NTE2NDQxMzQ1MjEyVjQ0LjI1NTk2ODQ1MTQ5OTk0SDI1Ni4yOTE1NzA2NjM0NTIxNVEyNTcuMTA0MjA3NTc1MzIxMiA0MS44NTMzOTY4OTI1NDc2MSAyNTkuMTM4NzAyMjczMzY4ODQgNDAuNDgxMjQ5MDM0NDA0NzU1UTI2MS4xNzMxOTY5NzE0MTY1IDM5LjEwOTEwMTE3NjI2MTkgMjYzLjc1NzcxMDgxNDQ3NiAzOS4xMDkxMDExNzYyNjE5UTI2NC4zMTM1Mjk5NjgyNjE3IDM5LjEwOTEwMTE3NjI2MTkgMjY1LjAzMTUwODc3MzU2NTMgMzkuMTQ5NzA2MDY1NjU0NzU1UTI2NS43NDk0ODc1Nzg4Njg4NyAzOS4xOTAzMTA5NTUwNDc2MSAyNjYuMjA5MzI5NzgzOTE2NSAzOS4yNDk4OTk0NDY5NjQyNjRWNDQuNzg2NDUwMzg2MDQ3MzZRMjY1Ljg5Mzk4MjQ3MDAzNTU1IDQ0LjY5MTAwMjkwNTM2ODgwNSAyNjQuOTk1NjU0NjEyNzc5NiA0NC41ODMxNjEyMDUwNTMzM1EyNjQuMDk3MzI2NzU1NTIzNyA0NC40NzUzMTk1MDQ3Mzc4NTQgMjYzLjE3MTgzNzUwODY3ODQ0IDQ0LjQ3NTMxOTUwNDczNzg1NFEyNjEuMTYyMTI2NDIxOTI4NCA0NC40NzUzMTk1MDQ3Mzc4NTQgMjU5LjU2NjExNzM3NjA4OTEgNDUuMzI1Mzk4OTgxNTcxMlEyNTcuOTcwMTA4MzMwMjQ5OCA0Ni4xNzU0Nzg0NTg0MDQ1NCAyNTcuMDY1OTc1NjM2MjQzOCA0Ny42NjU3NTQwMjAyMTQwOFEyNTYuMTYxODQyOTQyMjM3ODUgNDkuMTU2MDI5NTgyMDIzNjIgMjU2LjE2MTg0Mjk0MjIzNzg1IDUxLjEwMjk4NTAyNDQ1MjIxVjY5LjBaIi8+PHBhdGggZmlsbD0iIzZhYThmMCIgZD0iTTI3OS41NTE0ODcxODM1NzA4IDI5LjcxMjg5MDYyNVY2OS4wSDI3MS40OTQ4NTMzNTM1MDAzM1YyOS43MTI4OTA2MjVaTTI4NC45OTE1MjY5MTM2NDI5IDY5LjAgMjk4LjQzMDM4ODY0MTM1NzQgMjkuNzEyODkwNjI1SDMwOC45NTgwODY5MTk3ODQ1M0wzMjIuNzM4MTMzNjgwODIwNDUgNjkuMEgzMTMuNzkxMzY5MDkyNDY0NDRMMzA3LjQ5NTMyOTIxMzE0MjQgNTAuMDQ4MTQzMDI5MjEyOTVRMzA2LjM0NjI2MjgyNDUzNTM2IDQ2LjM3NjgzNzI1MzU3MDU2IDMwNS4xODE2MzAyMzU5MTA0IDQyLjAwNzg0MDYzMzM5MjMzNFEzMDQuMDE2OTk3NjQ3Mjg1NDUgMzcuNjM4ODQ0MDEzMjE0MTEgMzAyLjcyMzQxNzA1NTYwNjgzIDMyLjQ4NjcwMTM2OTI4NTU4SDMwNC40Njk5NDcxMTE2MDY2UTMwMy4yMTY5NzE0MDkzMjA4IDM3LjY2MzEwMjk4NDQyODQwNiAzMDIuMTI1NjM1NTQ2NDQ1ODQgNDIuMDU2MzU4NTc1ODIwOTJRMzAxLjAzNDI5OTY4MzU3MDg1IDQ2LjQ0OTYxNDE2NzIxMzQ0IDI5OS45NTAwOTcxNTU1NzEgNTAuMDQ4MTQzMDI5MjEyOTVMMjkzLjg3NzEyNDI2MTg1NjA3IDY5LjBaTTI5My4zODc4NDQyNzY0MjgyIDU5Ljg4MjE1MTI0NjA3MDg2VjUzLjU2ODg3MDY2MzY0Mjg4SDMxNC4zNDE4MTYzMTgwMzUxVjU5Ljg4MjE1MTI0NjA3MDg2WiIvPjwvc3ZnPg==" alt="asoterIA">
+                    </div>
+
+                    <div class="cover-center">
+                        <h1 class="cover-title">
+                            L'IA pour vos dossiers, sans qu'aucun dossier ne quitte le cabinet.
+                        </h1>
+                    </div>
+
+                    <div class="cover-footer">
+                        <span>Groupe 32</span>
+                        <span>01</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 2 : LE PROBLÈME (3 grands chiffres)
+                 =========================================== -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            Les petits cabinets d'avocats restent exclus de l'IA.
+                        </h2>
+                    </header>
+
+                    <div class="grid-3">
+                        <div class="card">
+                            <div class="big-number">57 %</div>
+                            <div class="card-label">Sans IA</div>
+                        </div>
+
+                        <div class="card highlight">
+                            <div class="big-number">81 %</div>
+                            <div class="card-label">Frein confidentialité</div>
+                        </div>
+
+                        <div class="card">
+                            <div class="big-number">5</div>
+                            <div class="card-label">Entretiens terrain</div>
+                        </div>
+                    </div>
+
+                    <footer class="slide-footer">
+                        <span>Actu-Juridique</span>
+                        <span>02</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 3 : NOTRE VISION (Split : Bloc central + 3 piliers sans numéros)
+                 =========================================== -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            Notre vision : apporter une IA souveraine directement dans les cabinets.
+                        </h2>
+                    </header>
+
+                    <div class="split-vision">
+                        <div class="vision-focal">
+                            <div class="vision-focal-tag">Solution clé en main</div>
+                            <div class="vision-focal-title">La Box asoterIA</div>
+                        </div>
+
+                        <div class="vision-stack">
+                            <div class="row-item">
+                                <div class="icon-square">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                                </div>
+                                <div class="row-item-title">Serveur 100 % hors ligne</div>
+                            </div>
+
+                            <div class="row-item">
+                                <div class="icon-square">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                                </div>
+                                <div class="row-item-title">Veille juridique intégrée</div>
+                            </div>
+
+                            <div class="row-item">
+                                <div class="icon-square">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>
+                                </div>
+                                <div class="row-item-title">Abonnement par cabinet</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer class="slide-footer">
+                        <span>asoterIA</span>
+                        <span>03</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 4 : MARCHÉ CIBLE (Entonnoir visuel TAM / SAM / SOM)
+                 =========================================== -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            En France, 63 % des cabinets comptent moins de 5 avocats.
+                        </h2>
+                    </header>
+
+                    <div class="funnel-wrap">
+                        <div class="funnel-bar tam">
+                            <span class="funnel-val">77 598</span>
+                            <span class="funnel-lbl">TAM · Avocats en France</span>
+                        </div>
+
+                        <div class="funnel-bar sam">
+                            <span class="funnel-val">63 %</span>
+                            <span class="funnel-lbl">SAM · Petits cabinets sans IT</span>
+                        </div>
+
+                        <div class="funnel-bar som">
+                            <span class="funnel-val">530</span>
+                            <span class="funnel-lbl">SOM · Île-de-France et alentours</span>
+                        </div>
+                    </div>
+
+                    <footer class="slide-footer">
+                        <span>CNB / Ministère de la Justice</span>
+                        <span>04</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 5 : PERSONA (Fiche profil à gauche + constats/besoin à droite, sans chiffres)
+                 =========================================== -->
+            <!-- Notes orateur :
+                 Persona : Le nouvel avocat
+                 « Je viens de sortir de mes études et m'installe dans un nouveau petit cabinet. Je suis habitué à l'utilisation de l'IA pour approfondir mes études de cas et pour mes recherches personnelles. »
+                 Besoin : « J'ai besoin de pouvoir gérer mes documents et rendez-vous pour pouvoir utiliser l'IA de manière sécurisée et fiable pendant mon activité en cabinet. » -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            Persona : le jeune avocat qui s'installe en petit cabinet.
+                        </h2>
+                    </header>
+
+                    <div class="persona-layout">
+                        <div class="persona-id">
+                            <div class="persona-avatar">
+                                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
+                            <div class="persona-role">Le nouvel avocat</div>
+                            <div class="persona-sub">Petit cabinet</div>
+                        </div>
+
+                        <div class="persona-needs">
+                            <div class="row-item">
+                                <div class="icon-square">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l1.8 4.7L18.5 9l-4.7 1.8L12 15.5l-1.8-4.7L5.5 9l4.7-1.3z"/></svg>
+                                </div>
+                                <div class="row-item-title">Habitué à l'IA dès ses études</div>
+                            </div>
+
+                            <div class="row-item" style="border-color:var(--accent); background:var(--accent-doux);">
+                                <div class="icon-square" style="background:var(--accent); color:#fff;">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                                </div>
+                                <div class="row-item-title" style="color:var(--accent);">Dossiers, agenda et IA sécurisée</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer class="slide-footer">
+                        <span>Cas d'usage cible</span>
+                        <span>05</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 6 : CONCURRENCE (Matrice 2x2)
+                 =========================================== -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            Seule asoterIA allie 100 % local, droit français et tarif par cabinet.
+                        </h2>
+                    </header>
+
+                    <div class="matrix-wrap">
+                        <div class="matrix-y-labels">
+                            <span>100 % Local</span>
+                            <span>Cloud</span>
+                        </div>
+                        <div class="matrix-grid">
+                            <div class="matrix-cell">
+                                <div class="matrix-names">Olares One · Start9</div>
+                            </div>
+                            <div class="matrix-cell winner">
+                                <div class="matrix-names">asoterIA</div>
+                            </div>
+                            <div class="matrix-cell">
+                                <div class="matrix-names">ChatGPT · Claude</div>
+                            </div>
+                            <div class="matrix-cell">
+                                <div class="matrix-names">Dalloz · Doctrine · Jimini</div>
+                            </div>
+                        </div>
+                        <div class="matrix-x-labels">
+                            <span>Générique</span>
+                            <span>Droit français</span>
+                        </div>
+                    </div>
+
+                    <footer class="slide-footer">
+                        <span>Positionnement concurrentiel</span>
+                        <span>06</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 7 : CONCURRENCE (Barres horizontales proportionnelles)
+                 =========================================== -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            Sur 3 ans, asoterIA est 3 à 4 fois moins chère pour un cabinet de 5 avocats.
+                        </h2>
+                    </header>
+
+                    <div class="bars-wrap">
+                        <div class="bar-row">
+                            <div class="bar-actor" style="color:var(--accent);">asoterIA</div>
+                            <div class="bar-track">
+                                <div class="bar-fill ours">
+                                    <span>10 500 €</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bar-row">
+                            <div class="bar-actor">LegisBox</div>
+                            <div class="bar-track">
+                                <div class="bar-fill theirs-1">
+                                    <span>35 964 €</span>
+                                    <span style="font-size:26px;font-weight:600;">Sur site</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bar-row">
+                            <div class="bar-actor">Dalloz / Predictice</div>
+                            <div class="bar-track">
+                                <div class="bar-fill theirs-2">
+                                    <span>38 340 €+</span>
+                                    <span style="font-size:26px;font-weight:600;">Cloud (5 sièges)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer class="slide-footer">
+                        <span>Coût total sur 36 mois (5 avocats)</span>
+                        <span>07</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 8 : DÉMO LIVE (Écran de transition sobre sans numéros)
+                 =========================================== -->
+            <section class="slide slide-dark">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            Démonstration : la box asoterIA en conditions réelles.
+                        </h2>
+                    </header>
+
+                    <div class="demo-center">
+                        <div class="demo-tag">
+                            <span class="demo-dot"></span>
+                            Matériel Non Final (Prototypage)
+                        </div>
+
+                        <div class="demo-pills">
+                            <div class="demo-pill">Cloud privé</div>
+                            <div class="demo-pill">Assistant IA sourcé</div>
+                            <div class="demo-pill">Droits d'accès</div>
+                        </div>
+                    </div>
+
+                    <footer class="slide-footer">
+                        <span>Démo Live</span>
+                        <span>08</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 9 : ARCHITECTURE & SÉCURITÉ (Schéma en couches sans numéros)
+                 =========================================== -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            Une architecture locale conçue pour garantir le secret professionnel.
+                        </h2>
+                    </header>
+
+                    <div class="arch-diagram">
+                        <div class="arch-core">
+                            Box locale asoterIA (100 % hors ligne)
+                        </div>
+
+                        <div class="arch-branches">
+                            <div class="row-item">
+                                <div class="icon-square">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l1.8 4.7L18.5 9l-4.7 1.8L12 15.5l-1.8-4.7L5.5 9l4.7-1.3z"/></svg>
+                                </div>
+                                <div class="row-item-title">Petits modèles + RAG sourcé</div>
+                            </div>
+
+                            <div class="row-item">
+                                <div class="icon-square">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                                </div>
+                                <div class="row-item-title">Droits d'accès respectés</div>
+                            </div>
+
+                            <div class="row-item">
+                                <div class="icon-square">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                                </div>
+                                <div class="row-item-title">Coffre-fort isolé de l'IA</div>
+                            </div>
+
+                            <div class="row-item">
+                                <div class="icon-square">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                </div>
+                                <div class="row-item-title">Chiffrement &amp; journal d'audit</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer class="slide-footer">
+                        <span>Architecture &amp; Sécurité</span>
+                        <span>09</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 10 : L'ÉQUIPE (Structurée en 3 pôles métiers, titre non redondant)
+                 =========================================== -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            Une équipe structurée autour de l'IA, de l'infrastructure et du déploiement.
+                        </h2>
+                    </header>
+
+                    <div class="team-poles">
+                        <div class="pole-card">
+                            <div class="pole-header">Stratégie &amp; Cabinets</div>
+                            <div class="member-item">
+                                <span class="member-name">William XU</span>
+                                <span class="member-role">CEO &amp; Commercial</span>
+                            </div>
+                        </div>
+
+                        <div class="pole-card">
+                            <div class="pole-header">IA &amp; Logiciel</div>
+                            <div class="member-item">
+                                <span class="member-name">Octave LOUVEL</span>
+                                <span class="member-role">CTO &amp; Head of AI</span>
+                            </div>
+                            <div class="member-item">
+                                <span class="member-name">Laure POUSSET</span>
+                                <span class="member-role">CPO &amp; Lead Software</span>
+                            </div>
+                        </div>
+
+                        <div class="pole-card">
+                            <div class="pole-header">Sécurité &amp; Box</div>
+                            <div class="member-item">
+                                <span class="member-name">Louka SIEGEL</span>
+                                <span class="member-role">CISO &amp; Systèmes</span>
+                            </div>
+                            <div class="member-item">
+                                <span class="member-name">Thibaud VEYSSIERE</span>
+                                <span class="member-role">COO &amp; Hardware</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer class="slide-footer">
+                        <span>Groupe 32</span>
+                        <span>10</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 11 : BUSINESS MODEL (2 blocs côte à côte)
+                 =========================================== -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            Un modèle économique lisible : matériel remboursé et abonnement par cabinet.
+                        </h2>
+                    </header>
+
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="big-number">1 500 €</div>
+                            <div class="card-label">Installation &amp; Box</div>
+                        </div>
+
+                        <div class="card highlight">
+                            <div class="big-number">250 € / mois</div>
+                            <div class="card-label">Abonnement &amp; Veille</div>
+                        </div>
+                    </div>
+
+                    <footer class="slide-footer">
+                        <span>Tarif unique par cabinet (1 à 10 avocats)</span>
+                        <span>11</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 12 : STRATÉGIE COMMERCIALE (Frise chronologique 2 phases)
+                 =========================================== -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            De 10 cabinets bêta-testeurs en Année 1 à 530 cabinets équipés en Année 5.
+                        </h2>
+                    </header>
+
+                    <div class="timeline-2">
+                        <div class="card">
+                            <div class="card-sub" style="margin-bottom:14px;font-weight:700;text-transform:uppercase;">Année 1 · Bêta</div>
+                            <div class="big-number">10</div>
+                            <div class="card-label">Cabinets en vente directe</div>
+                        </div>
+
+                        <div class="timeline-arrow">→</div>
+
+                        <div class="card highlight">
+                            <div class="card-sub" style="margin-bottom:14px;font-weight:700;text-transform:uppercase;">Années 2 à 5 · Accélération</div>
+                            <div class="big-number">+130 / an</div>
+                            <div class="card-label">3 commerciaux recrutés</div>
+                        </div>
+                    </div>
+
+                    <footer class="slide-footer">
+                        <span>Go-to-Market</span>
+                        <span>12</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 13 : IMPACT RSE (Score 7/10 mis en avant + réserves matérielles)
+                 =========================================== -->
+            <!-- Notes orateur :
+                 - Score Impact du coeur d'activité : 7/10 (Impact Score, pilier Stratégie à impact).
+                 - ODD 16 : accès équitable à l'IA pour les petits cabinets et protection du secret professionnel.
+                 - Sobriété logicielle : petits modèles locaux + RAG ciblé.
+                 - Réserve matérielle : GPU (36 W à 220 W) et Box complète (102 W au repos à 436 W en charge max). Avec le mix électrique français bas carbone (52 g CO2/kWh), c'est surtout la fabrication qui pèse, d'où le recours au matériel d'occasion en Année 1 pour les bêta-testeurs. -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            Un coeur de métier à fort impact, malgré des réserves sur le bilan matériel.
+                        </h2>
+                    </header>
+
+                    <div class="split-vision">
+                        <div class="card highlight" style="padding:56px 48px;">
+                            <div class="big-number" style="font-size:128px;">7 / 10</div>
+                            <div class="card-label">Impact du coeur d'activité</div>
+                            <div class="card-sub">Impact Score · Stratégie à impact</div>
+                        </div>
+
+                        <div class="vision-stack">
+                            <div class="row-item">
+                                <div class="icon-square">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v18"/><path d="M5 8l7-5 7 5"/></svg>
+                                </div>
+                                <div class="row-item-title">ODD 16 &amp; petits modèles RAG</div>
+                            </div>
+
+                            <div class="row-item" style="border-color:#b0414e; background:#f8e9eb;">
+                                <div class="icon-square" style="background:#b0414e; color:#fff;">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                </div>
+                                <div class="row-item-title" style="color:#b0414e;">Réserve : empreinte fabrication GPU</div>
+                            </div>
+
+                            <div class="row-item">
+                                <div class="icon-square">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                                </div>
+                                <div class="row-item-title">Occasion (A1) &amp; mix FR (52 g CO2/kWh)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer class="slide-footer">
+                        <span>Bilan RSE &amp; Impact Score</span>
+                        <span>13</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 14 : FINANCEMENT D'AMORÇAGE (90 000 €)
+                 =========================================== -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            Un financement d'amorçage de 90 000 € sans aucune dilution.
+                        </h2>
+                    </header>
+
+                    <div class="grid-3">
+                        <div class="card">
+                            <div class="big-number" style="font-size:96px;">20 000 €</div>
+                            <div class="card-label">Apport personnel</div>
+                        </div>
+
+                        <div class="card highlight">
+                            <div class="big-number" style="font-size:96px;">40 000 €</div>
+                            <div class="card-label">Prêts 0 % IMT Starter</div>
+                        </div>
+
+                        <div class="card">
+                            <div class="big-number" style="font-size:96px;">30 000 €</div>
+                            <div class="card-label">Subvention Innov'Up</div>
+                        </div>
+                    </div>
+
+                    <footer class="slide-footer">
+                        <span>Plan de financement initial</span>
+                        <span>14</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 15 : TRAJECTOIRE FINANCIÈRE SUR 5 ANS
+                 =========================================== -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            Rentabilité dès l'Année 3 et 1,59 M€ de chiffre d'affaires en Année 5.
+                        </h2>
+                    </header>
+
+                    <table class="fin-table">
+                        <thead>
+                            <tr>
+                                <th>Indicateur</th>
+                                <th>Année 1</th>
+                                <th>Année 2</th>
+                                <th>Année 3</th>
+                                <th>Année 4</th>
+                                <th>Année 5</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Clients cumulés</td>
+                                <td>10</td>
+                                <td>140</td>
+                                <td>270</td>
+                                <td>400</td>
+                                <td>530</td>
+                            </tr>
+                            <tr class="row-strong">
+                                <td>Chiffre d'affaires</td>
+                                <td>30 000 €</td>
+                                <td>420 000 €</td>
+                                <td>810 000 €</td>
+                                <td>1 200 000 €</td>
+                                <td>1 590 000 €</td>
+                            </tr>
+                            <tr>
+                                <td>Charges totales</td>
+                                <td>73 500 €</td>
+                                <td>430 500 €</td>
+                                <td>505 500 €</td>
+                                <td>505 500 €</td>
+                                <td>505 500 €</td>
+                            </tr>
+                            <tr class="row-strong">
+                                <td>EBE</td>
+                                <td>-43 500 €</td>
+                                <td>-10 500 €</td>
+                                <td>304 500 €</td>
+                                <td>694 500 €</td>
+                                <td>1 084 500 €</td>
+                            </tr>
+                            <tr>
+                                <td>Trésorerie cumulée</td>
+                                <td>46 500 €</td>
+                                <td>36 000 €</td>
+                                <td>340 500 €</td>
+                                <td>1 035 000 €</td>
+                                <td>2 119 500 €</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <footer class="slide-footer">
+                        <span>Prévisions financières sur 5 ans</span>
+                        <span>15</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 16 : CONCLUSION
+                 =========================================== -->
+            <section class="slide slide-dark">
+                <div class="slide-canvas">
+                    <div>
+                        <img class="cover-logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMzEgMTAwIiB3aWR0aD0iMTMyNCIgaGVpZ2h0PSI0MDAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iYXNvdGVySUEiPjx0aXRsZT5hc290ZXJJQTwvdGl0bGU+PHBvbHlnb24gcG9pbnRzPSI1MC4wMCwxMC4wMCA4NC42NCwzMC4wMCA4NC42NCw3MC4wMCA1MC4wMCw5MC4wMCAxNS4zNiw3MC4wMCAxNS4zNiwzMC4wMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZThlZGY0IiBzdHJva2Utd2lkdGg9IjciIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48ZyBzdHJva2U9IiNlOGVkZjQiIHN0cm9rZS13aWR0aD0iMy41MCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIj48bGluZSB4MT0iNTAiIHkxPSI1MCIgeDI9IjE1LjM2IiB5Mj0iMzAuMDAiLz48bGluZSB4MT0iNTAiIHkxPSI1MCIgeDI9Ijg0LjY0IiB5Mj0iMzAuMDAiLz48bGluZSB4MT0iNTAiIHkxPSI1MCIgeDI9IjUwLjAwIiB5Mj0iOTAuMDAiLz48L2c+PGcgc3Ryb2tlPSIjNmFhOGYwIiBzdHJva2Utd2lkdGg9IjQuOTAiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCI+PGxpbmUgeDE9IjUwIiB5MT0iNTAiIHgyPSIzMi42OCIgeTI9IjQwLjAwIi8+PGxpbmUgeDE9IjUwIiB5MT0iNTAiIHgyPSI2Ny4zMiIgeTI9IjQwLjAwIi8+PGxpbmUgeDE9IjUwIiB5MT0iNTAiIHgyPSI1MC4wMCIgeTI9IjcwLjAwIi8+PC9nPjxnIGZpbGw9IiM2YWE4ZjAiPjxjaXJjbGUgY3g9IjMyLjY4IiBjeT0iNDAuMDAiIHI9IjUuNDYiLz48Y2lyY2xlIGN4PSI2Ny4zMiIgY3k9IjQwLjAwIiByPSI1LjQ2Ii8+PGNpcmNsZSBjeD0iNTAuMDAiIGN5PSI3MC4wMCIgcj0iNS40NiIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjguMDUiLz48L2c+PHBhdGggZmlsbD0iI2U4ZWRmNCIgZD0iTTExOC4xNDg0Mjg5NzY1MzU4IDY5LjY0NzU3OTY2OTk1MjM5UTExNS4zNDg3NjEyMDA5MDQ4NSA2OS42NDc1Nzk2Njk5NTIzOSAxMTMuMDg2OTgzMDg0Njc4NjUgNjguNjE0MjQ4NzIyNzkxNjdRMTEwLjgyNTIwNDk2ODQ1MjQ1IDY3LjU4MDkxNzc3NTYzMDk1IDEwOS41MDQyMDc5MDkxMDcyMSA2NS41NzQzNzM4NDEyODU3UTEwOC4xODMyMTA4NDk3NjE5NiA2My41Njc4Mjk5MDY5NDA0NiAxMDguMTgzMjEwODQ5NzYxOTYgNjAuNjYyNjkzMzgxMzA5NTFRMTA4LjE4MzIxMDg0OTc2MTk2IDU4LjE1MDQyNjk4MzgzMzMxIDEwOS4xNTE5NDI2NzAzNDUzIDU2LjU0NDY2NjIzMDY3ODU2UTExMC4xMjA2NzQ0OTA5Mjg2NSA1NC45Mzg5MDU0Nzc1MjM4MDQgMTExLjc1OTM5NjY0MjQ0NjUyIDUzLjk5NjAxNjIwNDM1NzE1UTExMy4zOTgxMTg3OTM5NjQzOSA1My4wNTMxMjY5MzExOTA0OSAxMTUuNDE2NTI3NDc5ODg3MDEgNTIuNTc4NzgyMjkwMjIwMjZRMTE3LjQzNDkzNjE2NTgwOTYzIDUyLjEwNDQzNzY0OTI1MDAzIDExOS41MzQyODk4OTY0ODgxOSA1MS44NTk3NDkzNzY3NzM4MzRRMTIyLjE0MjUzMzI0MjcwMjQ4IDUxLjU0NTQ1MTM0MzA1OTU0IDEyMy43NzI4MTc3MDExMDEzIDUxLjM0NjY0MzMyODY2NjY5UTEyNS40MDMxMDIxNTk1MDAxMiA1MS4xNDc4MzUzMTQyNzM4MzQgMTI2LjE4MzU3MTg3NTA5NTM3IDUwLjY4NzcyODM3NTE5NjQ2UTEyNi45NjQwNDE1OTA2OTA2MSA1MC4yMjc2MjE0MzYxMTkwOCAxMjYuOTY0MDQxNTkwNjkwNjEgNDkuMTg5Mjc5ODU0Mjk3NjRWNDkuMDQwNTY4NTMwNTU5NTRRMTI2Ljk2NDA0MTU5MDY5MDYxIDQ3LjM4OTQ0NzMzMTQyODUzIDEyNi4zMjgzMjY2NzIzMTU2IDQ2LjI0NTg5NjkwNTY2MDYzUTEyNS42OTI2MTE3NTM5NDA1OCA0NS4xMDIzNDY0Nzk4OTI3MyAxMjQuNDM1NDE5NjE5MDgzNCA0NC40OTAzNjEwNjQ2NzI0N1ExMjMuMTc4MjI3NDg0MjI2MjMgNDMuODc4Mzc1NjQ5NDUyMjEgMTIxLjMwNjY3Njk4MzgzMzMxIDQzLjg3ODM3NTY0OTQ1MjIxUTExOS4zOTY2Mjk4MTAzMzMyNSA0My44NzgzNzU2NDk0NTIyMSAxMTguMDE3MDkzNTM5MjM3OTggNDQuNDcxMTEyNzI4MTE4OVExMTYuNjM3NTU3MjY4MTQyNyA0NS4wNjM4NDk4MDY3ODU1OCAxMTUuNzcyNzEwNjIxMzU2OTYgNDUuOTc5MDU3ODc4MjU1ODQ0UTExNC45MDc4NjM5NzQ1NzEyMyA0Ni44OTQyNjU5NDk3MjYxMDUgMTE0LjQ4NTQ1OTUwNjUxMTY5IDQ3Ljg5ODg1Njc1OTA3MTM1TDEwOS4wMjY5NjA4NDk3NjE5NiA0Ni40OTU1OTA5ODQ4MjEzMlExMTAuMDMyNjEwNTk1MjI2MjkgNDMuODQ0MTA1MDY0ODY4OTMgMTExLjkwNTIxMDM3NTc4NTgzIDQyLjIzNTQ0NjcyMTMxNTM4NFExMTMuNzc3ODEwMTU2MzQ1MzcgNDAuNjI2Nzg4Mzc3NzYxODQgMTE2LjIwMDE1OTUxOTkxMDgxIDM5Ljg4OTU2NjA2Mzg4MDkyUTExOC42MjI1MDg4ODM0NzYyNiAzOS4xNTIzNDM3NSAxMjEuMjI3MDQ1OTUzMjczNzcgMzkuMTUyMzQzNzVRMTIzLjAwMjYwMDE5MzAyMzY4IDM5LjE1MjM0Mzc1IDEyNS4wMDY1MDE2MTUwNDc0NSAzOS41NzcxMTYzNDAzOTg3OVExMjcuMDEwNDAzMDM3MDcxMjMgNDAuMDAxODg4OTMwNzk3NTggMTI4Ljc3MzMxMjgwNzA4MzEzIDQxLjEwNDAzNTQzNzEwNzA4NlExMzAuNTM2MjIyNTc3MDk1MDMgNDIuMjA2MTgxOTQzNDE2NTk1IDEzMS42NDk5NzM5Mjg5MjgzOCA0NC4yMTkwNTUzNTQ1OTUxODRRMTMyLjc2MzcyNTI4MDc2MTcyIDQ2LjIzMTkyODc2NTc3Mzc3IDEzMi43NjM3MjUyODA3NjE3MiA0OS40Mjk3NTE2OTQyMDI0MlY2OS4wSDEyNy4xNTIyOTg4Njc3MDI0OFY2NC45NjM3MTIwOTYyMTQzSDEyNi44NTQ4NzYyMjAyMjYyOVExMjYuMjgyNzExMTQ4MjYyMDIgNjYuMTA1OTM0MDIzODU3MTIgMTI1LjE0OTE4NjgxOTc5MTggNjcuMTg1OTM0NjAzMjE0MjZRMTI0LjAxNTY2MjQ5MTMyMTU2IDY4LjI2NTkzNTE4MjU3MTQxIDEyMi4yODIyODIyMzMyMzgyMiA2OC45NTY3NTc0MjYyNjE5UTEyMC41NDg5MDE5NzUxNTQ4OCA2OS42NDc1Nzk2Njk5NTIzOSAxMTguMTQ4NDI4OTc2NTM1OCA2OS42NDc1Nzk2Njk5NTIzOVpNMTE5LjQzNTY1NTk1MTQ5OTk0IDY1LjAwNDMzNjI5NzUxMjA1UTEyMS44MTYwOTYwNjc0Mjg1OSA2NS4wMDQzMzYyOTc1MTIwNSAxMjMuNTAwMTczODM2OTQ2NDkgNjQuMDcwOTMzOTk3NjMxMDdRMTI1LjE4NDI1MTYwNjQ2NDM5IDYzLjEzNzUzMTY5Nzc1MDA5IDEyNi4wODM2MzgzOTk4Mzk0IDYxLjYxNzcyMTc5NjAzNTc3UTEyNi45ODMwMjUxOTMyMTQ0MiA2MC4wOTc5MTE4OTQzMjE0NCAxMjYuOTgzMDI1MTkzMjE0NDIgNTguMzg1NjIzNDU1MDQ3NjFWNTQuNTk3NzAxMTMyMjk3NTE2UTEyNi42NjkyNTY2Mjc1NTk2NiA1NC45MDcyNTMyNjUzODA4NiAxMjUuNzgzODQyODAyMDQ3NzMgNTUuMTYyNzUyMTgxMjkxNThRMTI0Ljg5ODQyODk3NjUzNTggNTUuNDE4MjUxMDk3MjAyMyAxMjMuNzc0MTI2ODg3MzIxNDcgNTUuNjE0OTUwODk1MzA5NDVRMTIyLjY0OTgyNDc5ODEwNzE1IDU1LjgxMTY1MDY5MzQxNjU5NSAxMjEuNTg1NjQwNjY4ODY5MDIgNTUuOTQ5NTUxMzczNzIwMTdRMTIwLjUyMTQ1NjUzOTYzMDg5IDU2LjA4NzQ1MjA1NDAyMzc0IDExOS44NDU0MDE0NjU4OTI3OSA1Ni4xNzEyOTk1MTcxNTQ2OTRRMTE4LjIxNjk2MDQ4OTc0OTkxIDU2LjM3NzQ5MTExNjUyMzc0IDExNi44NTUzNTM3MTMwMzU1OCA1Ni44Nzc0MTM1NzA4ODA4OVExMTUuNDkzNzQ2OTM2MzIxMjYgNTcuMzc3MzM2MDI1MjM4MDQgMTE0LjY5MjE4MDU3Mzk0MDI4IDU4LjI5OTY2Mjk0NzY1NDcyNFExMTMuODkwNjE0MjExNTU5MyA1OS4yMjE5ODk4NzAwNzE0MSAxMTMuODkwNjE0MjExNTU5MyA2MC43NDMzODMzNDc5ODgxM1ExMTMuODkwNjE0MjExNTU5MyA2Mi4xNDQ1NDA5MDU5NTI0NTQgMTE0LjYxMDQ0MTMyNzA5NTAzIDYzLjA4OTgwNzk1NzQxMDgxUTExNS4zMzAyNjg0NDI2MzA3NyA2NC4wMzUwNzUwMDg4NjkxNyAxMTYuNTc3OTY4Nzc2MjI2MDQgNjQuNTE5NzA1NjUzMTkwNjFRMTE3LjgyNTY2OTEwOTgyMTMyIDY1LjAwNDMzNjI5NzUxMjA1IDExOS40MzU2NTU5NTE0OTk5NCA2NS4wMDQzMzYyOTc1MTIwNVpNMTUwLjc0OTU3NzY3NzI0OTkgNjkuNjEzODI4ODk3NDc2MlExNDcuNTQxNzUyNzkxNDA0NzIgNjkuNjEzODI4ODk3NDc2MiAxNDUuMDUzNzUwMTkzMTE5MDQgNjguNjg1NDQyMDYwMjMyMTZRMTQyLjU2NTc0NzU5NDgzMzM3IDY3Ljc1NzA1NTIyMjk4ODEzIDE0MC45Njc2MzUxNjA2ODQ1OCA2NS45NTI3NTExODk0NzAyOVExMzkuMzY5NTIyNzI2NTM1OCA2NC4xNDg0NDcxNTU5NTI0NSAxMzguODQ2OTI0ODc3MTY2NzQgNjEuNTUwNzU0NTQ3MTE5MTRMMTQ0LjMwOTYzOTk2NjQ4Nzg4IDYwLjQwODAwMzE1MTQxNjc4UTE0NC45MjM0Njg4NjM5NjQwOCA2Mi43MTAzOTA5ODUwMTIwNTQgMTQ2LjU3NDg0OTk2OTE0ODYzIDYzLjgwODU4NTc5Mjc3OTkyUTE0OC4yMjYyMzEwNzQzMzMxOSA2NC45MDY3ODA2MDA1NDc3OSAxNTAuNzkxNzYxMzE0ODY4OTIgNjQuOTA2NzgwNjAwNTQ3NzlRMTUzLjYwMTQ2MDAxNTc3Mzc3IDY0LjkwNjc4MDYwMDU0Nzc5IDE1NS4yNjA3NTQxNzM5OTQwNiA2My43NDAyOTAwNDU3MzgyMlExNTYuOTIwMDQ4MzMyMjE0MzUgNjIuNTczNzk5NDkwOTI4NjUgMTU2LjkyMDA0ODMzMjIxNDM1IDYwLjkyMDU3MDA3NTUxMTkzUTE1Ni45MjAwNDgzMzIyMTQzNSA1OS41MTQ2NjY2MTY5MTY2NiAxNTUuODk3MjYzMjk0NDU4MzggNTguNTkyMDc0OTYwNDcwMlExNTQuODc0NDc4MjU2NzAyNDIgNTcuNjY5NDgzMzA0MDIzNzQgMTUyLjc2NjY4MjAwNDkyODU4IDU3LjIwMTcyODA0NTk0MDRMMTQ3LjgwNTQzNDMyMjM1NzE3IDU2LjA3OTUzOTAwMDk4ODAxUTE0My43MTIxOTU2MTEwMDAwNiA1NS4xNTQwNDk3NTQxNDI3NiAxNDEuNzA4ODE4ODI5MDU5NiA1My4xMzAxMDU3OTM0NzYxMDVRMTM5LjcwNTQ0MjA0NzExOTEzIDUxLjEwNjE2MTgzMjgwOTQ1IDEzOS43MDU0NDIwNDcxMTkxMyA0Ny45MjgzOTEwOTg5NzYxMzVRMTM5LjcwNTQ0MjA0NzExOTEzIDQ1LjI5NzQ3NzE4NTcyNjE2NiAxNDEuMTY5NjEwMzI3NDgyMjIgNDMuMzIzODk0NjQ5NzQ0MDM0UTE0Mi42MzM3Nzg2MDc4NDUzIDQxLjM1MDMxMjExMzc2MTkgMTQ1LjIwMzUyMDQ1Mjk3NjIyIDQwLjI1MTMyNzkzMTg4MDk1UTE0Ny43NzMyNjIyOTgxMDcxNCAzOS4xNTIzNDM3NSAxNTEuMTA1NTM5NTM2NDc2MTMgMzkuMTUyMzQzNzVRMTU0LjI5NDM4MDgxOTc5NzUgMzkuMTUyMzQzNzUgMTU2LjU2MTY4OTM4Mjc5MTUgNDAuMDgwOTk1MzIxMjczODA0UTE1OC44Mjg5OTc5NDU3ODU1MiA0MS4wMDk2NDY4OTI1NDc2MSAxNjAuMjQxMjIxMjI1MjYxNjggNDIuNjU5NDM5NTkzNTUzNTRRMTYxLjY1MzQ0NDUwNDczNzg1IDQ0LjMwOTIzMjI5NDU1OTQ4IDE2Mi4yNzQ2NTY5ODcxOTAyNCA0Ni41MDEzOTU4MjE1NzEzNUwxNTcuMDcwMzM4NDA0MTc4NiA0Ny42NTE1MzA4MDIyNDk5MVExNTYuNTExMzUyMDk3OTg4MTIgNDYuMDkzMjI5MDU1NDA0NjYgMTU1LjE0NTc5MzYyMjczMjE2IDQ0LjkxMjc2NTUzMjczMjAxUTE1My43ODAyMzUxNDc0NzYyIDQzLjczMjMwMjAxMDA1OTM2IDE1MS4xNjUxMjgwMjgzOTI4IDQzLjczMjMwMjAxMDA1OTM2UTE0OC43NTYyMTI1MDg2Nzg0MyA0My43MzIzMDIwMTAwNTkzNiAxNDcuMTQ3NTQ0NTA5MTcyNDMgNDQuODE0NjgwMzY3NzA4MjA2UTE0NS41Mzg4NzY1MDk2NjY0NCA0NS44OTcwNTg3MjUzNTcwNTYgMTQ1LjUzODg3NjUwOTY2NjQ0IDQ3LjU3NjY1NTMyODI3Mzc3UTE0NS41Mzg4NzY1MDk2NjY0NCA0OS4wMzU4MjI2Mjk5Mjg1OSAxNDYuNjEzODcxMjgyMzM5MSA0OS45NTEwMzA3MDEzOTg4NVExNDcuNjg4ODY2MDU1MDExNzQgNTAuODY2MjM4NzcyODY5MTEgMTUwLjEwNjc0MzkwNzkyODQ2IDUxLjQxNTczMzI3Nzc5NzdMMTU0Ljg0MjgwNjczMjY1NDU3IDUyLjQ3MDQyMDc3Nzc5NzdRMTU4Ljk0MDc5MTM0NDY0MjYzIDUzLjM5MTE2NDEyNDAxMTk5IDE2MC45MjAxNzM4ODkzOTg1NyA1NS4zNzQ3Njc5MjkzMTU1N1ExNjIuODk5NTU2NDM0MTU0NSA1Ny4zNTgzNzE3MzQ2MTkxNCAxNjIuODk5NTU2NDM0MTU0NSA2MC40MzMzMTE0MDI3OTc3UTE2Mi44OTk1NTY0MzQxNTQ1IDYzLjEyMTcwNTU5MTY3ODYyIDE2MS4zNjAyNDMxMTc4MDkzIDY1LjE5MTAwMDM0MjM2OTA4UTE1OS44MjA5Mjk4MDE0NjQwOCA2Ny4yNjAyOTUwOTMwNTk1NCAxNTcuMDgxMTIwMDc5NzU1NzggNjguNDM3MDYxOTk1MjY3ODdRMTU0LjM0MTMxMDM1ODA0NzQ4IDY5LjYxMzgyODg5NzQ3NjIgMTUwLjc0OTU3NzY3NzI0OTkgNjkuNjEzODI4ODk3NDc2MlpNMTgxLjI0NDAxODAzMDE2NjYxIDY5LjYxMzgyODg5NzQ3NjJRMTc3LjA5MzgyODUxMTIzODEgNjkuNjEzODI4ODk3NDc2MiAxNzQuMDAxMjI0MDgyNzA4MzUgNjcuNzEzMDE4NDQ3MTYwNzJRMTcwLjkwODYxOTY1NDE3ODYgNjUuODEyMjA3OTk2ODQ1MjUgMTY5LjE5OTc2MzEwMTMzOTMzIDYyLjM4Njg0NjU3MjE2MDcyUTE2Ny40OTA5MDY1NDg1MDAwNSA1OC45NjE0ODUxNDc0NzYxOTYgMTY3LjQ5MDkwNjU0ODUwMDA1IDU0LjQyNjMyODg5NzQ3NjE5NlExNjcuNDkwOTA2NTQ4NTAwMDUgNDkuODI2MzA4Nzg2ODY5MDUgMTY5LjE5OTc2MzEwMTMzOTMzIDQ2LjM5MDEzNjcxODc1UTE3MC45MDg2MTk2NTQxNzg2IDQyLjk1Mzk2NDY1MDYzMDk1IDE3NC4wMDEyMjQwODI3MDgzNSA0MS4wNTMxNTQyMDAzMTU0NzVRMTc3LjA5MzgyODUxMTIzODEgMzkuMTUyMzQzNzUgMTgxLjI0NDAxODAzMDE2NjYxIDM5LjE1MjM0Mzc1UTE4NS40MTU4Mjg4MzU5NjQyIDM5LjE1MjM0Mzc1IDE4OC41MTQ0OTgwMDcyOTc1IDQxLjA1MzE1NDIwMDMxNTQ3NVExOTEuNjEzMTY3MTc4NjMwODIgNDIuOTUzOTY0NjUwNjMwOTUgMTkzLjMyMjAyMzczMTQ3MDEgNDYuMzkwMTM2NzE4NzVRMTk1LjAzMDg4MDI4NDMwOTM4IDQ5LjgyNjMwODc4Njg2OTA1IDE5NS4wMzA4ODAyODQzMDkzOCA1NC40MjYzMjg4OTc0NzYxOTZRMTk1LjAzMDg4MDI4NDMwOTM4IDU4Ljk2MTQ4NTE0NzQ3NjE5NiAxOTMuMzIyMDIzNzMxNDcwMSA2Mi4zODY4NDY1NzIxNjA3MlExOTEuNjEzMTY3MTc4NjMwODIgNjUuODEyMjA3OTk2ODQ1MjUgMTg4LjUxNDQ5ODAwNzI5NzUgNjcuNzEzMDE4NDQ3MTYwNzJRMTg1LjQxNTgyODgzNTk2NDIgNjkuNjEzODI4ODk3NDc2MiAxODEuMjQ0MDE4MDMwMTY2NjEgNjkuNjEzODI4ODk3NDc2MlpNMTgxLjI0NDAxODAzMDE2NjYxIDY0LjcwOTAzMTUyMjI3NDAyUTE4My45MzQwMTAyNzkxNzg2IDY0LjcwOTAzMTUyMjI3NDAyIDE4NS42OTAzMzU0OTQyNzk4NSA2My4yOTgzODIxNjMwNDc3OVExODcuNDQ2NjYwNzA5MzgxMSA2MS44ODc3MzI4MDM4MjE1NjQgMTg4LjI5ODMyMzc2MjQxNjgzIDU5LjU0NzkwMjQwNTI2MTk5UTE4OS4xNDk5ODY4MTU0NTI1NiA1Ny4yMDgwNzIwMDY3MDI0MiAxODkuMTQ5OTg2ODE1NDUyNTYgNTQuNDE2ODM3MDk2MjE0Mjk0UTE4OS4xNDk5ODY4MTU0NTI1NiA1MS41OTkyMzQ5OTgyMjYxNjYgMTg4LjI5ODMyMzc2MjQxNjgzIDQ5LjI0NDkwMjE2Mzc0Mzk3UTE4Ny40NDY2NjA3MDkzODExIDQ2Ljg5MDU2OTMyOTI2MTc4IDE4NS42OTAzMzU0OTQyNzk4NSA0NS40NzM4NTUyMjcyMzE5OFExODMuOTM0MDEwMjc5MTc4NiA0NC4wNTcxNDExMjUyMDIxOCAxODEuMjQ0MDE4MDMwMTY2NjEgNDQuMDU3MTQxMTI1MjAyMThRMTc4LjU3MDkwMTE2NzM5MjcyIDQ0LjA1NzE0MTEyNTIwMjE4IDE3Ni44MzM4MjQyODg4NDUwNSA0NS40NzM4NTUyMjcyMzE5OFExNzUuMDk2NzQ3NDEwMjk3MzggNDYuODkwNTY5MzI5MjYxNzggMTc0LjI0NTA4NDM1NzI2MTY1IDQ5LjIzNDA5MTUyMDMwOTQ1UTE3My4zOTM0MjEzMDQyMjU5IDUxLjU3NzYxMzcxMTM1NzEyIDE3My4zOTM0MjEzMDQyMjU5IDU0LjQxNjgzNzA5NjIxNDI5NFExNzMuMzkzNDIxMzA0MjI1OSA1Ny4yMDgwNzIwMDY3MDI0MiAxNzQuMjQ1MDg0MzU3MjYxNjUgNTkuNTQ3OTAyNDA1MjYxOTlRMTc1LjA5Njc0NzQxMDI5NzM4IDYxLjg4NzczMjgwMzgyMTU2NCAxNzYuODMzODI0Mjg4ODQ1MDUgNjMuMjk4MzgyMTYzMDQ3NzlRMTc4LjU3MDkwMTE2NzM5MjcyIDY0LjcwOTAzMTUyMjI3NDAyIDE4MS4yNDQwMTgwMzAxNjY2MSA2NC43MDkwMzE1MjIyNzQwMlpNMjEzLjY4MTY4ODIzNzE5MDIzIDM5LjUyMTQ4NDM3NVY0NC4yMzY5NjU1MzcwNzEyM0gxOTcuNjkxNjAxNTYyNDk5OThWMzkuNTIxNDg0Mzc1Wk0yMDEuOTk3ODk1NjQ2MDk1MjYgMzIuNTA3ODEyNUgyMDcuNzk3NTc5MzM2MTY2MzZWNjEuMDI2MDQ4NDgxNDY0Mzg2UTIwNy43OTc1NzkzMzYxNjYzNiA2Mi44MTM3NTE1MTg3MjYzNSAyMDguNTQyNDU0Nzk3MDI5NDggNjMuNjQyNzM5MTc2NzUwMThRMjA5LjI4NzMzMDI1Nzg5MjYgNjQuNDcxNzI2ODM0Nzc0MDIgMjExLjAxMjI3NzY1MDgzMzEgNjQuNDcxNzI2ODM0Nzc0MDJRMjExLjQ2NTI2NTczODk2NDA2IDY0LjQ3MTcyNjgzNDc3NDAyIDIxMi4yMDE5NjM0MTI3NjE2NyA2NC4zNjM4ODUxMzQ0NTg1NFEyMTIuOTM4NjYxMDg2NTU5MjggNjQuMjU2MDQzNDM0MTQzMDcgMjEzLjQ2NjUzNDMwNDYxODgyIDY0LjE1MDU3NDY4NDE0MzA3TDIxNC40OTQzMjUxNDkwNTkyOCA2OC43OTkwODM3NjkzMjE0NFEyMTMuNTYxNDYxOTczMTkwMyA2OS4xMDU0Njg3NSAyMTIuNTA0NDA2MzUwODUxMDQgNjkuMjQ0NDIzNTM4NDQ2NDNRMjExLjQ0NzM1MDcyODUxMTggNjkuMzgzMzc4MzI2ODkyODUgMjEwLjQzNDMyNzA1NDAyMzczIDY5LjM4MzM3ODMyNjg5Mjg1UTIwNi40MDcwMTExMzkzOTI4NCA2OS4zODMzNzgzMjY4OTI4NSAyMDQuMjAyNDUzMzkyNzQ0MDUgNjcuMzIxMjAyNDI3MTQ4ODJRMjAxLjk5Nzg5NTY0NjA5NTI2IDY1LjI1OTAyNjUyNzQwNDc5IDIwMS45OTc4OTU2NDYwOTUyNiA2MS41MDQzNDQ4MjA5NzYyNlpNMjMxLjc0ODI0MDI1NjMwOTUgNjkuNjEzODI4ODk3NDc2MlEyMjcuMzk2MDc1NTcwNTgzMzIgNjkuNjEzODI4ODk3NDc2MiAyMjQuMjQwOTgwMjMxNzYxOSA2Ny43MzIwMDIwNDk2ODQ1MlEyMjEuMDg1ODg0ODkyOTQwNSA2NS44NTAxNzUyMDE4OTI4NSAyMTkuMzg1NDY2MDMzMjIwMjcgNjIuNDQ4ODA4MDE0MzkyODVRMjE3LjY4NTA0NzE3MzUwMDA0IDU5LjA0NzQ0MDgyNjg5Mjg1IDIxNy42ODUwNDcxNzM1MDAwNCA1NC40Njk1NzE0NzEyMTQyOTRRMjE3LjY4NTA0NzE3MzUwMDA0IDQ5LjkyOTY2OTMyMDU4MzM0IDIxOS4zNTU0MDcwNTMyMzIxNyA0Ni40ODI2ODY2MDkwMjk3N1EyMjEuMDI1NzY2OTMyOTY0MyA0My4wMzU3MDM4OTc0NzYxOTYgMjI0LjA4MjUxMjM3MjczMjE0IDQxLjA5NDAyMzgyMzczODFRMjI3LjEzOTI1NzgxMjQ5OTk4IDM5LjE1MjM0Mzc1IDIzMS4yNDY3MzQyMjU3NDk5NSAzOS4xNTIzNDM3NVEyMzMuNzczNzU4MTM3MjI2MDggMzkuMTUyMzQzNzUgMjM2LjEzMDQ1NDI2NjA3MTMgMzkuOTc3NjM0Nzg3NTU5NTFRMjM4LjQ4NzE1MDM5NDkxNjUgNDAuODAyOTI1ODI1MTE5MDIgMjQwLjM1NzkwMTg2NTI0MzkgNDIuNTcyNjg5NzEyMDQ3NThRMjQyLjIyODY1MzMzNTU3MTI3IDQ0LjM0MjQ1MzU5ODk3NjEzNSAyNDMuMzIxODM3NTA4Njc4NCA0Ny4xNTg5OTY3NjA4NDUxODRRMjQ0LjQxNTAyMTY4MTc4NTU2IDQ5Ljk3NTUzOTkyMjcxNDIzIDI0NC40MTUwMjE2ODE3ODU1NiA1My45NjI3OTAwNzE5NjQyNjRWNTYuMDIxMDA5NDQ1MTkwNDNIMjIwLjkxMTMzNTg0OTc2MTk0VjUxLjY5MDQ3NTcwMjI4NTc3SDI0MS40MjU1Mjc1MzY4NjkwM0wyMzguNzE3MTEwMTIxMjUwMTMgNTMuMTE5NTc5MTk1OTc2MjZRMjM4LjcxNzExMDEyMTI1MDEzIDUwLjQxODUxNjM5NzQ3NjE5NiAyMzcuODc2MjU3NzExNjQ4OTIgNDguMzQ5MjExOTkwODMzMjhRMjM3LjAzNTQwNTMwMjA0NzcgNDYuMjc5OTA3NTg0MTkwMzcgMjM1LjM4MDA2NzY3MDM0NTI4IDQ1LjExNTAwMDYwNTU4MzE5UTIzMy43MjQ3MzAwMzg2NDI4NiA0My45NTAwOTM2MjY5NzYwMSAyMzEuMjY1NzE3ODI4MjczNzUgNDMuOTUwMDkzNjI2OTc2MDFRMjI4LjgwNjcwNTYxNzkwNDY0IDQzLjk1MDA5MzYyNjk3NjAxIDIyNy4wNjQ4ODI4Mzg3MjYwMiA0NS4xMzY2MjE4OTI0NTIyNFEyMjUuMzIzMDYwMDU5NTQ3NCA0Ni4zMjMxNTAxNTc5Mjg0NyAyMjQuNDA2NTMzMTQ1OTA0NTIgNDguMjYyNzI2ODQzMzU3MDg2UTIyMy40OTAwMDYyMzIyNjE2MyA1MC4yMDIzMDM1Mjg3ODU3MDYgMjIzLjQ5MDAwNjIzMjI2MTYzIDUyLjQ5MjU2MTg3Njc3MzgzNFY1NS40MzU2NTU5NTE0OTk5NFEyMjMuNDkwMDA2MjMyMjYxNjMgNTguNDY3ODkyMTY5OTUyMzkgMjI0LjUzMTI1MDIzMjQ1ODEgNjAuNTY4MzA5NjY0NzI2MjZRMjI1LjU3MjQ5NDIzMjY1NDU1IDYyLjY2ODcyNzE1OTUwMDEyIDIyNy40NTIyMTc2OTIxMzY3NCA2My43NDI0MDMwOTAwMDAxNVEyMjkuMzMxOTQxMTUxNjE4OTMgNjQuODE2MDc5MDIwNTAwMTggMjMxLjgwNzgyODc0ODIyNjE0IDY0LjgxNjA3OTAyMDUwMDE4UTIzMy40Mjk0MTU2MDc0NTIzNyA2NC44MTYwNzkwMjA1MDAxOCAyMzQuNzU1OTUyNzY5NTE3ODggNjQuMzUwNjk2NzEyNzMyMzJRMjM2LjA4MjQ4OTkzMTU4MzM4IDYzLjg4NTMxNDQwNDk2NDQ1IDIzNy4wMzk2MjE3MzQ2MTkxMiA2Mi45NTA4NTc5OTY5NDA2MVEyMzcuOTk2NzUzNTM3NjU0ODUgNjIuMDE2NDAxNTg4OTE2NzggMjM4LjUwNzc1MTM2OTQ3NjMgNjAuNjM2ODY1MzE3ODIxNUwyNDMuOTQ5OTA0MTA4MDQ3NDYgNjEuOTIxNDczOTIwMzQ1MzA2UTI0My4yNTQ4NjU0MzE3ODU1NiA2NC4yMTIyNTIwODA0NDA1MiAyNDEuNTc3Mzg2NzAxMTA3IDY1Ljk0NDgzODEzNjQzNDU2UTIzOS44OTk5MDc5NzA0Mjg0NCA2Ny42Nzc0MjQxOTI0Mjg1OSAyMzcuNDA2NjMwMDAzNDUyMjggNjguNjQ1NjI2NTQ0OTUyMzlRMjM0LjkxMzM1MjAzNjQ3NjEgNjkuNjEzODI4ODk3NDc2MiAyMzEuNzQ4MjQwMjU2MzA5NSA2OS42MTM4Mjg4OTc0NzYyWk0yNTAuMzYyMTU5MjUyMTY2NzIgNjkuMFYzOS41MjE0ODQzNzVIMjU1Ljk3NTE2NDQxMzQ1MjEyVjQ0LjI1NTk2ODQ1MTQ5OTk0SDI1Ni4yOTE1NzA2NjM0NTIxNVEyNTcuMTA0MjA3NTc1MzIxMiA0MS44NTMzOTY4OTI1NDc2MSAyNTkuMTM4NzAyMjczMzY4ODQgNDAuNDgxMjQ5MDM0NDA0NzU1UTI2MS4xNzMxOTY5NzE0MTY1IDM5LjEwOTEwMTE3NjI2MTkgMjYzLjc1NzcxMDgxNDQ3NiAzOS4xMDkxMDExNzYyNjE5UTI2NC4zMTM1Mjk5NjgyNjE3IDM5LjEwOTEwMTE3NjI2MTkgMjY1LjAzMTUwODc3MzU2NTMgMzkuMTQ5NzA2MDY1NjU0NzU1UTI2NS43NDk0ODc1Nzg4Njg4NyAzOS4xOTAzMTA5NTUwNDc2MSAyNjYuMjA5MzI5NzgzOTE2NSAzOS4yNDk4OTk0NDY5NjQyNjRWNDQuNzg2NDUwMzg2MDQ3MzZRMjY1Ljg5Mzk4MjQ3MDAzNTU1IDQ0LjY5MTAwMjkwNTM2ODgwNSAyNjQuOTk1NjU0NjEyNzc5NiA0NC41ODMxNjEyMDUwNTMzM1EyNjQuMDk3MzI2NzU1NTIzNyA0NC40NzUzMTk1MDQ3Mzc4NTQgMjYzLjE3MTgzNzUwODY3ODQ0IDQ0LjQ3NTMxOTUwNDczNzg1NFEyNjEuMTYyMTI2NDIxOTI4NCA0NC40NzUzMTk1MDQ3Mzc4NTQgMjU5LjU2NjExNzM3NjA4OTEgNDUuMzI1Mzk4OTgxNTcxMlEyNTcuOTcwMTA4MzMwMjQ5OCA0Ni4xNzU0Nzg0NTg0MDQ1NCAyNTcuMDY1OTc1NjM2MjQzOCA0Ny42NjU3NTQwMjAyMTQwOFEyNTYuMTYxODQyOTQyMjM3ODUgNDkuMTU2MDI5NTgyMDIzNjIgMjU2LjE2MTg0Mjk0MjIzNzg1IDUxLjEwMjk4NTAyNDQ1MjIxVjY5LjBaIi8+PHBhdGggZmlsbD0iIzZhYThmMCIgZD0iTTI3OS41NTE0ODcxODM1NzA4IDI5LjcxMjg5MDYyNVY2OS4wSDI3MS40OTQ4NTMzNTM1MDAzM1YyOS43MTI4OTA2MjVaTTI4NC45OTE1MjY5MTM2NDI5IDY5LjAgMjk4LjQzMDM4ODY0MTM1NzQgMjkuNzEyODkwNjI1SDMwOC45NTgwODY5MTk3ODQ1M0wzMjIuNzM4MTMzNjgwODIwNDUgNjkuMEgzMTMuNzkxMzY5MDkyNDY0NDRMMzA3LjQ5NTMyOTIxMzE0MjQgNTAuMDQ4MTQzMDI5MjEyOTVRMzA2LjM0NjI2MjgyNDUzNTM2IDQ2LjM3NjgzNzI1MzU3MDU2IDMwNS4xODE2MzAyMzU5MTA0IDQyLjAwNzg0MDYzMzM5MjMzNFEzMDQuMDE2OTk3NjQ3Mjg1NDUgMzcuNjM4ODQ0MDEzMjE0MTEgMzAyLjcyMzQxNzA1NTYwNjgzIDMyLjQ4NjcwMTM2OTI4NTU4SDMwNC40Njk5NDcxMTE2MDY2UTMwMy4yMTY5NzE0MDkzMjA4IDM3LjY2MzEwMjk4NDQyODQwNiAzMDIuMTI1NjM1NTQ2NDQ1ODQgNDIuMDU2MzU4NTc1ODIwOTJRMzAxLjAzNDI5OTY4MzU3MDg1IDQ2LjQ0OTYxNDE2NzIxMzQ0IDI5OS45NTAwOTcxNTU1NzEgNTAuMDQ4MTQzMDI5MjEyOTVMMjkzLjg3NzEyNDI2MTg1NjA3IDY5LjBaTTI5My4zODc4NDQyNzY0MjgyIDU5Ljg4MjE1MTI0NjA3MDg2VjUzLjU2ODg3MDY2MzY0Mjg4SDMxNC4zNDE4MTYzMTgwMzUxVjU5Ljg4MjE1MTI0NjA3MDg2WiIvPjwvc3ZnPg==" alt="asoterIA">
+                    </div>
+
+                    <div class="cover-center">
+                        <h2 class="cover-title">
+                            Démocratiser l'IA juridique, sans compromis sur le secret professionnel.
+                        </h2>
+                    </div>
+
+                    <div class="cover-footer">
+                        <span>Merci de votre attention · Groupe 32</span>
+                        <span>16</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 17 : ANNEXE / BACKUP - COMPOSANTS DE LA BOX (PRIX HT)
+                 =========================================== -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            Annexe : composants matériels de la Box asoterIA (prix HT).
+                        </h2>
+                    </header>
+
+                    <table class="fin-table compact">
+                        <thead>
+                            <tr>
+                                <th>Composant</th>
+                                <th style="text-align:left;">Référence</th>
+                                <th>Consommation</th>
+                                <th>Prix HT (hors port)</th>
+                                <th>Prix HT (port inclus)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Carte graphique (GPU)</td>
+                                <td style="text-align:left;">MSI VENTUS 2X OC GeForce RTX 5060 8 Go</td>
+                                <td>36 W – 220 W</td>
+                                <td>416,66 €</td>
+                                <td>416,66 €</td>
+                            </tr>
+                            <tr>
+                                <td>Mémoire vive (RAM)</td>
+                                <td style="text-align:left;">Corsair Vengeance 32 Go (2 x 16 Go) DDR5-6000 CL36</td>
+                                <td>31 W</td>
+                                <td>379,99 €</td>
+                                <td>384,15 €</td>
+                            </tr>
+                            <tr>
+                                <td>Stockage (SSD NVMe)</td>
+                                <td style="text-align:left;">Kingston KC3000 1.024 To M.2 PCIe 4.0 x4</td>
+                                <td>2 W – 10 W</td>
+                                <td>174,08 €</td>
+                                <td>182,33 €</td>
+                            </tr>
+                            <tr>
+                                <td>Processeur (CPU)</td>
+                                <td style="text-align:left;">AMD Ryzen 5 7600X (6 coeurs, 4.7 GHz)</td>
+                                <td>13 W – 105 W</td>
+                                <td>162,98 €</td>
+                                <td>162,98 €</td>
+                            </tr>
+                            <tr>
+                                <td>Boîtier</td>
+                                <td style="text-align:left;">Asus Prime AP201 MicroATX Mini Tower</td>
+                                <td>—</td>
+                                <td>66,65 €</td>
+                                <td>66,65 €</td>
+                            </tr>
+                            <tr>
+                                <td>Alimentation</td>
+                                <td style="text-align:left;">be quiet! Pure Power 12 650 W (80+ Gold)</td>
+                                <td>— (650 W max)</td>
+                                <td>66,65 €</td>
+                                <td>66,65 €</td>
+                            </tr>
+                            <tr>
+                                <td>Carte mère</td>
+                                <td style="text-align:left;">Biostar B650MT Micro ATX AM5</td>
+                                <td>15 W – 60 W</td>
+                                <td>62,55 €</td>
+                                <td>62,55 €</td>
+                            </tr>
+                            <tr>
+                                <td>Refroidissement CPU</td>
+                                <td style="text-align:left;">be quiet! Pure Rock 3 (59.6 CFM)</td>
+                                <td>5 W – 10 W</td>
+                                <td>22,49 €</td>
+                                <td>22,49 €</td>
+                            </tr>
+                            <tr class="row-strong">
+                                <td>Total Box</td>
+                                <td style="text-align:left;">TTC : 1 622,47 € hors port / 1 637,36 € port inclus</td>
+                                <td>102 W – 436 W</td>
+                                <td>1 352,06 € HT</td>
+                                <td>1 364,47 € HT</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <footer class="slide-footer">
+                        <span>Backup · Coût matériel couvert par les 1 500 € HT d'installation</span>
+                        <span>A1</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 18 : ANNEXE / BACKUP - COMPTE DE RÉSULTAT COMPLET (5 ANS)
+                 =========================================== -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            Annexe : détail complet des prévisions financières sur 5 ans.
+                        </h2>
+                    </header>
+
+                    <table class="fin-table dense">
+                        <thead>
+                            <tr>
+                                <th>Indicateur / Poste</th>
+                                <th>Année 1</th>
+                                <th>Année 2</th>
+                                <th>Année 3</th>
+                                <th>Année 4</th>
+                                <th>Année 5</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Nouveaux clients</td>
+                                <td>10</td>
+                                <td>130</td>
+                                <td>130</td>
+                                <td>130</td>
+                                <td>130</td>
+                            </tr>
+                            <tr>
+                                <td>Nombre de clients cumulés</td>
+                                <td>10</td>
+                                <td>140</td>
+                                <td>270</td>
+                                <td>400</td>
+                                <td>530</td>
+                            </tr>
+                            <tr>
+                                <td>Abonnements (250 € / mois)</td>
+                                <td>15 000 €</td>
+                                <td>225 000 €</td>
+                                <td>615 000 €</td>
+                                <td>1 005 000 €</td>
+                                <td>1 395 000 €</td>
+                            </tr>
+                            <tr>
+                                <td>Frais d'installation (1 500 €)</td>
+                                <td>15 000 €</td>
+                                <td>195 000 €</td>
+                                <td>195 000 €</td>
+                                <td>195 000 €</td>
+                                <td>195 000 €</td>
+                            </tr>
+                            <tr class="row-strong">
+                                <td>Chiffre d'affaires</td>
+                                <td>30 000 €</td>
+                                <td>420 000 €</td>
+                                <td>810 000 €</td>
+                                <td>1 200 000 €</td>
+                                <td>1 590 000 €</td>
+                            </tr>
+                            <tr>
+                                <td>Charges salariales (Tech)</td>
+                                <td>50 000 €</td>
+                                <td>125 000 €</td>
+                                <td>200 000 €</td>
+                                <td>200 000 €</td>
+                                <td>200 000 €</td>
+                            </tr>
+                            <tr>
+                                <td>Matériel pour Box</td>
+                                <td>13 500 €</td>
+                                <td>175 500 €</td>
+                                <td>175 500 €</td>
+                                <td>175 500 €</td>
+                                <td>175 500 €</td>
+                            </tr>
+                            <tr>
+                                <td>Charges salariales (Commercial / Mktg)</td>
+                                <td>0 €</td>
+                                <td>120 000 €</td>
+                                <td>120 000 €</td>
+                                <td>120 000 €</td>
+                                <td>120 000 €</td>
+                            </tr>
+                            <tr>
+                                <td>Frais généraux (loyer, etc.)</td>
+                                <td>10 000 €</td>
+                                <td>10 000 €</td>
+                                <td>10 000 €</td>
+                                <td>10 000 €</td>
+                                <td>10 000 €</td>
+                            </tr>
+                            <tr class="row-strong">
+                                <td>Excédent brut d'exploitation (EBE)</td>
+                                <td>-43 500 €</td>
+                                <td>-10 500 €</td>
+                                <td>304 500 €</td>
+                                <td>694 500 €</td>
+                                <td>1 084 500 €</td>
+                            </tr>
+                            <tr>
+                                <td>Financement initial</td>
+                                <td>90 000 €</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>—</td>
+                                <td>—</td>
+                            </tr>
+                            <tr class="row-strong">
+                                <td>Trésorerie cumulée</td>
+                                <td>46 500 €</td>
+                                <td>36 000 €</td>
+                                <td>340 500 €</td>
+                                <td>1 035 000 €</td>
+                                <td>2 119 500 €</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <footer class="slide-footer">
+                        <span>Backup · Ventilation complète des produits et charges</span>
+                        <span>A2</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 19 : ANNEXE / BACKUP - ZOOM CONCURRENTS DÉTAILLÉ
+                 =========================================== -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            Annexe : analyse détaillée des acteurs concurrents.
+                        </h2>
+                    </header>
+
+                    <table class="fin-table compact">
+                        <thead>
+                            <tr>
+                                <th>Acteur</th>
+                                <th style="text-align:left;">Positionnement</th>
+                                <th style="text-align:left;">Financement / Taille</th>
+                                <th>Tarif relevé</th>
+                                <th style="text-align:left;">Avantage asoterIA</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="row-strong">
+                                <td>asoterIA</td>
+                                <td style="text-align:left;">Box IA juridique + Cloud privé</td>
+                                <td style="text-align:left;">Amorçage 90 k€</td>
+                                <td>1 500 € + 250 € / mois</td>
+                                <td style="text-align:left;">100 % local, droit FR, prix par cabinet</td>
+                            </tr>
+                            <tr>
+                                <td>Olares One</td>
+                                <td style="text-align:left;">Box Cloud &amp; IA perso (RTX 5090M)</td>
+                                <td style="text-align:left;">45 M$ levés (Série A, SIG)</td>
+                                <td>2 899 $ à 4 999 $</td>
+                                <td style="text-align:left;">Sans veille juridique ni installation FR</td>
+                            </tr>
+                            <tr>
+                                <td>Dalloz / Doctrine</td>
+                                <td style="text-align:left;">IA juridiques Cloud</td>
+                                <td style="text-align:left;">Rachat par LexisNexis (2026)</td>
+                                <td>213 à 250 € HT / mois / avocat</td>
+                                <td style="text-align:left;">Dossiers dans le cloud, 4x plus cher</td>
+                            </tr>
+                            <tr>
+                                <td>Jimini AI / Septeo</td>
+                                <td style="text-align:left;">Copilotes juridiques en ligne</td>
+                                <td style="text-align:left;">1,9 M€ levés (Jimini) / Groupe Septeo</td>
+                                <td>65 €+ / mois / siège + devis</td>
+                                <td style="text-align:left;">100 % en ligne, facturation par siège</td>
+                            </tr>
+                            <tr>
+                                <td>LegisBox Cabinet</td>
+                                <td style="text-align:left;">Serveur IA juridique sur site</td>
+                                <td style="text-align:left;">Jeune société FR (EYA SAS)</td>
+                                <td>499 à 1 799 € HT / mois (36 mois)</td>
+                                <td style="text-align:left;">2 à 7x plus cher, sans cloud complet</td>
+                            </tr>
+                            <tr>
+                                <td>Start9 / Umbrel</td>
+                                <td style="text-align:left;">Serveurs auto-hébergés</td>
+                                <td style="text-align:left;">PME US (Start9, Umbrel)</td>
+                                <td>399 $ à 1 139 € (boîtier nu)</td>
+                                <td style="text-align:left;">Pas de droit FR, pas de déplacement site</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <footer class="slide-footer">
+                        <span>Backup · Comparatif détaillé des 5 familles de concurrents</span>
+                        <span>A3</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 20 : ANNEXE / BACKUP - SÉCURITÉ, PANNE & MISES À JOUR
+                 =========================================== -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            Annexe : continuité d'activité, sauvegardes et mises à jour.
+                        </h2>
+                    </header>
+
+                    <div class="arch-branches" style="margin:auto 0;">
+                        <div class="row-item">
+                            <div class="icon-square">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            </div>
+                            <div>
+                                <div class="row-item-title">Sauvegarde 3-2-1 chiffrée client</div>
+                                <div class="card-sub" style="margin-top:6px;">Locale + hors site illisible par asoterIA</div>
+                            </div>
+                        </div>
+
+                        <div class="row-item">
+                            <div class="icon-square">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.4-.6-.6-2.4z"/></svg>
+                            </div>
+                            <div>
+                                <div class="row-item-title">Remplacement matériel inclus</div>
+                                <div class="card-sub" style="margin-top:6px;">Intervention sur site en cas de panne</div>
+                            </div>
+                        </div>
+
+                        <div class="row-item">
+                            <div class="icon-square">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            </div>
+                            <div>
+                                <div class="row-item-title">Mises à jour sur accord client</div>
+                                <div class="card-sub" style="margin-top:6px;">Flux chiffré tracé dans le journal d'audit</div>
+                            </div>
+                        </div>
+
+                        <div class="row-item">
+                            <div class="icon-square">
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                            </div>
+                            <div>
+                                <div class="row-item-title">Cloisonnement strict des accès</div>
+                                <div class="card-sub" style="margin-top:6px;">Coffre-fort exclu de l'indexation IA</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer class="slide-footer">
+                        <span>Backup · Gestion des risques techniques et sécurité</span>
+                        <span>A4</span>
+                    </footer>
+                </div>
+            </section>
+
+            <!-- ===========================================
+                 SLIDE 21 : ANNEXE / BACKUP - DÉTAIL DU BILAN CARBONE & ÉLECTRIQUE
+                 =========================================== -->
+            <section class="slide">
+                <div class="slide-canvas">
+                    <header class="slide-header">
+                        <h2 class="slide-title">
+                            Annexe : pourquoi la fabrication pèse plus que l'électricité en France.
+                        </h2>
+                    </header>
+
+                    <div class="grid-3">
+                        <div class="card">
+                            <div class="big-number" style="font-size:88px;">102 – 436 W</div>
+                            <div class="card-label">Puissance Box</div>
+                            <div class="card-sub">Repos vs Charge IA (GPU 220 W)</div>
+                        </div>
+
+                        <div class="card">
+                            <div class="big-number" style="font-size:88px;">52 g</div>
+                            <div class="card-label">CO2eq / kWh</div>
+                            <div class="card-sub">Mix électrique français bas carbone</div>
+                        </div>
+
+                        <div class="card highlight">
+                            <div class="big-number" style="font-size:88px;">Occasion</div>
+                            <div class="card-label">Levier n°1 (Année 1)</div>
+                            <div class="card-sub">Amortir le coût carbone de fabrication</div>
+                        </div>
+                    </div>
+
+                    <footer class="slide-footer">
+                        <span>Backup · Analyse cycle de vie (Fabrication vs Usage)</span>
+                        <span>A5</span>
+                    </footer>
+                </div>
+            </section>
+
+        </main>
+
+        <nav class="deck-controls" aria-label="Navigation">
+            <button id="prevBtn" title="Précédent">←</button>
+            <span id="slideIndicator">1 / 16</span>
+            <button id="nextBtn" title="Suivant">→</button>
+        </nav>
+    </div>
+
+    <script>
+        /* ===========================================
+           SLIDE PRESENTATION CONTROLLER
+           =========================================== */
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.mainSlidesCount = 16;
+                this.currentSlide = 0;
+                this.stage = document.getElementById('deckStage');
+                this.indicator = document.getElementById('slideIndicator');
+                this.isEditing = false;
+                this.setupStageScale();
+                this.setupNav();
+                this.setupEditor();
+                this.showSlide(0);
+            }
+
+            setupStageScale() {
+                const scale = () => {
+                    const factor = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+                    const x = (window.innerWidth - 1920 * factor) / 2;
+                    const y = (window.innerHeight - 1080 * factor) / 2;
+                    this.stage.style.transform = `translate(${x}px, ${y}px) scale(${factor})`;
+                };
+                scale();
+                window.addEventListener('resize', scale);
+            }
+
+            setupNav() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.target.getAttribute('contenteditable') === 'true') return;
+                    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+                        e.preventDefault();
+                        this.showSlide(this.currentSlide + 1);
+                    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+                        e.preventDefault();
+                        this.showSlide(this.currentSlide - 1);
+                    } else if (e.key === 'e' || e.key === 'E') {
+                        this.toggleEditMode();
+                    }
+                });
+                document.getElementById('prevBtn').addEventListener('click', () => this.showSlide(this.currentSlide - 1));
+                document.getElementById('nextBtn').addEventListener('click', () => this.showSlide(this.currentSlide + 1));
+            }
+
+            setupEditor() {
+                const hotzone = document.getElementById('editHotzone');
+                const editToggle = document.getElementById('editToggle');
+                let hideTimeout = null;
+
+                hotzone.addEventListener('mouseenter', () => {
+                    clearTimeout(hideTimeout);
+                    editToggle.classList.add('show');
+                });
+                hotzone.addEventListener('mouseleave', () => {
+                    hideTimeout = setTimeout(() => {
+                        if (!this.isEditing) editToggle.classList.remove('show');
+                    }, 400);
+                });
+                editToggle.addEventListener('mouseenter', () => clearTimeout(hideTimeout));
+                editToggle.addEventListener('mouseleave', () => {
+                    hideTimeout = setTimeout(() => {
+                        if (!this.isEditing) editToggle.classList.remove('show');
+                    }, 400);
+                });
+                editToggle.addEventListener('click', () => this.toggleEditMode());
+                hotzone.addEventListener('click', () => this.toggleEditMode());
+            }
+
+            toggleEditMode() {
+                this.isEditing = !this.isEditing;
+                const editToggle = document.getElementById('editToggle');
+                editToggle.classList.toggle('active', this.isEditing);
+                editToggle.textContent = this.isEditing ? '💾 Quitter édition' : '✏️ Éditer';
+                this.slides.forEach(slide => {
+                    slide.querySelectorAll('h1, h2, .big-number, .card-label, .card-sub, .row-item-title, .funnel-val, .funnel-lbl, .matrix-names, .member-name, .member-role, td, th').forEach(el => {
+                        el.setAttribute('contenteditable', this.isEditing ? 'true' : 'false');
+                    });
+                });
+            }
+
+            showSlide(index) {
+                this.currentSlide = Math.max(0, Math.min(index, this.slides.length - 1));
+                this.slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === this.currentSlide);
+                    slide.classList.toggle('visible', i === this.currentSlide);
+                });
+                if (this.currentSlide < this.mainSlidesCount) {
+                    this.indicator.textContent = `${this.currentSlide + 1} / ${this.mainSlidesCount}`;
+                } else {
+                    const annexIndex = this.currentSlide - this.mainSlidesCount + 1;
+                    const annexTotal = this.slides.length - this.mainSlidesCount;
+                    this.indicator.textContent = `Annexe ${annexIndex} / ${annexTotal}`;
+                }
+            }
+        }
+
+        new SlidePresentation();
+    </script>
+</body>
+</html>

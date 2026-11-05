@@ -63,9 +63,19 @@ Avant d'appeler le modèle, trois cas reçoivent une réponse fixe, **sans appel
 |---|---|
 | Question sur un mot de passe, le coffre-fort, un code d'accès | « Je n'ai pas accès au coffre-fort de mots de passe… » |
 | Un nom propre de la question n'apparaît dans aucun document, agenda ou contact visible | « Je ne trouve aucun élément mentionnant « X » parmi les documents… » Le message ne dit pas si ce nom existe ailleurs dans le cabinet |
-| Aucun extrait pertinent | « Je ne trouve pas cette information dans les documents auxquels vous avez accès. » |
+| Question sur le cabinet (dossiers, documents, agendas, contacts) et nom propre introuvable | Même réponse fixe ; c'est le refus d'accès de la démo |
 
 Ensuite, le modèle reçoit une consigne stricte ([`assistant/consignes.py`](assistant/consignes.py)) : répondre seulement avec les extraits fournis, citer chaque phrase par son numéro d'extrait, recopier les dates et montants, dire « je ne trouve pas » sinon. Température 0,1 : les réponses varient très peu d'un essai à l'autre.
+
+## Réponses générales (5 novembre)
+
+Une question qui ne porte pas sur le cabinet (« Bonjour », « Qu'est-ce qu'une SCI ? », « Rédige un courriel de relance »), ou pour laquelle aucun document, agenda ou contact ne correspond, reçoit une **réponse générale** du modèle (consigne `GENERAL` de `consignes.py`) au lieu de « Je ne trouve pas… » à chaque fois. La page l'affiche sous la réponse : « Réponse générale du modèle, sans document source du cabinet : à vérifier avant usage ». La consigne lui interdit de citer ou d'inventer un fait du cabinet, et lui demande de dire qu'une réponse de droit vient de ses connaissances et doit être vérifiée. Les trois derniers échanges sont envoyés avec chaque question : l'assistant suit la conversation.
+
+**Exception à la règle « l'assistant cite toujours sa source »** (`AGENTS.md`, règle 3) : à valider par l'équipe (README, section 8).
+
+## Actions : rendez-vous et dossiers (5 novembre)
+
+« Ajoute un rendez-vous avec M. Garnier demain de 14 h à 15 h », « Crée le dossier 2026-021 Martin » : l'assistant **propose** l'action (titre, date, heure, agenda, ou emplacement du dossier) et n'agit qu'après **Confirmer**. Les dates et heures sont lues par le code (`actions.py`), pas par le modèle. L'action passe par les droits Nextcloud de la personne (agenda « Personnel », ou celui nommé dans la demande ; dossier créé dans « Dossiers clients ») et elle est inscrite au journal (`action_proposee`, `action_agenda`, `action_dossier`). Une proposition expire après 15 minutes et ne sert qu'une fois.
 
 ## Recherche
 
@@ -102,6 +112,9 @@ Banc de mesure : [`mesures/mesurer_modeles.py`](mesures/mesurer_modeles.py), 5 q
 `IA_MOTEUR=openai` et `IA_MOTEUR_URL` permettent d'utiliser un serveur compatible OpenAI, comme [Colibri](https://github.com/JustVugg/colibri), qui fait tourner de gros modèles « à experts » (Qwen3.6-35B-A3B) en lisant une partie du modèle sur le disque. Mesuré le 3 novembre sur le portable de démo (16 Go) : **inutilisable pour la démo** (voir la section 5 de `docs/prototype.md`). À réessayer sur une box avec au moins 32 Go de mémoire.
 
 ## Limites connues
+
+- **Modèle** : `qwen3:4b` de la bibliothèque Ollama est la version « thinking » (juillet 2025) ; même avec `think: false`, il écrit son raisonnement en anglais dans la réponse. C'était la cause des réponses en boucle. La démo utilise `qwen3:4b-instruct`. Évaluation du 5 novembre avec ce modèle (`evaluation/evaluer_demo.py --essais 1`) : refus Q3a et Q3b réussis ; Q1, Q2 et Q4 justes sur le fond mais incomplets selon les critères (montant de 5 500 € absent, contrat de travail non cité, assistant interne non mentionné). Premier mot entre 19 et 47 s sur le portable de démo.
+- Une réponse générale peut contenir une erreur (le modèle a cité une loi de 1956 pour la SCI) : elle est signalée comme telle, à vérifier.
 
 - La recherche par le sens demande le modèle d'embeddings ; sans lui, la recherche se fait par mots, ce qui suffit pour les questions de la démo.
 - L'index contient le texte de tous les documents consultés par au moins une personne : il est protégé comme les données (disque de la box), et filtré à chaque question.

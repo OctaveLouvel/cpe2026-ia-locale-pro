@@ -15,7 +15,7 @@ from http import cookies
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from . import config, journal, modeles
+from . import actions, config, journal, modeles
 from .index import Index
 from .moteur import Moteur, MoteurIndisponible
 from .nextcloud import AccesRefuse, Client, Indisponible
@@ -209,7 +209,11 @@ class Gestionnaire(BaseHTTPRequestHandler):
         if chemin == "/api/deconnexion":
             return self._deconnexion(session)
         if chemin == "/api/question":
-            return self._question(session, str(corps.get("question", "")))
+            historique = [(str(q)[:1500], str(r)[:1500]) for q, r in (corps.get("historique") or [])[-3:]
+                          if isinstance(q, str) and isinstance(r, str)]
+            return self._question(session, str(corps.get("question", "")), historique)
+        if chemin == "/api/action":
+            return self._action(session, str(corps.get("jeton", "")), bool(corps.get("confirmer")))
         if chemin.startswith("/api/modeles/"):
             if not session.admin:
                 return self._repondre({"erreur": "Réservé aux administrateurs du cabinet."}, 403)
@@ -324,7 +328,28 @@ class Gestionnaire(BaseHTTPRequestHandler):
             fin = {"type": "erreur", "texte": str(erreur)}
         self.wfile.write(f"data: {json.dumps(fin, ensure_ascii=False)}\n\n".encode())
 
-    def _question(self, session, question):
+    def _action(self, session, jeton, confirmer):
+        """Exécute (ou annule) une action proposée par l'assistant, avec les droits Nextcloud de la personne."""
+        proposition = actions.reprendre(jeton, session.login)
+        if proposition is None:
+            return self._repondre({"erreur": "Cette proposition a expiré : reformulez la demande."}, 410)
+        type_journal = f"action_{proposition.type}"
+        if not confirmer:
+            journal.ecrire(type_journal, session.login, {**actions._public(proposition.details)}, "annulee")
+            return self._repondre({"texte": "Action annulée : rien n'a été modifié."})
+        try:
+            texte = actions.executer(session, proposition)
+        except AccesRefuse:
+            journal.ecrire(type_journal, session.login, actions._public(proposition.details), "refus")
+            return self._repondre({"erreur": "Nextcloud refuse : vous n'avez pas le droit de modifier cet emplacement."}, 403)
+        except Indisponible as erreur:
+            journal.ecrire(type_journal, session.login, {**actions._public(proposition.details), "erreur": str(erreur)[:120]}, "echec")
+            existe = "405" in str(erreur) or "412" in str(erreur)
+            return self._repondre({"erreur": "Ce dossier existe déjà." if existe else "Nextcloud n'a pas pu enregistrer l'action."}, 409 if existe else 502)
+        journal.ecrire(type_journal, session.login, actions._public(proposition.details))
+        self._repondre({"texte": texte, "lien": actions.lien(proposition, config.BOX_DOMAIN)})
+
+    def _question(self, session, question, historique=()):
         self.send_response(200)
         self.send_header("Content-Type", "text/event-stream; charset=utf-8")
         self.send_header("Cache-Control", "no-store")
@@ -342,7 +367,7 @@ class Gestionnaire(BaseHTTPRequestHandler):
         if not etat["pret"]:
             return envoyer({"type": "erreur", "texte": f"L'assistant n'est pas prêt : {etat['message']}."})
         try:
-            for evenement in repondre(session, question, index, moteur):
+            for evenement in repondre(session, question, index, moteur, historique):
                 envoyer(evenement)
         except (BrokenPipeError, ConnectionResetError):
             pass  # page fermée : la génération s'arrête avec la connexion au moteur

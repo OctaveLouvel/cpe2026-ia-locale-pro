@@ -171,6 +171,19 @@ class Client:
                 evenements += [e for e in _evenements_ics(ics, nom) if e.fin is None or e.fin > debut]
         return sorted(evenements, key=lambda e: e.debut)
 
+    def agendas(self) -> list[tuple[str, str]]:
+        """(adresse, nom) des agendas de la personne, y compris ceux partagés avec elle."""
+        return self._collections(f"/remote.php/dav/calendars/{urllib.parse.quote(self.login)}/", "c:calendar")
+
+    def ajouter_evenement(self, agenda_href: str, uid: str, ics: str):
+        """Nextcloud refuse (403) si la personne ne peut pas modifier cet agenda."""
+        self._requete("PUT", agenda_href.rstrip("/") + f"/{uid}.ics", ics,
+                      {"Content-Type": "text/calendar; charset=utf-8", "If-None-Match": "*"}, ok=(201, 204))
+
+    def creer_dossier(self, chemin: str):
+        self._requete("MKCOL", f"/remote.php/dav/files/{urllib.parse.quote(self.login)}/{urllib.parse.quote(chemin)}",
+                      ok=(201,))
+
     # ------------------------------------------------------------ contacts
 
     def contacts(self) -> list[Contact]:

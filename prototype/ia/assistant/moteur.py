@@ -107,11 +107,15 @@ class Moteur:
 
     # ------------------------------------------------------------ rédaction
 
-    def repondre(self, systeme, message):
-        """Génère la réponse au fil de l'eau. Produit des morceaux de texte, puis un dictionnaire de mesures."""
-        messages = [{"role": "system", "content": systeme}, {"role": "user", "content": message}]
+    def repondre(self, systeme, message, historique=(), temperature=0.1):
+        """Génère la réponse au fil de l'eau. Produit des morceaux de texte, puis un dictionnaire de mesures.
+        historique : échanges précédents de la conversation [(question, réponse)], les plus anciens d'abord."""
+        messages = [{"role": "system", "content": systeme}]
+        for question, reponse in historique:
+            messages += [{"role": "user", "content": question}, {"role": "assistant", "content": reponse}]
+        messages.append({"role": "user", "content": message})
         debut, premier, usage = time.monotonic(), None, {}
-        for morceau, fin in (self._openai(messages) if self.type == "openai" else self._ollama(messages)):
+        for morceau, fin in (self._openai(messages, temperature) if self.type == "openai" else self._ollama(messages, temperature)):
             if morceau:
                 if premier is None:
                     premier = time.monotonic() - debut
@@ -124,9 +128,11 @@ class Moteur:
                "tokens_generes": usage.get("generes", 0),
                "generation_tokens_s": round(usage.get("generes", 0) / generation, 1)}
 
-    def _openai(self, messages):
+    def _openai(self, messages, temperature=0.1):
+        # Pénalité de répétition : un petit modèle à température basse peut boucler sur la même phrase.
         corps = {"model": self.modele, "messages": messages, "stream": True, "stream_options": {"include_usage": True},
-                 "enable_thinking": False, "temperature": 0.1, "max_tokens": config.GENERATION_MAX}
+                 "enable_thinking": False, "temperature": temperature, "frequency_penalty": 0.3,
+                 "max_tokens": config.GENERATION_MAX}
         with appeler(self.url, "/v1/chat/completions", corps, entetes=self._entetes) as reponse:
             for ligne in reponse:
                 ligne = ligne.decode("utf-8").strip()
@@ -141,9 +147,10 @@ class Moteur:
                     yield "", {"contexte": donnee["usage"].get("prompt_tokens", 0),
                                "generes": donnee["usage"].get("completion_tokens", 0)}
 
-    def _ollama(self, messages):
+    def _ollama(self, messages, temperature=0.1):
         corps = {"model": self.modele, "messages": messages, "stream": True, "keep_alive": "24h",
-                 "options": {"temperature": 0.1, "seed": 42, "num_ctx": config.CONTEXTE,
+                 "options": {"temperature": temperature, "seed": 42, "num_ctx": config.CONTEXTE,
+                             "repeat_penalty": 1.15, "repeat_last_n": 128,
                              "num_predict": config.GENERATION_MAX}}
         if self.modele not in self._reflexion:
             with appeler(config.OLLAMA_URL, "/api/show", {"model": self.modele}) as r:

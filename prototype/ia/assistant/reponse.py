@@ -6,10 +6,10 @@ import urllib.parse
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 
-from . import config, consignes, journal
+from . import actions, config, consignes, journal
 from .index import jetons
 from .nextcloud import PARIS, Client
-from .recherche import (contacts_utiles, dossiers_cites, evenements_utiles, noms_inconnus, rechercher)
+from .recherche import (contacts_utiles, dossiers_cites, evenements_utiles, noms_inconnus, noms_propres, rechercher)
 
 COFFRE = re.compile(r"(?i)\b(mots? de passe|password|mdp|coffre[- ]?fort|codes? d.acc[eè]s|identifiants? de connexion"
                     r"|cl[ée] e-?barreau)\b")
@@ -22,6 +22,12 @@ REFUS_COFFRE = ("Je n'ai pas accès au coffre-fort de mots de passe : il est sé
                 "ni lire ni communiquer un mot de passe. Pour l'obtenir, ouvrez le coffre-fort du cabinet avec "
                 "votre propre compte.")
 RIEN = "Je ne trouve pas cette information dans les documents auxquels vous avez accès."
+# Question qui porte sur le cabinet (ses dossiers, documents, agendas, contacts) : on cherche dans ses données.
+# Sinon (« Bonjour », « Rédige un courriel de relance », « Qu'est-ce qu'une SCI ? ») : réponse générale du modèle.
+DOCUMENTAIRE = re.compile(r"(?i)\b(dossiers?|documents?|pi[eè]ces?|fichiers?|clients?|affaires?|audiences?|"
+                          r"[ée]ch[ée]ances?|agendas?|rendez-vous|rdv|contacts?|t[ée]l[ée]phone|coordonn[ée]es|charte|"
+                          r"cabinet|conclusions?|assignations?|factures?|honoraires|r[ée]sum\w*|synth[èe]se|o[uù] en est|"
+                          r"selon|d'apr[èe]s|mes|mon|ma|notre|nos|loyers?|bail|contrat|courriers?)\b")
 
 
 @dataclass
@@ -52,7 +58,7 @@ def _quand(evenement):
     return f"{jour}, de {consignes.heure(evenement.debut)}{fin}"
 
 
-def repondre(session: Session, question: str, index, moteur):
+def repondre(session: Session, question: str, index, moteur, historique=()):
     debut = time.monotonic()
     maintenant = datetime.now(PARIS)
     question = " ".join(question.split())[:1000]
@@ -66,6 +72,20 @@ def repondre(session: Session, question: str, index, moteur):
         journal.ecrire("refus_coffre", session.login, {"question": question}, "refus")
         yield {"type": "texte", "texte": REFUS_COFFRE}
         yield fin([], refus="coffre")
+        return
+
+    # 2. Demande d'action (rendez-vous, dossier) : l'assistant propose, la personne confirme (POST /api/action).
+    action = actions.type_action(question)
+    if action:
+        yield {"type": "etape", "texte": "Préparation de l'action"}
+        if action == "agenda":
+            proposition = actions.proposer_rendez_vous(session, question, maintenant)
+        else:
+            proposition = actions.proposer_dossier(session, question, session.client.fichiers())
+        if proposition["type"] == "action":
+            journal.ecrire("action_proposee", session.login, {"question": question, "action": action})
+        yield proposition
+        yield fin([], action=action)
         return
 
     # 2. Ce que Nextcloud montre à cette personne, et rien d'autre.
@@ -84,7 +104,8 @@ def repondre(session: Session, question: str, index, moteur):
 
     # 3. Un nom inconnu de cette personne : on ne cherche pas plus loin et on ne dit pas s'il existe ailleurs.
     inconnus = noms_inconnus(question, mots_visibles)
-    if inconnus:
+    documentaire = bool(DOCUMENTAIRE.search(question) or (set(noms_propres(question)) - set(inconnus)))
+    if inconnus and documentaire:
         texte = (f"Je ne trouve aucun élément mentionnant « {', '.join(inconnus)} » parmi les documents, agendas "
                  "et contacts auxquels vous avez accès.")
         journal.ecrire("aucun_resultat", session.login, {"question": question, "noms_inconnus": inconnus}, "refus")
@@ -98,10 +119,14 @@ def repondre(session: Session, question: str, index, moteur):
     fileids = {i for i, f in visibles.items() if not dossiers or f.dossier in dossiers}
     resume = bool(RESUME.search(question))
     requete = question + (" faits procédure demandes montants audience" if resume else "")
+    # Question courte qui prolonge la précédente (« et pour Lefort ? ») : on cherche avec les deux.
+    if historique and len(question.split()) < 6:
+        requete = f"{historique[-1][0]} {requete}"
     indices = rechercher(index, moteur, requete, fileids,
-                         config.EXTRAITS_RESUME if resume else config.EXTRAITS, 1 if resume else 3, resume)
-    agenda = evenements_utiles(evenements, dossiers, maintenant) if (resume or AGENDA.search(question)) else []
-    carnet = contacts_utiles(contacts, question) if CONTACTS.search(question) else []
+                         config.EXTRAITS_RESUME if resume else config.EXTRAITS, 1 if resume else 3, resume) \
+        if documentaire else []
+    agenda = evenements_utiles(evenements, dossiers, maintenant) if documentaire and (resume or AGENDA.search(question)) else []
+    carnet = contacts_utiles(contacts, question) if documentaire and CONTACTS.search(question) else []
 
     extraits, sources = [], []
     for i in indices:
@@ -128,18 +153,30 @@ def repondre(session: Session, question: str, index, moteur):
         sources.append({"numero": numero, "type": "contact", "titre": c.nom, "carnet": c.carnet,
                         "lien_nextcloud": f"https://cloud.{config.BOX_DOMAIN}/apps/contacts"})
 
-    # 5. Rien de pertinent : pas d'appel au modèle, pas de réponse inventée.
+    # 5. Rien du cabinet ne correspond : réponse générale, signalée comme telle, sans aucune source.
     if not extraits:
-        journal.ecrire("aucun_resultat", session.login, {"question": question}, "refus")
-        yield {"type": "texte", "texte": RIEN}
-        yield fin([], refus="aucun_extrait")
+        yield {"type": "etape", "texte": "Réponse générale du modèle local"}
+        note = ("\n\n(Aucun document, agenda ou contact accessible ne correspond à cette question.)"
+                if documentaire else "")
+        message = (f"Nous sommes le {consignes.date_longue(maintenant.date())}, {consignes.heure(maintenant)}. "
+                   f"Personne qui écrit : {session.nom}.\n\n{question}{note}")
+        morceaux, mesures = [], {}
+        for morceau in moteur.repondre(consignes.GENERAL, message, historique, temperature=0.4):
+            if isinstance(morceau, dict):
+                mesures = morceau
+            else:
+                morceaux.append(morceau)
+                yield {"type": "texte", "texte": morceau}
+        journal.ecrire("question", session.login, {"question": question, "mode": "général", "modele": moteur.modele,
+                                                   "duree_s": round(time.monotonic() - debut, 1), **mesures})
+        yield fin([], generale=True, mesures=mesures)
         return
 
     # 6. Le modèle local rédige, à partir des seuls extraits.
     yield {"type": "etape", "texte": f"Rédaction par le modèle local à partir de {len(extraits)} extrait(s)"}
     message = consignes.message(question, extraits, maintenant, f"{session.nom} ({session.login})", resume)
     morceaux, mesures = [], {}
-    for morceau in moteur.repondre(consignes.SYSTEME, message):
+    for morceau in moteur.repondre(consignes.SYSTEME, message, historique):
         if isinstance(morceau, dict):
             mesures = morceau
         else:

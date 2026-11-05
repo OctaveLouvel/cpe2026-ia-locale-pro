@@ -1,8 +1,10 @@
 {
   "remarque": "Tailles de téléchargement relevées sur https://ollama.com/library le 3 novembre 2026. La mémoire nécessaire est une ESTIMATION (taille x 1,3 + 0,5 Go pour le contexte), pas une mesure : mesurer avec prototype/ia/mesures/ avant de choisir le modèle de la démo.",
   "modeles": [
+    {"id": "qwen3:4b-instruct", "nom": "Qwen3 4B Instruct", "editeur": "Alibaba (Qwen)", "type": "redaction", "moteur": "ollama", "taille_go": 2.5,
+     "description": "Même taille que Qwen3 4B, sans raisonnement écrit : répond directement, en français. Choix par défaut prévu pour la démo."},
     {"id": "qwen3:4b", "nom": "Qwen3 4B", "editeur": "Alibaba (Qwen)", "type": "redaction", "moteur": "ollama", "taille_go": 2.5,
-     "description": "Bon équilibre qualité et vitesse, multilingue. Choix par défaut prévu pour la démo."},
+     "description": "Version qui raisonne avant de répondre : dans Ollama, elle écrit ce raisonnement dans la réponse, en anglais, et répond lentement. Préférer Qwen3 4B Instruct."},
     {"id": "granite4.2:3b", "nom": "Granite 4.2 3B", "editeur": "IBM", "type": "redaction", "moteur": "ollama", "taille_go": 2.2,
      "description": "Multilingue, présenté par IBM comme adapté à la recherche documentaire (RAG)."},
     {"id": "ministral-3:3b", "nom": "Ministral 3 3B", "editeur": "Mistral AI", "type": "redaction", "moteur": "ollama", "taille_go": 3.0,

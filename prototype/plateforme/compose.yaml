@@ -194,6 +194,8 @@ services:
       # Colibri (hors conteneur, optionnel) : adresse écrite par ./box.sh moteur-ia demarrer.
       IA_COLIBRI_URL: ${IA_COLIBRI_URL:-}
       IA_MOTEUR_CLE: ${IA_MOTEUR_CLE:-}
+      # Longueur maximale d'une réponse, en tokens : à 400, le résumé de la question 1 était coupé avant les échéances.
+      IA_GENERATION_MAX: ${IA_GENERATION_MAX:-700}
       BOX_DOMAIN: ${BOX_DOMAIN:-cabinet.localhost}
       IA_DONNEES: /donnees
       IA_JOURNAL: /journal/assistant.jsonl

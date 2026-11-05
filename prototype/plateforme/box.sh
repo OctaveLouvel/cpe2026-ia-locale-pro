@@ -559,11 +559,54 @@ cmd_moteur_ia() {
         demarrer)
             [ -x "${COLIBRI_DIR:-}/c/coli" ] || echec "Colibri introuvable : renseigner COLIBRI_DIR dans .env"
             [ -d "${COLIBRI_MODELE:-}" ] || echec "modèle introuvable : renseigner COLIBRI_MODELE dans .env"
+            # Sinon l'ancien moteur répondrait à la place du nouveau, qui n'a pas pu ouvrir le port.
+            curl -fsS "${cle[@]}" "http://$ip:$port/v1/models" >/dev/null 2>&1 \
+                && echec "un moteur répond déjà sur $ip:$port : ./box.sh moteur-ia arreter d'abord"
             info "Démarrage de Colibri sur $ip:$port (réseau interne seulement)"
-            # setsid : le lanceur et le moteur qu'il démarre forment un groupe, arrêté d'un coup.
-            setsid nohup "$COLIBRI_DIR/c/coli" serve --model "$COLIBRI_MODELE" --host "$ip" --port "$port" --no-think \
-                ${IA_MOTEUR_CLE:+--api-key "$IA_MOTEUR_CLE"} > "$SORTIE/ia/colibri.log" 2>&1 &
-            echo $! > "$SORTIE/ia/colibri.pid"
+            # COLIBRI_VULKAN=1 : une partie du modèle va sur la carte graphique (moteur compilé avec VK=1,
+            # voir prototype/ia/README.md). Contexte limité comme celui d'Ollama : la mémoire libérée
+            # sert de cache aux experts.
+            info "Carte graphique (Vulkan) : ${COLIBRI_VULKAN:-0}, contexte : ${COLIBRI_CTX:-4096} tokens"
+            # Le journal du lancement précédent est gardé : c'est lui qui explique un arrêt.
+            [ -f "$SORTIE/ia/colibri.log" ] && mv -f "$SORTIE/ia/colibri.log" "$SORTIE/ia/colibri.log.1"
+            local commande=("$COLIBRI_DIR/c/coli" serve --model "$COLIBRI_MODELE" --host "$ip" --port "$port"
+                            --no-think --ctx "${COLIBRI_CTX:-4096}" ${IA_MOTEUR_CLE:+--api-key "$IA_MOTEUR_CLE"})
+            local reglages=(COLI_VULKAN="${COLIBRI_VULKAN:-0}")
+            # COLIBRI_STREAM_ROWS : un expert absent de la carte graphique y est envoyé dès ce nombre de lignes
+            # pendant la lecture de la question (16 par défaut dans Colibri), au lieu d'être calculé par le processeur.
+            [ -n "${COLIBRI_STREAM_ROWS:-}" ] && reglages+=(COLI_VK_TIER_STREAM_ROWS="$COLIBRI_STREAM_ROWS")
+            # COLIBRI_RESERVE_GO : mémoire de la carte graphique laissée libre (Colibri : 1 Go). Avec 1 Go, il restait
+            # moins de 300 Mo libres et la carte a cessé de répondre après 4 ou 5 questions (5 novembre).
+            [ -n "${COLIBRI_RESERVE_GO:-}" ] && reglages+=(COLI_VK_TIER_RESERVE_GB="$COLIBRI_RESERVE_GO")
+            if command -v systemd-run >/dev/null && systemctl --user show-environment >/dev/null 2>&1; then
+                # Service utilisateur systemd : lancé avec setsid depuis un terminal, Colibri restait dans le
+                # groupe de processus (cgroup) de la fenêtre, et fermer la fenêtre l'arrêtait (5 novembre, 15h07).
+                # Restart=on-failure : relancé tout seul s'il s'arrête sur une erreur.
+                systemctl --user reset-failed box-colibri 2>/dev/null || true
+                local env_args=() r
+                for r in "${reglages[@]}"; do env_args+=(-E "$r"); done
+                systemd-run --user --quiet --collect --unit=box-colibri \
+                    -p Restart=on-failure -p RestartSec=5 \
+                    -p StandardOutput="append:$SORTIE/ia/colibri.log" -p StandardError="append:$SORTIE/ia/colibri.log" \
+                    "${env_args[@]}" "${commande[@]}" || echec "systemd-run n'a pas pu démarrer Colibri"
+                systemctl --user show -p MainPID --value box-colibri > "$SORTIE/ia/colibri.pid"
+                # Garde : si la carte graphique cesse de répondre, Colibri continue sur le processeur seul, plusieurs
+                # minutes par question. On le relance plutôt (une trentaine de secondes), la carte repart.
+                systemctl --user stop box-colibri-garde 2>/dev/null || true
+                systemctl --user reset-failed box-colibri-garde 2>/dev/null || true
+                systemd-run --user --quiet --collect --unit=box-colibri-garde -p Restart=always -p RestartSec=5 \
+                    bash -c 'while true; do
+                        tail -n0 -F "$1" 2>/dev/null | grep -m1 -q "stopped answering"
+                        echo "[garde box.sh] $(date "+%F %T") carte graphique perdue : redémarrage de Colibri" >> "$1"
+                        systemctl --user restart box-colibri
+                        sleep 60
+                    done' garde "$SORTIE/ia/colibri.log" || info "garde de Colibri non démarrée"
+            else
+                # Sans systemd : setsid, le lanceur et le moteur qu'il démarre forment un groupe, arrêté d'un coup.
+                # Attention, Colibri s'arrête alors avec la fenêtre du terminal qui l'a lancé.
+                env "${reglages[@]}" setsid nohup "${commande[@]}" > "$SORTIE/ia/colibri.log" 2>&1 &
+                echo $! > "$SORTIE/ia/colibri.pid"
+            fi
             local essai
             for essai in $(seq 1 120); do
                 curl -fsS "${cle[@]}" "http://$ip:$port/v1/models" >/dev/null 2>&1 && break
@@ -579,13 +622,19 @@ cmd_moteur_ia() {
             ok "Colibri prêt : http://$ip:$port/v1"
             ;;
         arreter)
-            [ -f "$SORTIE/ia/colibri.pid" ] && kill -TERM -- "-$(cat "$SORTIE/ia/colibri.pid")" 2>/dev/null || true
+            systemctl --user stop box-colibri-garde 2>/dev/null || true
+            if systemctl --user is-active --quiet box-colibri 2>/dev/null; then
+                systemctl --user stop box-colibri
+            elif [ -f "$SORTIE/ia/colibri.pid" ]; then
+                kill -TERM -- "-$(cat "$SORTIE/ia/colibri.pid")" 2>/dev/null || true
+            fi
             rm -f "$SORTIE/ia/colibri.pid"
             journal moteur_ia "Colibri arrêté"
             ok "Colibri arrêté"
             ;;
         etat)
             if curl -fsS "${cle[@]}" "http://$ip:$port/v1/models" 2>/dev/null; then echo; else echo "Colibri arrêté"; fi
+            systemctl --user status box-colibri --no-pager 2>/dev/null | sed -n '1,3p' || true
             ;;
         *) echec "usage : ./box.sh moteur-ia demarrer|arreter|etat" ;;
     esac
@@ -648,6 +697,7 @@ Usage : ./box.sh <commande>
   ia [commande]        Modèles d'IA : menu pour choisir, installer et activer (liste, installer, activer, supprimer)
   moteur-ia ACTION     demarrer | arreter | etat : moteur Colibri sur le réseau interne
   indexer-ia           Prépare l'index de recherche de l'assistant pour la démo
+  fiches-ia            Attend que les fiches des dossiers ouverts soient prêtes (ouvrir chaque dossier de la démo avant)
   assistant [adresse]  Assistant web de première configuration (défaut 127.0.0.1:8090)
   preparer-hors-ligne  Exporte toutes les images dans sortie/images-box.tar (installation sans internet)
   reinitialiser        Supprime conteneurs ET volumes (demande confirmation)
@@ -672,6 +722,7 @@ case $commande in
     moteur-ia)            cmd_moteur_ia "$@" ;;
     ia)                   charger_env; exec python3 "$ICI/../ia/gerer_modeles.py" "$@" ;;
     indexer-ia)           cmd_indexer_ia ;;
+    fiches-ia)            "${COMPOSE[@]}" exec -T assistant python -m assistant fiches ;;
     assistant)            exec python3 "$ICI/installeur/assistant.py" "$@" ;;
     preparer-hors-ligne)  cmd_preparer_hors_ligne ;;
     reinitialiser)        cmd_reinitialiser ;;

@@ -38,7 +38,7 @@ Les couleurs d'état ne servent qu'aux états, jamais à la décoration.
 
 ## 4. Formes
 
-- Rayons : 10 px pour les cartes, 8 px pour les boutons et les champs, pastilles arrondies.
+- Angles droits : 2 px au plus pour les boutons et les champs, aucun pour les cadres. Pas de pastilles ni de points de couleur : un état s'écrit en toutes lettres, et la couleur ne sert qu'à signaler un problème (rouge, ou ocre pour une attente). Pas de détail technique (commandes, scripts, versions) sur les pages des utilisateurs : il va sur la page État de santé.
 - Bordures de 1 px en couleur de filet. Au survol, la bordure passe en marine. Pas d'ombre, pas d'effet de soulèvement.
 - Icônes au trait (1,8 px), en marine, dans un carré teinté de 40 px.
 - En-tête de chaque page : fond surface, filet en bas, logo à gauche (version claire ou sombre selon le thème).

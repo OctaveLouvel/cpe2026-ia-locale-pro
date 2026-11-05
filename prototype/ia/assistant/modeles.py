@@ -88,7 +88,7 @@ def activer(identifiant, moteur, index, utilisateur):
         index.vecteurs = None  # recalculées avec le nouveau modèle au rechargement
     elif m["moteur"] == "colibri":
         if not colibri_disponible():
-            raise ValueError("Colibri n'est pas démarré : ./box.sh moteur-ia demarrer sur la box.")
+            raise ValueError("Le moteur Colibri n'est pas démarré sur cette box.")
         moteur.choisir("openai", identifiant)
     else:
         if identifiant not in modeles_ollama():

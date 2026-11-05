@@ -42,7 +42,7 @@ Ce qui tourne ensuite (`./box.sh etat` pour le voir) :
 
 ## 3. Ouvrir la box
 
-1. Ouvrir **https://cabinet.localhost** : c'est le tableau de bord, avec un lien vers chaque service et leur état en direct.
+1. Ouvrir **https://cabinet.localhost** : c'est le tableau de bord, avec un lien vers chaque service. Le lien « État de santé », en haut à droite, donne l'état de chaque service, des sauvegardes et des connexions sortantes.
 2. Le navigateur prévient que le certificat est inconnu : c'est normal, la box a sa propre autorité de certification. Pour ne plus avoir l'alerte, importer `plateforme/sortie/autorite-locale.crt` dans le navigateur ([marche à suivre](plateforme/README.md#faire-confiance-au-certificat-de-la-box)).
 3. Se connecter avec un compte fictif. Le mot de passe commun est la valeur `DEMO_MOT_DE_PASSE` du fichier `plateforme/.env`.
 

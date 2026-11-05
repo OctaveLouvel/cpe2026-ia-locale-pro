@@ -27,8 +27,9 @@ EVENEMENTS_MAX = 20
 OUTILS = [
     {"type": "function", "function": {
         "name": "chercher_documents",
-        "description": "Cherche dans les documents du cabinet que la personne a le droit de voir (dossiers clients, "
-                       "contrats, conclusions, notes, charte du cabinet...). Renvoie des extraits numérotés.",
+        "description": "Cherche dans les documents du cabinet que la personne a le droit de voir : dossiers clients, "
+                       "contrats, conclusions, assignations, notes, et règles du cabinet (charte, usage de l'IA). "
+                       "Renvoie des extraits numérotés, ou « aucun document » si la personne n'a accès à rien de tel.",
         "parameters": {"type": "object", "properties": {
             "requete": {"type": "string", "description": "Mots à chercher, en français"},
             "dossier": {"type": "string", "description": "Nom du dossier client si la question en cite un (facultatif)"}},
@@ -104,7 +105,7 @@ class Outils:
     def _source(self, source, etiquette, texte):
         numero = len(self.sources) + 1
         self.sources.append({"numero": numero, **source})
-        return f"[{numero}] {etiquette}\n{texte.strip()}"
+        return f"Source [{numero}] — {etiquette}\n{texte.strip()}"
 
     def visibles(self):
         if self._visibles is None:

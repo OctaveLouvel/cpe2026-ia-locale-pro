@@ -67,15 +67,21 @@ Avant d'appeler le modèle, trois cas reçoivent une réponse fixe, **sans appel
 
 Ensuite, le modèle reçoit une consigne stricte ([`assistant/consignes.py`](assistant/consignes.py)) : répondre seulement avec les extraits fournis, citer chaque phrase par son numéro d'extrait, recopier les dates et montants, dire « je ne trouve pas » sinon. Température 0,1 : les réponses varient très peu d'un essai à l'autre.
 
-## Réponses générales (5 novembre)
+## Le modèle choisit ses outils (5 novembre, soir)
 
-Une question qui ne porte pas sur le cabinet (« Bonjour », « Qu'est-ce qu'une SCI ? », « Rédige un courriel de relance »), ou pour laquelle aucun document, agenda ou contact ne correspond, reçoit une **réponse générale** du modèle (consigne `GENERAL` de `consignes.py`) au lieu de « Je ne trouve pas… » à chaque fois. La page l'affiche sous la réponse : « Réponse générale du modèle, sans document source du cabinet : à vérifier avant usage ». La consigne lui interdit de citer ou d'inventer un fait du cabinet, et lui demande de dire qu'une réponse de droit vient de ses connaissances et doit être vérifiée. Les trois derniers échanges sont envoyés avec chaque question : l'assistant suit la conversation.
+Plus rien n'est décidé par le code (ni mots-clés, ni réponse toute faite) : le modèle reçoit la question, les trois derniers échanges et cinq outils, appelle ceux qu'il veut, lit les résultats et répond ([`assistant/reponse.py`](assistant/reponse.py), consigne `AGENT` de [`assistant/consignes.py`](assistant/consignes.py)).
 
-**Exception à la règle « l'assistant cite toujours sa source »** (`AGENTS.md`, règle 3) : à valider par l'équipe (README, section 8).
+| Outil | Ce qu'il fait |
+|---|---|
+| `chercher_documents` | Recherche dans les documents que la personne voit dans Nextcloud (option : un dossier) |
+| `lire_agenda` | Événements de ses agendas entre deux dates |
+| `chercher_contacts` | Recherche dans ses carnets d'adresses |
+| `proposer_rendez_vous` | Prépare un rendez-vous ; la page affiche la proposition, rien n'est fait avant « Confirmer » |
+| `proposer_dossier` | Prépare un dossier dans « Dossiers clients », même principe |
 
-## Actions : rendez-vous et dossiers (5 novembre)
+Ce qui reste dans le code est ce qu'on ne peut pas confier au modèle : les **droits** (chaque outil ne voit que ce que Nextcloud montre à la personne), l'**accord** de la personne avant une action, et l'absence de tout outil vers le **coffre-fort**. Les résultats d'outils sont numérotés : le modèle cite ses sources par ces numéros. Sans outil appelé, la page signale « Réponse générale du modèle, sans document source ».
 
-« Ajoute un rendez-vous avec M. Garnier demain de 14 h à 15 h », « Crée le dossier 2026-021 Martin » : l'assistant **propose** l'action (titre, date, heure, agenda, ou emplacement du dossier) et n'agit qu'après **Confirmer**. Les dates et heures sont lues par le code (`actions.py`), pas par le modèle. L'action passe par les droits Nextcloud de la personne (agenda « Personnel », ou celui nommé dans la demande ; dossier créé dans « Dossiers clients ») et elle est inscrite au journal (`action_proposee`, `action_agenda`, `action_dossier`). Une proposition expire après 15 minutes et ne sert qu'une fois.
+Évaluation du 5 novembre au soir (`evaluation/evaluer_demo.py --essais 1`, `qwen3:4b-instruct`, portable de démo) : **refus Lefort et coffre-fort réussis** (rédigés par le modèle) ; clause Garnier juste, un détail manquant (délai de 15 jours) ; résumé Fournil et charte sur l'IA ratés (le modèle n'a pas cité les documents, ou n'a pas appelé la recherche). Premier mot de 28 s à 197 s : plusieurs tours d'outils sur processeur. Un modèle plus gros ferait mieux ; c'est un prototype.
 
 ## Recherche
 

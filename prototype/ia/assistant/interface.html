@@ -64,6 +64,10 @@ details summary{cursor:pointer;color:var(--doux);font-size:.85rem;margin-top:8px
 .suggestions button{background:var(--fond);color:var(--accent);border:1px solid var(--bord);font-weight:500;font-size:.85rem}
 table.journal{width:100%;border-collapse:collapse;font-size:.85rem}
 table.journal td{border-bottom:1px solid var(--bord);padding:6px 4px;vertical-align:top}
+.action{border:1px solid var(--accent);padding:12px 14px;border-radius:2px}
+.action .boutons{display:flex;gap:10px;margin-top:10px}
+.action .resultat{margin-top:8px}
+.generale{color:var(--doux);font-size:.85rem;border-left:3px solid var(--bord);padding-left:10px}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -80,19 +84,13 @@ table.journal td{border-bottom:1px solid var(--bord);padding:6px 4px;vertical-al
 </div></header>
 
 <main>
-  <form class="carte" id="connexion">
-    <strong>Connexion avec votre compte du cabinet</strong>
-    <label for="login">Identifiant</label><input id="login" autocomplete="username" required>
-    <label for="mdp">Mot de passe</label><input id="mdp" type="password" autocomplete="current-password" required>
-    <div style="margin-top:14px"><button>Se connecter</button></div>
-    <div class="erreur" id="erreur-connexion"></div>
-  </form>
 
   <section id="conversation" hidden>
     <div class="carte" id="accueil">
-      Posez une question sur vos dossiers, vos audiences ou vos contacts. Chaque réponse cite ses sources :
+      Posez une question sur vos dossiers, vos audiences ou vos contacts, demandez un courrier, ou faites ajouter un rendez-vous et créer un dossier. Les réponses tirées du cabinet citent leurs sources :
       vérifiez-les avant de les utiliser. L'assistant n'a jamais accès au coffre-fort de mots de passe.
       Pour travailler sur un dossier, choisissez-le dans la liste en bas de page : sa fiche s'affiche tout de suite.
+      Vous pouvez aussi faire ajouter un rendez-vous ou créer un dossier : rien n'est fait sans votre confirmation.
       <div class="suggestions" id="suggestions"></div>
     </div>
     <div id="fil"></div>
@@ -117,6 +115,8 @@ table.journal td{border-bottom:1px solid var(--bord);padding:6px 4px;vertical-al
 <script>
 const $ = (id) => document.getElementById(id);
 let numeroQuestion = 0;
+// Échanges de la conversation, envoyés avec chaque question (les 3 derniers) : l'assistant suit le fil.
+const historique = [];
 
 function echapper(t) {
   return t.replace(/[&<>"']/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
@@ -159,7 +159,8 @@ function carteSource(s, q) {
 }
 
 const SUGGESTIONS_GENERALES = ["Quelles sont mes prochaines échéances ?",
-  "Ai-je le droit de copier un document client dans une IA en ligne ?", "Que dit la charte du cabinet sur l'IA ?"];
+  "Ai-je le droit de copier un document client dans une IA en ligne ?", "Que dit la charte du cabinet sur l'IA ?",
+  "Ajoute un rendez-vous avec M. Garnier demain de 14 h à 15 h"];
 const SUGGESTIONS_DOSSIER = ["Résume ce dossier et liste les prochaines échéances.",
   "Quels montants sont en jeu dans ce dossier ?", "Quelles sont les prochaines échéances de ce dossier ?"];
 
@@ -230,30 +231,19 @@ async function verifierEtat() {
   } catch { $("etat").textContent = "Hors service"; setTimeout(verifierEtat, 5000); }
 }
 
+// Connexion unique : sans session, la page de connexion de la box, qui ramène ici ensuite.
+const DOMAINE = location.hostname.replace(/^ia\./, "") + (location.port ? `:${location.port}` : "");
+const PAGE_CONNEXION = `https://${DOMAINE}/connexion?retour=${encodeURIComponent(location.href)}`;
+
 async function verifierSession() {
   const s = await (await fetch("/api/session")).json();
-  const connecte = s.connecte;
-  $("connexion").hidden = connecte;
-  for (const id of ["conversation", "saisie", "identite", "deconnexion", "voir-journal"]) $(id).hidden = !connecte;
-  $("lien-modeles").hidden = $("lien-journal").hidden = !(connecte && s.admin);
-  if (connecte) { $("identite").textContent = s.nom; $("question").focus(); chargerDossiers(); afficherSuggestions(); }
-  else { $("login").focus(); }
+  if (!s.connecte) { location.replace(PAGE_CONNEXION); return; }
+  for (const id of ["conversation", "saisie", "identite", "deconnexion", "voir-journal"]) $(id).hidden = false;
+  $("lien-modeles").hidden = $("lien-journal").hidden = !s.admin;
+  $("identite").textContent = s.nom; $("question").focus(); chargerDossiers(); afficherSuggestions();
 }
 
-$("connexion").addEventListener("submit", async (ev) => {
-  ev.preventDefault();
-  $("erreur-connexion").textContent = "";
-  const r = await fetch("/api/connexion", {method: "POST", headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({login: $("login").value, mot_de_passe: $("mdp").value})});
-  $("mdp").value = "";
-  if (!r.ok) { $("erreur-connexion").textContent = (await r.json()).erreur; return; }
-  verifierSession();
-});
-
-$("deconnexion").addEventListener("click", async () => {
-  await fetch("/api/deconnexion", {method: "POST", headers: {"Content-Type": "application/json"}, body: "{}"});
-  $("fil").innerHTML = ""; $("journal").hidden = true; $("dossier").innerHTML = `<option value="">Tous mes documents</option>`; verifierSession();
-});
+$("deconnexion").addEventListener("click", () => { location.href = `https://${DOMAINE}/deconnexion`; });
 
 $("voir-journal").addEventListener("click", async () => {
   const lignes = await (await fetch("/api/journal")).json();
@@ -266,6 +256,38 @@ $("voir-journal").addEventListener("click", async () => {
   $("journal").hidden = false;
   $("journal").scrollIntoView({behavior: "smooth"});
 });
+
+// Action proposée (rendez-vous, dossier) : rien n'est fait avant « Confirmer ».
+function carteAction(ev) {
+  const d = ev.details, carte = document.createElement("div");
+  carte.className = "action";
+  let resume;
+  if (ev.action === "agenda") {
+    const debut = new Date(d.debut);
+    const jour = debut.toLocaleDateString("fr-FR", {weekday: "long", day: "numeric", month: "long", year: "numeric"});
+    const h = (x) => new Date(x).toLocaleTimeString("fr-FR", {hour: "2-digit", minute: "2-digit"});
+    resume = `Ajouter à l'agenda « ${d.agenda} » : « ${d.titre} », le ${jour}`
+           + (d.journee ? " (journée entière)" : `, de ${h(d.debut)} à ${h(d.fin)}`) + (d.lieu ? `, ${d.lieu}` : "") + ".";
+  } else {
+    resume = `Créer le dossier « ${d.nom} » dans « ${d.parent || "vos fichiers"} ».`;
+  }
+  carte.innerHTML = `<p>${echapper(resume)}</p><div class="boutons"><button type="button">Confirmer</button>`
+                  + `<button type="button" class="lien">Annuler</button></div><p class="resultat"></p>`;
+  const [oui, non] = carte.querySelectorAll("button"), resultat = carte.querySelector(".resultat");
+  const repondreAction = async (confirmer) => {
+    oui.disabled = non.disabled = true;
+    const r = await fetch("/api/action", {method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({jeton: ev.jeton, confirmer})});
+    const d2 = await r.json();
+    resultat.textContent = d2.texte || d2.erreur;
+    resultat.className = "resultat" + (r.ok ? "" : " erreur");
+    if (d2.lien) { const a = document.createElement("a"); a.href = d2.lien; a.target = "_blank"; a.rel = "noopener";
+                   a.textContent = " Ouvrir"; resultat.append(a); }
+  };
+  oui.addEventListener("click", () => repondreAction(true));
+  non.addEventListener("click", () => repondreAction(false));
+  return carte;
+}
 
 async function poser(question) {
   const q = ++numeroQuestion;
@@ -280,7 +302,7 @@ async function poser(question) {
   $("envoyer").disabled = true;
   try {
     const r = await fetch("/api/question", {method: "POST", headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({question, dossier: $("dossier").value})});
+      body: JSON.stringify({question, dossier: $("dossier").value, historique: historique.slice(-3)})});
     if (r.status === 401) { verifierSession(); return; }
     const lecteur = r.body.getReader(), decodeur = new TextDecoder();
     let tampon = "";
@@ -296,12 +318,16 @@ async function poser(question) {
         if (ev.type === "etape") etape.textContent = ev.texte + "…";
         else if (ev.type === "texte") { etape.hidden = true; texte += ev.texte; reponse.innerHTML = rendre(texte, q); }
         else if (ev.type === "erreur") { etape.hidden = true; reponse.innerHTML = `<p class="erreur">${echapper(ev.texte)}</p>`; }
+        else if (ev.type === "action") { etape.hidden = true; reponse.append(carteAction(ev)); }
         else if (ev.type === "fin") {
           const citees = ev.sources.filter((s) => s.citee), autres = ev.sources.filter((s) => !s.citee);
           bloc.querySelector(".sources").innerHTML = citees.map((s) => carteSource(s, q)).join("")
             + (autres.length ? `<details><summary>${autres.length} autre(s) extrait(s) consulté(s), non cité(s)</summary>`
                + autres.map((s) => carteSource(s, q)).join("") + "</details>" : "");
           bloc.querySelector(".couverture").innerHTML = rendreCouverture(ev);
+          if (texte) historique.push([question, texte]);
+          if (ev.generale) bloc.querySelector(".sources").innerHTML =
+            `<div class="generale">Réponse générale du modèle, sans document source du cabinet : à vérifier avant usage.</div>`;
           const m = ev.mesures || {};
           const avert = [];
           if (m.coupee) avert.push(`Réponse coupée : la limite de ${m.longueur_max} tokens a été atteinte. Posez une question plus précise.`);

@@ -46,7 +46,15 @@ http://{$BOX_DOMAIN} {
 		rewrite * /alive
 		reverse_proxy coffre:80
 	}
+	# Connexion unique (servie par l'assistant, qui ouvre la session Nextcloud de la personne).
+	@connexion path /connexion /deconnexion /api/connexion /api/deconnexion /api/session
+	handle @connexion {
+		reverse_proxy assistant:8000
+	}
 	handle {
+		forward_auth assistant:8000 {
+			uri /api/verifier?service=accueil
+		}
 		reverse_proxy tableau-de-bord:8000
 	}
 }
@@ -56,8 +64,17 @@ cloud.{$BOX_DOMAIN} {
 	import entetes
 	redir /.well-known/carddav /remote.php/dav/ 301
 	redir /.well-known/caldav /remote.php/dav/ 301
+	# Se déconnecter de Nextcloud, c'est se déconnecter de la box (sinon la connexion unique la rouvre aussitôt).
+	@sortie path /logout /index.php/logout
+	redir @sortie https://{$BOX_DOMAIN}/deconnexion 303
 	request_body {
 		max_size 4GB
+	}
+	# Connexion unique : l'assistant donne le mot de passe d'application de la personne connectée à la box.
+	# Les applications de synchronisation, qui envoient leurs propres identifiants, ne sont pas concernées.
+	forward_auth assistant:8000 {
+		uri /api/verifier?service=cloud
+		copy_headers Authorization
 	}
 	reverse_proxy nextcloud:80
 }

@@ -34,6 +34,17 @@ Puis ouvrir https://cloud.cabinet.localhost et se connecter avec un compte du ta
 
 Détail des données et des droits : [`../donnees-demo/README.md`](../donnees-demo/README.md).
 
+## Connexion unique
+
+Une seule connexion, sur https://cabinet.localhost/connexion, avec le compte du cabinet (celui de Nextcloud). Elle ouvre l'accueil, l'assistant et Nextcloud (fichiers, agenda, contacts) sans redemander le mot de passe :
+
+- l'assistant vérifie le mot de passe auprès de Nextcloud, l'échange contre un mot de passe d'application révocable, et pose un cookie valable pour la box et ses sous-domaines ;
+- Caddy demande à l'assistant (`forward_auth`, `/api/verifier`) si la personne est connectée avant de servir l'accueil ou Nextcloud ; pour Nextcloud, il ajoute le mot de passe d'application à la requête, et Nextcloud ouvre sa session ;
+- les applications de synchronisation (bureau, téléphone, agenda), qui envoient leurs propres identifiants, ne sont pas concernées ;
+- « Se déconnecter », sur l'accueil, l'assistant ou Nextcloud, révoque le mot de passe d'application : toutes les sessions se ferment.
+
+Le **coffre-fort** garde son mot de passe maître : c'est la clé qui chiffre le coffre, la box ne la connaît pas.
+
 ## Faire confiance au certificat de la box
 
 Les certificats sont signés par l'autorité de certification propre à la box : aucune autorité publique, tout marche sans internet. Chaque poste doit lui faire confiance une fois.

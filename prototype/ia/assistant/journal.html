@@ -102,7 +102,7 @@ function afficher() {
 async function charger() {
   const s = await (await fetch("/api/session")).json();
   const m = $("message");
-  if (!s.connecte) { m.hidden = false; m.textContent = "Connectez-vous d'abord sur la page de l'assistant."; return; }
+  if (!s.connecte) { location.replace(`https://${location.hostname.replace(/^ia\./, "")}/connexion?retour=${encodeURIComponent(location.href)}`); return; }
   const r = await fetch("/api/journal/tout");
   if (!r.ok) { m.hidden = false; m.textContent = (await r.json()).erreur; return; }
   entrees = await r.json();

@@ -93,7 +93,7 @@ Ce qui reste dans le code est ce qu'on ne peut pas confier au modèle : les **dr
 - Recherche par mots (BM25, sans dépendance) et, si un modèle d'embeddings est disponible, par le sens ; fusion des deux classements.
 - Un dossier cité dans la question (« dossier Garnier », « 2026-014 »), ou choisi dans la liste de l'interface, limite la recherche à ce dossier. Sans dossier, la réponse le signale : « Recherche dans tous vos documents ».
 - Pour un résumé de dossier : la **fiche de chaque pièce** (section suivante), donc toutes les pièces, plus les 5 prochaines échéances de l'agenda pour ce dossier. Une pièce dont la fiche n'est pas encore prête est représentée par son meilleur extrait.
-- **Budget de contexte** : si la consigne, les extraits et la réponse attendue (`IA_GENERATION_MAX`) dépassent le contexte du modèle (`IA_CONTEXTE`), les extraits les moins pertinents sont retirés, et la réponse le dit (« 2 extraits écartés faute de place »).
+- **Budget de contexte** : si la consigne, les extraits et la réponse attendue (`IA_GENERATION_MAX`, place réservée à la réponse ; l'assistant à outils n'a pas de limite de longueur, seul le contexte la borne) dépassent le contexte du modèle (`IA_CONTEXTE`), les extraits les moins pertinents sont retirés, et la réponse le dit (« 2 extraits écartés faute de place »).
 - **Réponse coupée** : si le modèle s'arrête sur la limite de longueur, la réponse l'indique au lieu de paraître complète.
 
 ## Fiches préparées à l'avance

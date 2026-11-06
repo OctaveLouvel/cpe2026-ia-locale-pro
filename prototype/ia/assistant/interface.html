@@ -338,7 +338,7 @@ async function poser(question) {
             `<div class="generale">Réponse générale du modèle, sans document source du cabinet : à vérifier avant usage.</div>`;
           const m = ev.mesures || {};
           const avert = [];
-          if (m.coupee) avert.push(`Réponse coupée : la limite de ${m.longueur_max} tokens a été atteinte. Posez une question plus précise.`);
+          if (m.coupee) avert.push(m.longueur_max ? `Réponse coupée : la limite de ${m.longueur_max} tokens a été atteinte. Posez une question plus précise.` : `Réponse coupée : la mémoire de travail du modèle est pleine. Posez une question plus précise.`);
           if (ev.retires) avert.push(`${ev.retires} extrait(s) écarté(s) faute de place dans le contexte du modèle.`);
           if (avert.length) { const a = bloc.querySelector(".avertissement"); a.textContent = avert.join(" "); a.hidden = false; }
           bloc.querySelector(".pied").textContent = `Réponse en ${String(ev.duree_s).replace(".", ",")} s`

@@ -11,24 +11,27 @@ Deux parties, en Python sans dépendance et sans aucune ressource externe (polic
 
 Lancé avec le reste de la box : `./box.sh installer` (voir [`../plateforme/README.md`](../plateforme/README.md)). Aucune image à construire : le service utilise l'image `python:3.12-slim`, déjà présente pour les outils, avec ce dossier monté en lecture seule. Après une modification de la page : `docker compose restart tableau-de-bord` dans `prototype/plateforme/`.
 
-Ce qu'il montre, en direct (rafraîchi toutes les 30 secondes) :
+Deux pages. **L'accueil** (`/`) ne montre que les services du cabinet (fichiers, agenda et contacts, assistant IA, coffre-fort, journal d'audit) : rien sur l'état technique quand tout va bien, une seule ligne si un service ne répond pas, avec un lien vers la page suivante. Pas de commande ni de détail technique : la box est livrée clé en main.
+
+**L'état de santé** (`/etat-de-sante`, lien en haut à droite de l'accueil) montre, en direct (rafraîchi toutes les 30 secondes) :
 
 - **état des services** : Nextcloud, coffre-fort, assistant IA (nombre de documents indexés, modèle actif), moteur d'IA ;
 - **connexions sortantes** : depuis quand rien n'est sorti de la box, la dernière connexion et le nombre sur 30 jours ;
 - **dernière sauvegarde** réussie, dernier test de restauration ;
-- **dernière vérification hors ligne** (`./box.sh verifier-hors-ligne`) ;
+- **dernière vérification hors ligne** ;
 - **mises à jour** : date d'installation et versions de chaque brique, lues dans `compose.yaml` ;
-- accès aux services et lien vers le **journal d'audit** détaillé de DEV-4 (https://ia.cabinet.localhost/journal, réservé aux administrateurs).
+- le lien vers le **certificat de la box**, à installer sur un nouveau poste.
 
 D'où viennent les données : routes de santé des services sur le réseau interne, journaux `prototype/plateforme/sortie/journal/*.jsonl` (montés en lecture seule ; un nouveau journal de DEV-4 au même format est pris en compte sans rien changer), et `compose.yaml`. Le tableau de bord ne lit **aucune donnée du cabinet** et n'affiche ni nom de personne ni question posée : il est visible de tous les postes. Le coffre-fort étant sur un réseau à part, son état est lu par la page à travers le reverse proxy (`/etat/coffre`).
 
 | Fichier | Rôle |
 |---|---|
-| `tableau_de_bord/serveur.py` | Serveur web : `/` (page), `/api/resume` (état), `/api/sante` (santé du conteneur) |
+| `tableau_de_bord/serveur.py` | Serveur web : `/` (accueil), `/etat-de-sante`, `/api/resume` (état), `/api/sante` (santé du conteneur) |
 | `tableau_de_bord/collecte.py` | Lecture des services, des journaux et des versions |
-| `tableau_de_bord/page.html` | La page (HTML, CSS et JavaScript dans un seul fichier) |
+| `tableau_de_bord/page.html` | L'accueil (HTML, CSS et JavaScript dans un seul fichier) |
+| `tableau_de_bord/etat.html` | L'état de santé (même principe) |
 
-Pour la démo (étape 2 du scénario, `docs/prototype.md` section 6) : lancer `./box.sh sauvegarder` le matin, pour que la carte « Dernière sauvegarde » soit verte, et `./box.sh verifier-hors-ligne` câble débranché juste avant le passage.
+Pour la démo (étape 2 du scénario, `docs/prototype.md` section 6) : lancer `./box.sh sauvegarder` le matin, pour que la page État de santé affiche une sauvegarde du jour, et `./box.sh verifier-hors-ligne` câble débranché juste avant le passage.
 
 ## Landing page et liste d'attente
 

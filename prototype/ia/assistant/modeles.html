@@ -18,30 +18,30 @@ header{background:var(--carte);border-bottom:1px solid var(--bord)}
 .barre .logo{display:block;height:32px;width:auto}.barre picture{display:block}.barre h1{font-size:1.05rem;margin:0;padding-left:12px;border-left:1px solid var(--bord);color:var(--doux);font-weight:500}
 .barre a{color:var(--accent);font-size:.92rem}
 main{max-width:1000px;margin:0 auto;padding:22px 16px 48px}
-.resume{background:var(--carte);border:1px solid var(--bord);border-radius:10px;box-shadow:var(--ombre);padding:16px 20px;display:flex;flex-wrap:wrap;gap:8px 28px;margin-bottom:8px}
+.resume{background:var(--carte);border:1px solid var(--bord);border-radius:2px;box-shadow:var(--ombre);padding:16px 20px;display:flex;flex-wrap:wrap;gap:8px 28px;margin-bottom:8px}
 .resume div{font-size:.9rem;color:var(--doux)}
 .resume strong{display:block;color:var(--texte);font-size:1.02rem}
 h2{font-size:1.05rem;margin:26px 0 4px}
 .aide{color:var(--doux);font-size:.9rem;margin:0 0 12px}
 .grille{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
-.modele{background:var(--carte);border:1px solid var(--bord);border-radius:10px;box-shadow:var(--ombre);padding:18px;display:flex;flex-direction:column;gap:8px}
-.modele.actif{border:2px solid var(--ok)}
+.modele{background:var(--carte);border:1px solid var(--bord);border-radius:2px;box-shadow:var(--ombre);padding:18px;display:flex;flex-direction:column;gap:8px}
+.modele.actif{border:2px solid var(--accent)}
 .modele h3{margin:0;font-size:1.05rem}
 .editeur{color:var(--doux);font-size:.82rem;margin-top:-6px}
 .modele p{margin:0;color:var(--doux);font-size:.9rem;flex:1}
 .chiffres{font-size:.85rem;color:var(--doux)}
-.badges{display:flex;gap:6px;flex-wrap:wrap}
-.badge{font-size:.78rem;padding:2px 9px;border-radius:999px;background:var(--accent-doux);color:var(--accent)}
-.badge.oui{background:var(--ok-fond);color:var(--ok)}.badge.juste{background:var(--att-fond);color:var(--att)}.badge.non{background:var(--ko-fond);color:var(--ko)}
+.badges{display:flex;gap:4px 14px;flex-wrap:wrap}
+.badge{font-size:.85rem;color:var(--doux)}
+.badge.juste{color:var(--att)}.badge.non{color:var(--ko)}.badge.actif{color:var(--accent);font-weight:600}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
-button{font:inherit;font-weight:600;font-size:.88rem;padding:7px 13px;border-radius:9px;border:0;cursor:pointer;background:var(--accent);color:var(--sur-accent)}
+button{font:inherit;font-weight:600;font-size:.88rem;padding:7px 13px;border-radius:2px;border:0;cursor:pointer;background:var(--accent);color:var(--sur-accent)}
 button.second{background:var(--accent-doux);color:var(--accent)}
 button.danger{background:transparent;color:var(--ko);border:1px solid var(--ko)}
 button:disabled{opacity:.5;cursor:default}
-.progression{height:8px;border-radius:99px;background:var(--accent-doux);overflow:hidden}
+.progression{height:6px;border-radius:0;background:var(--accent-doux);overflow:hidden}
 .progression div{height:100%;width:0;background:var(--accent);transition:width .3s}
 .statut{font-size:.82rem;color:var(--doux)}
-.message{padding:12px 16px;border-radius:10px;margin:12px 0;background:var(--att-fond);color:var(--att)}
+.message{padding:12px 16px;border-radius:2px;margin:12px 0;background:var(--att-fond);color:var(--att)}
 .message.ko{background:var(--ko-fond);color:var(--ko)}
 [hidden]{display:none!important}
 </style>
@@ -87,9 +87,9 @@ async function poster(action, id) {
 
 function carte(m) {
   const tient = {oui: "Tient en mémoire", juste: "Mémoire juste", non: "Trop gros pour cette machine"}[m.tient];
-  const etat = m.actif ? `<span class="badge oui">Actif</span>` : m.installe ? `<span class="badge">Installé</span>` : "";
+  const etat = m.actif ? `<span class="badge actif">Actif</span>` : m.installe ? `<span class="badge">Installé</span>` : "";
   let actions = "";
-  if (m.moteur === "colibri" && !m.installe) actions = `<span class="statut">Hors conteneur : démarrer Colibri sur la box (./box.sh moteur-ia demarrer)</span>`;
+  if (m.moteur === "colibri" && !m.installe) actions = `<span class="statut">Moteur Colibri non démarré sur cette box</span>`;
   else if (!m.installe) actions = `<button data-action="installer">Installer (${String(m.taille_go).replace(".", ",")} Go)</button>`;
   else if (!m.actif) actions = `<button data-action="activer">Activer</button>` + (m.moteur === "ollama" ? `<button class="danger" data-action="supprimer">Supprimer</button>` : "");
   const div = document.createElement("div");
@@ -143,7 +143,7 @@ async function installer(m, div) {
 
 async function charger() {
   const s = await (await fetch("/api/session")).json();
-  if (!s.connecte) { message("Connectez-vous d'abord sur la page de l'assistant."); $("contenu").hidden = true; return; }
+  if (!s.connecte) { location.replace(`https://${location.hostname.replace(/^ia\./, "")}/connexion?retour=${encodeURIComponent(location.href)}`); return; }
   const r = await fetch("/api/modeles");
   if (!r.ok) { message((await r.json()).erreur, true); $("contenu").hidden = true; return; }
   const e = await r.json();

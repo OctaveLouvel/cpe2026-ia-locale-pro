@@ -16,7 +16,7 @@ from http import cookies
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from . import config, consignes, journal, modeles
+from . import actions, config, consignes, journal, modeles, rejeu
 from .fiches import Fiches
 from .index import Index
 from .moteur import Moteur, MoteurIndisponible
@@ -27,6 +27,14 @@ from .reponse import Session, dossiers_visibles, repondre
 INTERFACE = (Path(__file__).parent / "interface.html").read_bytes()
 PAGE_MODELES = (Path(__file__).parent / "modeles.html").read_bytes()
 PAGE_JOURNAL = (Path(__file__).parent / "journal.html").read_bytes()
+PAGE_CONNEXION = (Path(__file__).parent / "connexion.html").read_bytes()
+# Connexion unique : un seul cookie pour toute la box (accueil, assistant, fichiers). Le reverse proxy demande
+# à /api/verifier si la personne est connectée avant de servir l'accueil et Nextcloud.
+COOKIE = "box_session"
+# Chemins de Nextcloud utilisés par les applications de synchronisation (bureau, téléphone) : jamais redirigés
+# vers la page de connexion de la box, ils gardent leur propre authentification.
+CHEMINS_CLIENTS_NC = ("/remote.php", "/public.php", "/ocs/", "/status.php", "/.well-known", "/index.php/login/v2",
+                      "/login/v2", "/index.php/s/", "/s/", "/apps/theming/", "/core/", "/dist/", "/apps/files_sharing/publicpreview")
 DUREE_SESSION = 8 * 3600
 TAILLE_MAX = 64 * 1024
 POLITIQUE = ("default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; "
@@ -106,7 +114,7 @@ class Gestionnaire(BaseHTTPRequestHandler):
 
     def _session(self) -> Session | None:
         maintenant = time.time()
-        biscuit = cookies.SimpleCookie(self.headers.get("Cookie", "")).get("session")
+        biscuit = cookies.SimpleCookie(self.headers.get("Cookie", "")).get(COOKIE)
         with verrou_sessions:
             if biscuit and biscuit.value in sessions:
                 session, expire = sessions[biscuit.value]
@@ -136,6 +144,17 @@ class Gestionnaire(BaseHTTPRequestHandler):
 
     def do_GET(self):
         chemin = urllib.parse.urlsplit(self.path).path
+        if chemin == "/connexion":
+            return self._repondre(PAGE_CONNEXION, type_contenu="text/html; charset=utf-8",
+                                  entetes={"Content-Security-Policy": POLITIQUE, "Referrer-Policy": "no-referrer"})
+        if chemin == "/api/verifier":
+            return self._verifier()
+        if chemin == "/deconnexion":
+            session = self._session()
+            if session is not None:
+                self._fermer(session)
+            return self._repondre(b"", 303, "text/plain", {"Location": f"https://{config.BOX_DOMAIN}/connexion",
+                                                           "Set-Cookie": self._cookie("", 0)})
         if chemin in ("/", "/index.html", "/modeles", "/journal"):
             page = {"/modeles": PAGE_MODELES, "/journal": PAGE_JOURNAL}.get(chemin, INTERFACE)
             return self._repondre(page,
@@ -145,7 +164,7 @@ class Gestionnaire(BaseHTTPRequestHandler):
             return self._repondre({**etat, "modele": moteur.modele, "modele_embeddings": moteur.modele_embeddings,
                                    "documents_indexes": len(index.fichiers), "extraits": len(index.morceaux),
                                    "recherche_semantique": index.vecteurs is not None,
-                                   "fiches": fiches.progression()})
+                                   "fiches": fiches.progression(), "rejeu_actif": rejeu.actif()})
         session = self._session()
         if chemin == "/api/session":
             return self._repondre({"connecte": session is not None,
@@ -244,7 +263,11 @@ class Gestionnaire(BaseHTTPRequestHandler):
         if chemin == "/api/deconnexion":
             return self._deconnexion(session)
         if chemin == "/api/question":
-            return self._question(session, str(corps.get("question", "")), str(corps.get("dossier", "")))
+            historique = [(str(q)[:1500], str(r)[:1500]) for q, r in (corps.get("historique") or [])[-3:]
+                          if isinstance(q, str) and isinstance(r, str)]
+            return self._question(session, str(corps.get("question", "")), str(corps.get("dossier", "")), historique)
+        if chemin == "/api/action":
+            return self._action(session, str(corps.get("jeton", "")), bool(corps.get("confirmer")))
         if chemin.startswith("/api/modeles/"):
             if not session.admin:
                 return self._repondre({"erreur": "Réservé aux administrateurs du cabinet."}, 403)
@@ -269,15 +292,44 @@ class Gestionnaire(BaseHTTPRequestHandler):
             return self._repondre({"erreur": "Nextcloud ne répond pas."}, 502)
         jeton = secrets.token_urlsafe(32)
         client_session = Client(profil["login"], secret, self._ip())
-        session = Session(profil["login"], profil["nom"], client_session, _admin(client_session))
+        session = Session(profil["login"], profil["nom"], client_session, _admin(client_session), secret)
         with verrou_sessions:
             sessions[jeton] = (session, time.time() + DUREE_SESSION)
         journal.ecrire("connexion", session.login, {"ip": self._ip()})
-        securise = "; Secure" if self.headers.get("X-Forwarded-Proto") == "https" else ""
-        self._repondre({"login": session.login, "nom": session.nom},
-                       entetes={"Set-Cookie": f"session={jeton}; HttpOnly; SameSite=Strict; Path=/{securise}"})
+        self._repondre({"login": session.login, "nom": session.nom}, entetes={"Set-Cookie": self._cookie(jeton)})
 
-    def _deconnexion(self, session):
+    def _cookie(self, valeur, duree=DUREE_SESSION):
+        """Cookie valable pour le domaine de la box et tous ses sous-domaines (cloud., ia., coffre.)."""
+        securise = "; Secure" if self.headers.get("X-Forwarded-Proto") == "https" else ""
+        return f"{COOKIE}={valeur}; Max-Age={duree}; Domain={config.BOX_DOMAIN}; Path=/; HttpOnly; SameSite=Lax{securise}"
+
+    def _verifier(self):
+        """Appelé par le reverse proxy (forward_auth) avant l'accueil (service=accueil) et Nextcloud (service=cloud).
+        Connecté : 200, et pour Nextcloud l'en-tête Authorization avec le mot de passe d'application de la
+        personne (Nextcloud ouvre alors sa session sans redemander le mot de passe). Sinon : redirection vers
+        la page de connexion, sauf pour les applications de synchronisation, qui gardent leur authentification."""
+        service = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query).get("service", ["accueil"])[0]
+        hote = self.headers.get("X-Forwarded-Host", config.BOX_DOMAIN)
+        uri = self.headers.get("X-Forwarded-Uri", "/")
+        session = self._session() if not self.headers.get("Authorization") else None
+        if service == "cloud":
+            if self.headers.get("Authorization"):
+                # Identifiants propres du client (synchronisation) : renvoyés tels quels, car le reverse proxy
+                # remplace l'en-tête de la requête par celui de cette réponse.
+                return self._repondre(b"", 200, "text/plain", {"Authorization": self.headers["Authorization"]})
+            if session is not None:
+                jeton = base64.b64encode(f"{session.login}:{session.secret}".encode()).decode()
+                return self._repondre(b"", 200, "text/plain", {"Authorization": f"Basic {jeton}"})
+            page = self.headers.get("X-Forwarded-Method", "GET") == "GET" and "text/html" in self.headers.get("Accept", "")
+            if not page or urllib.parse.urlsplit(uri).path.startswith(CHEMINS_CLIENTS_NC):
+                return self._repondre(b"", 200, "text/plain")
+        elif session is not None:
+            return self._repondre(b"", 200, "text/plain")
+        retour = urllib.parse.quote(f"https://{hote}{uri}", safe="")
+        self._repondre(b"", 302, "text/plain", {"Location": f"https://{config.BOX_DOMAIN}/connexion?retour={retour}"})
+
+    def _fermer(self, session):
+        """Révoque le mot de passe d'application : la session Nextcloud ouverte avec lui se ferme aussi."""
         try:
             session.client.revoquer_mot_de_passe_application()
         except (AccesRefuse, Indisponible):
@@ -286,7 +338,10 @@ class Gestionnaire(BaseHTTPRequestHandler):
             for jeton in [j for j, (s, _) in sessions.items() if s is session]:
                 del sessions[jeton]
         journal.ecrire("deconnexion", session.login, {})
-        self._repondre({"ok": True}, entetes={"Set-Cookie": "session=; Max-Age=0; Path=/; HttpOnly; SameSite=Strict"})
+
+    def _deconnexion(self, session):
+        self._fermer(session)
+        self._repondre({"ok": True}, entetes={"Set-Cookie": self._cookie("", 0)})
 
     def _modeles(self, session, action, identifiant):
         try:
@@ -327,7 +382,28 @@ class Gestionnaire(BaseHTTPRequestHandler):
             fin = {"type": "erreur", "texte": str(erreur)}
         self.wfile.write(f"data: {json.dumps(fin, ensure_ascii=False)}\n\n".encode())
 
-    def _question(self, session, question, dossier=""):
+    def _action(self, session, jeton, confirmer):
+        """Exécute (ou annule) une action proposée par l'assistant, avec les droits Nextcloud de la personne."""
+        proposition = actions.reprendre(jeton, session.login)
+        if proposition is None:
+            return self._repondre({"erreur": "Cette proposition a expiré : reformulez la demande."}, 410)
+        type_journal = f"action_{proposition.type}"
+        if not confirmer:
+            journal.ecrire(type_journal, session.login, {**actions._public(proposition.details)}, "annulee")
+            return self._repondre({"texte": "Action annulée : rien n'a été modifié."})
+        try:
+            texte = actions.executer(session, proposition)
+        except AccesRefuse:
+            journal.ecrire(type_journal, session.login, actions._public(proposition.details), "refus")
+            return self._repondre({"erreur": "Nextcloud refuse : vous n'avez pas le droit de modifier cet emplacement."}, 403)
+        except Indisponible as erreur:
+            journal.ecrire(type_journal, session.login, {**actions._public(proposition.details), "erreur": str(erreur)[:120]}, "echec")
+            existe = "405" in str(erreur) or "412" in str(erreur)
+            return self._repondre({"erreur": "Ce dossier existe déjà." if existe else "Nextcloud n'a pas pu enregistrer l'action."}, 409 if existe else 502)
+        journal.ecrire(type_journal, session.login, actions._public(proposition.details))
+        self._repondre({"texte": texte, "lien": actions.lien(proposition, config.BOX_DOMAIN)})
+
+    def _question(self, session, question, dossier="", historique=()):
         self.send_response(200)
         self.send_header("Content-Type", "text/event-stream; charset=utf-8")
         self.send_header("Cache-Control", "no-store")
@@ -344,8 +420,11 @@ class Gestionnaire(BaseHTTPRequestHandler):
             return envoyer({"type": "erreur", "texte": "Question vide."})
         if not etat["pret"]:
             return envoyer({"type": "erreur", "texte": f"L'assistant n'est pas prêt : {etat['message']}."})
+        # Mode secours de la démo : réponse réelle enregistrée plus tôt, annoncée comme telle (voir rejeu.py).
+        enregistree = rejeu.trouver(session.login, question, dossier)
         try:
-            for evenement in repondre(session, question, index, moteur, fiches, dossier):
+            for evenement in (rejeu.rejouer(enregistree, session.login) if enregistree else
+                              repondre(session, question, index, moteur, fiches, dossier, historique)):
                 envoyer(evenement)
         except (BrokenPipeError, ConnectionResetError):
             pass  # page fermée : la génération s'arrête avec la connexion au moteur

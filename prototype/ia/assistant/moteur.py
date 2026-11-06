@@ -146,6 +146,60 @@ class Moteur:
                "generation_tokens_s": round(usage.get("generes", 0) / generation, 1),
                "coupee": usage.get("raison") == "length", "longueur_max": longueur_max}
 
+    @property
+    def contexte(self):
+        """Taille du contexte du moteur actif, en tokens."""
+        return config.CONTEXTE if self.type == "openai" else config.CONTEXTE_OLLAMA
+
+    def discuter(self, messages, outils, temperature=0.2):
+        """Un tour de conversation avec outils, au fil de l'eau. Produit ("texte", morceau), puis éventuellement
+        ("appels", [{"nom", "arguments"}]) si le modèle choisit d'utiliser des outils, puis ("mesures", {...})."""
+        debut, premier, usage, appels = time.monotonic(), None, {}, []
+        if self.type == "openai":
+            corps = {"model": self.modele, "messages": messages, "tools": outils, "stream": False,
+                     "enable_thinking": False, "temperature": temperature}  # pas de limite : seul le contexte borne la réponse
+            with appeler(self.url, "/v1/chat/completions", corps, entetes=self._entetes) as r:
+                donnee = json.load(r)
+            message = donnee["choices"][0]["message"]
+            if message.get("content"):
+                premier = time.monotonic() - debut
+                yield "texte", message["content"]
+            for appel in message.get("tool_calls") or []:
+                try:
+                    arguments = json.loads(appel["function"].get("arguments") or "{}")
+                except ValueError:
+                    arguments = {}
+                appels.append({"nom": appel["function"]["name"], "arguments": arguments, "id": appel.get("id")})
+            usage = {"contexte": donnee.get("usage", {}).get("prompt_tokens", 0),
+                     "generes": donnee.get("usage", {}).get("completion_tokens", 0),
+                     "raison": donnee["choices"][0].get("finish_reason")}
+        else:
+            corps = {"model": self.modele, "messages": messages, "tools": outils, "stream": True, "keep_alive": "24h",
+                     "think": False, "options": {"temperature": temperature, "num_ctx": self.contexte,
+                                                 "repeat_penalty": 1.15, "repeat_last_n": 128,
+                                                 "num_predict": -1}}  # pas de limite : seul le contexte borne la réponse
+            with appeler(config.OLLAMA_URL, "/api/chat", corps) as reponse:
+                for ligne in reponse:
+                    if not ligne.strip():
+                        continue
+                    donnee = json.loads(ligne)
+                    if "error" in donnee:
+                        raise MoteurIndisponible(donnee["error"])
+                    message = donnee.get("message", {})
+                    if message.get("content"):
+                        premier = premier if premier is not None else time.monotonic() - debut
+                        yield "texte", message["content"]
+                    for appel in message.get("tool_calls") or []:
+                        appels.append({"nom": appel["function"]["name"], "arguments": appel["function"].get("arguments") or {}})
+                    if donnee.get("done"):
+                        usage = {"contexte": donnee.get("prompt_eval_count", 0), "generes": donnee.get("eval_count", 0),
+                                 "raison": donnee.get("done_reason")}
+        if appels:
+            yield "appels", appels
+        yield "mesures", {"premier_mot_s": round(premier if premier is not None else time.monotonic() - debut, 1),
+                          "tokens_contexte": usage.get("contexte", 0), "tokens_generes": usage.get("generes", 0),
+                          "coupee": usage.get("raison") == "length"}
+
     def _openai(self, messages, longueur_max):
         corps = {"model": self.modele, "messages": messages, "stream": True, "stream_options": {"include_usage": True},
                  "enable_thinking": False, "temperature": 0.1, "max_tokens": longueur_max}

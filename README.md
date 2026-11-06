@@ -212,6 +212,7 @@ Chaque piège ci-dessous a été identifié pendant l'analyse du projet. **Un ag
 | Numéro d'équipe et salle de coaching | Toute l'équipe | Immédiat | À reporter dans [`docs/attendus-challenge.md`](docs/attendus-challenge.md) |
 | Matériel de la démo | DEV-1 | Mardi 3 nov, 14h00 | Ce qui est disponible tout de suite et fait tourner un modèle local correct. **Proposition du 3 nov** : portable de DEV-1 (16 Go, sans GPU dédié), à remplacer par un mini-PC ou un portable avec GPU s'il y en a un d'ici mercredi midi. Détail dans [`docs/prototype.md`](docs/prototype.md), section 2. À confirmer au point de 17h30 |
 | Prix des offres | BIZ + DEV-4 | Mercredi 4 nov, 17h30 | Coût matériel réel + réponses des entretiens |
+| Assistant généraliste et actions (5 nov) | DEV-1 + DEV-2 | Avant l'oral du 6 nov (**fait après le gel de 16h**) | Le modèle choisit lui-même ses outils (documents, agenda, contacts, propositions de rendez-vous et de dossier), rien n'est codé en dur. Sans document du cabinet, il répond de façon générale, signalée « sans document source » : exception à la règle « cite toujours sa source » (AGENTS.md, règle 3), à valider. Résultats moins sûrs qu'avant sur le résumé Fournil et la charte. Modèle de démo proposé : `qwen3:4b-instruct` (le `qwen3:4b` d'Ollama écrit son raisonnement dans la réponse). Voir [`prototype/ia/README.md`](prototype/ia/README.md) |
 | Publication de la landing page | BIZ + DEV-3 | Mercredi 4 nov, 17h30 | Texte validé par BIZ, nom du projet, adresse de contact, durée de conservation des inscriptions, hébergeur (le serveur doit garder les inscriptions). Page prête en local : [`prototype/interface/README.md`](prototype/interface/README.md) |
 
 | Ajouts à l'assistant après le gel de la démo (jeudi 5 nov, 16h00) : liste des dossiers, fiche de dossier instantanée, résumé à partir de toutes les pièces, couverture « pièces lues / non lues » sous chaque réponse | DEV-2 + DEV-3 | Jeudi 5 nov, soir | Décidé le 5 novembre vers 17h (« on a encore 20 h »). **À valider par l'équipe** : la vidéo de secours de 16h30 ne montre pas ces écrans, et le scénario de démo (`docs/prototype.md`, section 6) est à revoir. Mesures et risques : `prototype/ia/README.md`, section « Fiches préparées à l'avance » |
@@ -248,6 +249,7 @@ livrables/
   generer-pdf.sh             Génère le PDF depuis le HTML
   plan-pitch.md              Déroulé des 15 minutes, qui parle quand
   questions-jury.md          Questions probables et éléments de réponse
+  guide-demo.md              Préparation et déroulé de la démo, mode secours (réponses réelles rejouées)
 prototype/                   Code de la démo (une partie par développeur, voir prototype/README.md)
   DEMARRAGE.md               Guide : lancer toute la box en une commande, choisir le modèle d'IA
   plateforme/                DEV-1 : box.sh, services Docker, installeur, sauvegarde, vérification hors ligne

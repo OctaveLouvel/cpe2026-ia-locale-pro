@@ -64,7 +64,11 @@ def main():
     for q in choisies:
         meilleure = None
         for essai in range(1, arguments.essais + 1):
-            evenements, duree = poser(arguments.url, contexte_ssl, q["compte"], mot_de_passe, q["question"], q.get("dossier", ""))
+            try:
+                evenements, duree = poser(arguments.url, contexte_ssl, q["compte"], mot_de_passe, q["question"], q.get("dossier", ""))
+            except (RuntimeError, OSError) as erreur:  # moteur arrêté, délai dépassé : essai suivant
+                print(f"  {q['id']} essai {essai} : ERREUR {erreur}", file=sys.stderr, flush=True)
+                continue
             texte = "".join(e["texte"] for e in evenements if e["type"] == "texte")
             fin = next((e for e in evenements if e["type"] == "fin"), {})
             verdict = verifier(q, texte, fin)
@@ -75,16 +79,19 @@ def main():
                 meilleure = candidat
             if verdict["ok"]:
                 break
+        if meilleure is None:
+            continue
         _, duree, evenements, verdict = meilleure
         nouvelles.append({"id": q["id"], "login": q["compte"], "question": q["question"], "dossier": q.get("dossier", ""),
                           "date": datetime.now().astimezone().isoformat(timespec="seconds"),
                           "modele": next((e.get("modele") for e in evenements if e["type"] == "fin"), ""),
                           "duree_s": round(duree, 1), "controle_ok": verdict["ok"], "manquants": verdict["manquants"],
                           "evenements": evenements})
-    ids = {n["id"] for n in nouvelles}
-    sortie.parent.mkdir(parents=True, exist_ok=True)
-    sortie.write_text(json.dumps([a for a in anciennes if a.get("id") not in ids] + nouvelles, ensure_ascii=False, indent=1) + "\n",
-                      encoding="utf-8")
+        # Écrit après chaque question : un arrêt du moteur ne fait pas perdre les précédentes.
+        ids = {n["id"] for n in nouvelles}
+        sortie.parent.mkdir(parents=True, exist_ok=True)
+        sortie.write_text(json.dumps([a for a in anciennes if a.get("id") not in ids] + nouvelles, ensure_ascii=False,
+                                     indent=1) + "\n", encoding="utf-8")
     print(f"\n{len(nouvelles)} réponse(s) enregistrée(s) dans {sortie}")
     for n in nouvelles:
         print(f"- {n['id']} ({n['login']}) : {'contrôles réussis' if n['controle_ok'] else 'IMPARFAITE, manque ' + ', '.join(n['manquants'])}, "

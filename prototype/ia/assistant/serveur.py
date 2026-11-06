@@ -16,7 +16,7 @@ from http import cookies
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from . import actions, config, consignes, journal, modeles
+from . import actions, config, consignes, journal, modeles, rejeu
 from .fiches import Fiches
 from .index import Index
 from .moteur import Moteur, MoteurIndisponible
@@ -164,7 +164,7 @@ class Gestionnaire(BaseHTTPRequestHandler):
             return self._repondre({**etat, "modele": moteur.modele, "modele_embeddings": moteur.modele_embeddings,
                                    "documents_indexes": len(index.fichiers), "extraits": len(index.morceaux),
                                    "recherche_semantique": index.vecteurs is not None,
-                                   "fiches": fiches.progression()})
+                                   "fiches": fiches.progression(), "rejeu_actif": rejeu.actif()})
         session = self._session()
         if chemin == "/api/session":
             return self._repondre({"connecte": session is not None,
@@ -420,8 +420,11 @@ class Gestionnaire(BaseHTTPRequestHandler):
             return envoyer({"type": "erreur", "texte": "Question vide."})
         if not etat["pret"]:
             return envoyer({"type": "erreur", "texte": f"L'assistant n'est pas prêt : {etat['message']}."})
+        # Mode secours de la démo : réponse réelle enregistrée plus tôt, annoncée comme telle (voir rejeu.py).
+        enregistree = rejeu.trouver(session.login, question, dossier)
         try:
-            for evenement in repondre(session, question, index, moteur, fiches, dossier, historique):
+            for evenement in (rejeu.rejouer(enregistree, session.login) if enregistree else
+                              repondre(session, question, index, moteur, fiches, dossier, historique)):
                 envoyer(evenement)
         except (BrokenPipeError, ConnectionResetError):
             pass  # page fermée : la génération s'arrête avec la connexion au moteur

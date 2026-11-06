@@ -679,6 +679,40 @@ cmd_reinitialiser() {
     ok "box réinitialisée (le fichier .env est conservé)"
 }
 
+# Mode secours de la démo : réponses RÉELLES du modèle, enregistrées plus tôt sur cette box, rejouées et annoncées
+# comme telles sur la page. Voir prototype/ia/assistant/rejeu.py et livrables/guide-demo.md.
+cmd_demo_secours() {
+    charger_env
+    local drapeau="$SORTIE/ia/rejeu-actif"
+    case ${1:-etat} in
+        enregistrer)
+            rm -f "$drapeau"
+            info "Enregistrement des réponses du modèle aux questions de la démo (plusieurs minutes par question)"
+            BOX_DOMAIN="$BOX_DOMAIN" DEMO_MOT_DE_PASSE="$DEMO_MOT_DE_PASSE" \
+                python3 "$ICI/../ia/evaluation/enregistrer_rejeu.py" --ca "$SORTIE/autorite-locale.crt" "${@:2}"
+            journal demo_secours "réponses de la démo enregistrées pour le mode secours"
+            ;;
+        activer)
+            [ -f "$SORTIE/ia/rejeu.json" ] || echec "aucune réponse enregistrée : lancer d'abord ./box.sh demo-secours enregistrer"
+            touch "$drapeau"
+            journal demo_secours "mode secours activé : les questions enregistrées sont rejouées, et annoncées comme telles"
+            ok "mode secours activé (les autres questions vont au modèle)"
+            ;;
+        desactiver)
+            rm -f "$drapeau"
+            journal demo_secours "mode secours désactivé"
+            ok "mode secours désactivé : toutes les questions vont au modèle"
+            ;;
+        etat)
+            if [ -f "$drapeau" ]; then echo "mode secours ACTIF"; else echo "mode secours inactif"; fi
+            [ -f "$SORTIE/ia/rejeu.json" ] && python3 -c "
+import json,sys
+for e in json.load(open(sys.argv[1])): print(f\"- {e['id']} ({e['login']}), {e['date']}, {e['duree_s']} s, {'contrôles réussis' if e['controle_ok'] else 'imparfaite'} : {e['question']}\")" "$SORTIE/ia/rejeu.json"
+            ;;
+        *) echec "usage : ./box.sh demo-secours enregistrer [--essais N] | activer | desactiver | etat" ;;
+    esac
+}
+
 cmd_aide() {
     cat <<'EOF'
 Usage : ./box.sh <commande>
@@ -697,6 +731,7 @@ Usage : ./box.sh <commande>
   ia [commande]        Modèles d'IA : menu pour choisir, installer et activer (liste, installer, activer, supprimer)
   moteur-ia ACTION     demarrer | arreter | etat : moteur Colibri sur le réseau interne
   indexer-ia           Prépare l'index de recherche de l'assistant pour la démo
+  demo-secours ACTION  Mode secours de la démo : enregistrer | activer | desactiver | etat
   fiches-ia            Attend que les fiches des dossiers ouverts soient prêtes (ouvrir chaque dossier de la démo avant)
   assistant [adresse]  Assistant web de première configuration (défaut 127.0.0.1:8090)
   preparer-hors-ligne  Exporte toutes les images dans sortie/images-box.tar (installation sans internet)
@@ -722,6 +757,7 @@ case $commande in
     moteur-ia)            cmd_moteur_ia "$@" ;;
     ia)                   charger_env; exec python3 "$ICI/../ia/gerer_modeles.py" "$@" ;;
     indexer-ia)           cmd_indexer_ia ;;
+    demo-secours)         cmd_demo_secours "$@" ;;
     fiches-ia)            "${COMPOSE[@]}" exec -T assistant python -m assistant fiches ;;
     assistant)            exec python3 "$ICI/installeur/assistant.py" "$@" ;;
     preparer-hors-ligne)  cmd_preparer_hors_ligne ;;

@@ -67,6 +67,7 @@ table.journal td{border-bottom:1px solid var(--bord);padding:6px 4px;vertical-al
 .action{border:1px solid var(--accent);padding:12px 14px;border-radius:2px}
 .action .boutons{display:flex;gap:10px;margin-top:10px}
 .action .resultat{margin-top:8px}
+.rejeu{font-size:.85rem;color:var(--attente);border-left:3px solid var(--attente);padding-left:10px;margin:0 0 10px}
 .generale{color:var(--doux);font-size:.85rem;border-left:3px solid var(--bord);padding-left:10px}
 [hidden]{display:none!important}
 </style>
@@ -318,6 +319,13 @@ async function poser(question) {
         if (ev.type === "etape") etape.textContent = ev.texte + "…";
         else if (ev.type === "texte") { etape.hidden = true; texte += ev.texte; reponse.innerHTML = rendre(texte, q); }
         else if (ev.type === "erreur") { etape.hidden = true; reponse.innerHTML = `<p class="erreur">${echapper(ev.texte)}</p>`; }
+        else if (ev.type === "rejeu") {
+          const quand = new Date(ev.date).toLocaleString("fr-FR", {day: "numeric", month: "long", hour: "2-digit", minute: "2-digit"});
+          const annonce = document.createElement("p");
+          annonce.className = "rejeu";
+          annonce.textContent = `Réponse enregistrée le ${quand} sur cette box par le modèle ${ev.modele} (en ${String(ev.duree_s).replace(".", ",")} s), rejouée.`;
+          bloc.querySelector(".carte").prepend(annonce);
+        }
         else if (ev.type === "action") { etape.hidden = true; reponse.append(carteAction(ev)); }
         else if (ev.type === "fin") {
           const citees = ev.sources.filter((s) => s.citee), autres = ev.sources.filter((s) => !s.citee);
@@ -335,7 +343,7 @@ async function poser(question) {
           if (avert.length) { const a = bloc.querySelector(".avertissement"); a.textContent = avert.join(" "); a.hidden = false; }
           bloc.querySelector(".pied").textContent = `Réponse en ${String(ev.duree_s).replace(".", ",")} s`
             + (m.premier_mot_s ? ` (premier mot à ${String(m.premier_mot_s).replace(".", ",")} s)` : "")
-            + ` · modèle local ${ev.modele} · rien n'est sorti de la box`;
+            + ` · modèle local ${ev.modele} · rien n'est sorti de la box` + (ev.rejeu ? " · réponse enregistrée, rejouée" : "");
         }
       }
     }

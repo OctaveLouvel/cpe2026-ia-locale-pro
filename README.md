@@ -249,6 +249,7 @@ livrables/
   generer-pdf.sh             Génère le PDF depuis le HTML
   plan-pitch.md              Déroulé des 15 minutes, qui parle quand
   questions-jury.md          Questions probables et éléments de réponse
+  guide-demo.md              Préparation et déroulé de la démo, mode secours (réponses réelles rejouées)
 prototype/                   Code de la démo (une partie par développeur, voir prototype/README.md)
   DEMARRAGE.md               Guide : lancer toute la box en une commande, choisir le modèle d'IA
   plateforme/                DEV-1 : box.sh, services Docker, installeur, sauvegarde, vérification hors ligne
